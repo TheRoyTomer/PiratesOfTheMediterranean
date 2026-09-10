@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e2fe0025b044b1a4fa7ff85ef76e8387
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Examples/Shared/Materials/Brown MAT.mat
+  uploadId: 917504

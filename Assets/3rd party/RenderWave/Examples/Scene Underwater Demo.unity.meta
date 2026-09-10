@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: fad83636c281c0c4f96c4ba8a8d3bcc8
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Examples/Scene Underwater Demo.unity
+  uploadId: 917504

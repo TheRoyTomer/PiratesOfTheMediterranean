@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 54b66bd2f404bd64bbe744312a9efd14
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Documentation/QUICKSTART.md
+  uploadId: 917504

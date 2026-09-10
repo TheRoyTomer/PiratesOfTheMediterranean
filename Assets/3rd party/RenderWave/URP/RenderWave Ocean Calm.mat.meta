@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a7f3a6cb1c8748c4b265e34f0d51aa11
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/URP/RenderWave Ocean Calm.mat
+  uploadId: 917504

@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 96712ca0c7058c54bb6b5de1119de555
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Runtime/Data/WaterQueryResult.cs
+  uploadId: 917504

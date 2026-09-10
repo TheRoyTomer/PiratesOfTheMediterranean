@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: bdbbfa8073fda6945b382155b9c961fe
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Examples/Shared/Scripts/DemoBoatAutopilot.cs
+  uploadId: 917504

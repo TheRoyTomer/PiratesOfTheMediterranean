@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 074e3b02c0167ba44ac4e372cf33140c
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Runtime/Core/OceanManager.cs
+  uploadId: 917504

@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 7371eb03f2016d54487be3028fea5a01
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Runtime/Wakes/WakeEmitter.cs
+  uploadId: 917504

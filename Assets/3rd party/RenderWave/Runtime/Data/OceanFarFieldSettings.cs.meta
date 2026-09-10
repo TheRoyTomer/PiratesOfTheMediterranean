@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: cce1acb9dff3e7147b6f65b9db11c433
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Runtime/Data/OceanFarFieldSettings.cs
+  uploadId: 917504

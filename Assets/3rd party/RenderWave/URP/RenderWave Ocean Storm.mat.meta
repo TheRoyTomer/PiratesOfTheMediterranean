@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b2c8e1f39fb54fb3a60ad3e8c6a14b72
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/URP/RenderWave Ocean Storm.mat
+  uploadId: 917504

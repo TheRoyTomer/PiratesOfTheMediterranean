@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 09d12af1501de6b46b0deef861a017c9
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 370516
+  packageName: "RenderWave \u2013 Scalable Ocean System"
+  packageVersion: 1.1.0
+  assetPath: Assets/RenderWave/Shaders/RenderWaveFarField.shader
+  uploadId: 917504
