@@ -84,27 +84,39 @@ flowchart LR
 
 The player controls the ship from a third-person perspective.
 
-| Action | Keyboard / Mouse |
-|---|---|
-| Move forward | `W` |
-| Move backward / reverse | `S` |
-| Turn left | `A` |
-| Turn right | `D` |
-| Select left firing direction | `Left Arrow` |
-| Select right firing direction | `Right Arrow` |
-| Select front firing direction | `Up Arrow` |
-| Select rear firing direction | `Down Arrow` |
-| Fire selected cannons | `Space` |
-| Repair using Ship Parts | `R` |
-| Short boost | `Left Shift` |
-| Rotate camera | Mouse |
+| Action                             | Keyboard / Mouse              |
+| ---------------------------------- | ----------------------------- |
+| Move forward                       | `W`                           |
+| Move backward / reverse            | `S`                           |
+| Turn left                          | `A`                           |
+| Turn right                         | `D`                           |
+| Cycle firing direction clockwise   | `Q`                           |
+| Toggle Main Camera / Firing Camera | `E`                           |
+| Fire selected cannons              | `Left Mouse Button` / `Space` |
+| Repair using Ship Parts            | `R`                           |
+| Short boost                        | `Left Shift`                  |
+| Rotate Main Camera                 | Mouse                         |
 
-The selected firing direction is shown on the HUD before the player fires.
+The selected firing direction cycles clockwise through:
+
+`Front → Right → Rear → Left → Front`
+
+The currently selected firing direction is clearly shown on the HUD.
+
+If the player changes the firing direction while using the Firing Camera, the camera automatically switches to the corresponding firing-side view.
 
 ### Camera
 
-- Third-person camera positioned behind and above the ship.
-- The camera can rotate around the ship independently from the ship's movement.
+The game uses two camera modes:
+
+* **Main Camera** - a third-person camera positioned behind and above the ship. The player can rotate it freely around the ship using the mouse.
+* **Firing Camera** - a fixed combat camera aligned with the currently selected firing direction.
+
+There are four firing camera views: Front, Right, Rear, and Left.
+
+Pressing `E` toggles between the Main Camera and the Firing Camera.
+
+While using the Firing Camera, pressing `Q` changes both the selected firing direction and the active firing camera to the next direction.
 
 ## 4. Ships
 
@@ -229,18 +241,18 @@ The game is divided into several main systems, each responsible for a specific p
 
 ### Scenes
 
-- `MainMenu` - contains the main menu and allows the player to start a new match.
-- `Loadout` - allows the player to choose the ship type before entering the match.
-- `Game` - contains the naval arena, player ship, AI ships, combat systems, HUD, and match logic.
+* `MainMenu` - contains the main menu and allows the player to start a new match.
+* `Loadout` - allows the player to choose the ship type before entering the match.
+* `Game` - contains the naval arena, player ship, AI ships, combat systems, HUD, and match logic.
 
 Victory and Game Over are handled as UI states inside the `Game` scene rather than separate scenes.
 
 ### Packages / Systems Used
 
-- **URP**
-- **Unity Input System**
-- **Unity Physics**
-- **Cinemachine**
+* **URP**
+* **Unity Input System**
+* **Unity Physics**
+* **Cinemachine**
 
 ### Target Device
 
@@ -256,6 +268,12 @@ graph TD
     PS[Player Ship]
     AIS[AI Ship]
 
+    PI[PlayerInput<br/>Reads Player Controls]
+    AIC[AIController<br/>Target Selection, Positioning, Decision Making]
+
+    CMD[Ship Commands<br/>Move, Turn, Fire, Repair, Boost]
+    CAM[CameraController<br/>Main Camera, Firing Cameras, Camera Switching]
+
     SC[ShipController<br/>Movement, Turning, Reverse, Boost]
     SS[ShipStats<br/>Max HP, Speed, Turning Rate, Size, Firepower]
     WS[WeaponSystem<br/>4 Firing Directions, Broadside, Cooldowns]
@@ -266,8 +284,6 @@ graph TD
     LS[LootSystem<br/>Drop / Collect Ship Parts]
     REP[RepairSystem<br/>Restore HP]
 
-    AIC[AIController<br/>Target Selection, Movement, Positioning, Attack, Reposition]
-
     RAD[RadarSystem<br/>Detect Nearby Ships]
     UI[UIManager<br/>HP, Ship Parts, Firing Direction, Cooldowns, Ships Remaining]
 
@@ -277,21 +293,23 @@ graph TD
     GM --> AIS
     GM --> UI
 
-    PS --> SC
+    PS --> PI
     PS --> SS
-    PS --> WS
     PS --> HS
     PS --> RS
 
-    AIS --> SC
+    AIS --> AIC
     AIS --> SS
-    AIS --> WS
     AIS --> HS
     AIS --> RS
-    AIS --> AIC
 
-    AIC --> SC
-    AIC --> WS
+    PI --> CMD
+    PI --> CAM
+    AIC --> CMD
+
+    CMD --> SC
+    CMD --> WS
+    CMD --> REP
 
     WS --> PM
     PM --> OP
@@ -307,24 +325,33 @@ graph TD
     RAD --> UI
 ```
 
+The player and AI use the same underlying ship actions.
+
+`PlayerInput` translates keyboard and mouse input into ship commands, while `AIController` decides which commands should be executed according to the AI's current target and situation.
+
+Both then execute the same shared ship commands, ensuring that player-controlled and AI-controlled ships follow the same movement and combat rules.
+
 ### Main Systems
 
-| System | Responsibility |
-|---|---|
-| `GameManager` | Manages the overall match state, including start, victory, defeat, and the number of ships remaining. |
-| `ShipController` | Handles ship movement, turning, reverse movement, and boost. |
-| `ShipStats` | Stores ship-specific base values such as maximum HP, speed, turn rate, size, and firepower. |
-| `WeaponSystem` | Handles firing from the four directions, broadside attacks, and weapon cooldowns. |
-| `ProjectileManager` | Spawns and reuses projectiles through the Object Pool. |
-| `Projectile` | Handles projectile movement, collision detection, and applying damage on impact. |
-| `HealthSystem` | Tracks current HP and handles damage and ship destruction. |
-| `RammingSystem` | Calculates collision damage based on impact speed and ship size. |
-| `LootSystem` | Handles Ship Parts drops and collection. |
-| `RepairSystem` | Uses collected Ship Parts to restore HP. |
-| `AIController` | Controls target selection, movement, positioning, attacking, and repositioning for AI ships. |
-| `RadarSystem` | Detects nearby ships and provides information for the minimap. |
-| `UIManager` | Updates the HUD with HP, Ship Parts, selected firing direction, cooldowns, and remaining ships. |
-| `ObjectPool` | Reuses cannonballs and possibly VFX instead of repeatedly creating and destroying them. |
+| System              | Responsibility                                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GameManager`       | Manages the overall match state, including start, victory, defeat, and the number of ships remaining.                                            |
+| `PlayerInput`       | Reads keyboard and mouse input and determines which shared ship commands the player wants to execute.                                            |
+| `Ship Commands` | Encapsulate shared gameplay actions such as movement, turning, firing direction selection, firing, repair, and boost. Both player input and AI decision-making execute these same commands. |
+| `CameraController` | Handles the Main Camera, the four firing camera views, and switching between them according to player input and the selected firing direction. |
+| `ShipController`    | Handles ship movement, turning, reverse movement, and boost.                                                                                     |
+| `ShipStats`         | Stores ship-specific base values such as maximum HP, speed, turn rate, size, and firepower.                                                      |
+| `WeaponSystem`      | Handles firing from the four directions, broadside attacks, and weapon cooldowns.                                                                |
+| `ProjectileManager` | Spawns and reuses projectiles through the Object Pool.                                                                                           |
+| `Projectile`        | Handles projectile movement, collision detection, and applying damage on impact.                                                                 |
+| `HealthSystem`      | Tracks current HP and handles damage and ship destruction.                                                                                       |
+| `RammingSystem`     | Calculates collision damage based on impact speed and ship size.                                                                                 |
+| `LootSystem`        | Handles Ship Parts drops and collection.                                                                                                         |
+| `RepairSystem`      | Uses collected Ship Parts to restore HP.                                                                                                         |
+| `AIController`      | Handles AI decision-making such as target selection, positioning, and deciding which shared ship commands to execute.                            |
+| `RadarSystem`       | Detects nearby ships and provides information for the minimap.                                                                                   |
+| `UIManager`         | Updates the HUD with HP, Ship Parts, selected firing direction, cooldowns, and remaining ships.                                                  |
+| `ObjectPool`        | Reuses cannonballs and possibly VFX instead of repeatedly creating and destroying them.                                                          |
 
 ### Course Features / Design Patterns
 
@@ -333,6 +360,14 @@ graph TD
 2. **Object Pool** - used for cannonballs and possibly combat VFX to avoid repeated `Instantiate` / `Destroy` operations during gameplay.
 
 3. **Coroutines** - used for timed gameplay actions such as reloads, cooldowns, and temporary effects.
+
+4. **Command Pattern** - gameplay actions are encapsulated as commands that can be executed by both the player and AI.
+
+Player input and AI decision-making determine which command should be executed, while the command itself performs the shared ship action.
+
+Examples include movement, turning, firing direction selection, firing, repairing, and boosting.
+
+This ensures that player-controlled and AI-controlled ships use the same gameplay logic instead of maintaining separate implementations.
 
 ---
 
@@ -343,7 +378,7 @@ graph TD
 - [ ] Sloop
 - [ ] Galleon
 - [ ] Ship movement
-- [ ] Third-person camera
+- [ ] Main third-person camera and four firing camera views
 - [ ] Cannons in four directions
 - [ ] Broadside attacks
 - [ ] Ramming
