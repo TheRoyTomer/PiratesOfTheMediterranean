@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 public class PlayerInputController : MonoBehaviour
 {
     [SerializeField] private ShipController shipController;
+    [SerializeField] private FiringDirectionController firingDirectionController;
+    [SerializeField] private WeaponSystem weaponSystem;
 
     private PiratesInputActions inputActions;
 
@@ -28,5 +30,15 @@ public class PlayerInputController : MonoBehaviour
 
         shipController.SetThrottle(moveInput.y);
         shipController.SetSteering(moveInput.x);
+        
+        if (inputActions.Player.CycleFiringDirection.WasPressedThisFrame())
+        {
+            firingDirectionController.CycleDirection();
+        }
+        
+        if (inputActions.Player.Fire.WasPressedThisFrame())
+        {
+            weaponSystem.Fire(firingDirectionController.SelectedDirection);
+        }
     }
 }
