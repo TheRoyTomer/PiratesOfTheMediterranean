@@ -3,9 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class ShipController : MonoBehaviour
 {
-    [SerializeField] private float acceleration = 5f;
+    [SerializeField] private float acceleration = 15f;
     [SerializeField] private float turnAcceleration = 2f;
     [SerializeField] private float boostMultiplier = 1.5f;
+    
+    [SerializeField] private float maxTurnSpeed = 0.6f;
 
     private Rigidbody rb;
 
@@ -54,11 +56,14 @@ public class ShipController : MonoBehaviour
 
     private void ApplySteering()
     {
-        Vector3 torque =
-            Vector3.up *
-            steeringInput *
-            turnAcceleration;
+        if (Mathf.Abs(rb.angularVelocity.y) < maxTurnSpeed)
+        {
+            Vector3 torque =
+                Vector3.up *
+                steeringInput *
+                turnAcceleration;
 
-        rb.AddTorque(torque, ForceMode.Acceleration);
+            rb.AddTorque(torque, ForceMode.Acceleration);
+        }
     }
 }

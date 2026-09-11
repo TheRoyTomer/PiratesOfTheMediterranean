@@ -351,6 +351,7 @@ GameObject:
   - component: {fileID: 703826542}
   - component: {fileID: 703826541}
   - component: {fileID: 703826544}
+  - component: {fileID: 703826545}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -426,11 +427,11 @@ Transform:
   m_GameObject: {fileID: 703826540}
   serializedVersion: 2
   m_LocalRotation: {x: -0.17183374, y: -0.036344714, z: 0.006342636, w: -0.9844349}
-  m_LocalPosition: {x: -1.9056025, y: 59.5809, z: -89.24064}
+  m_LocalPosition: {x: -1.9056025, y: 58.5809, z: -89.24064}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1542415239}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 30, y: 280, z: 0}
 --- !u!114 &703826544
 MonoBehaviour:
@@ -476,6 +477,22 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &703826545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 703826540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dc888876afdb61478e118c8e87aed67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
+  target: {fileID: 1542415239}
+  distance: 50
+  height: 30
+  mouseSensitivity: 0.15
 --- !u!1001 &1143382772
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -526,14 +543,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       propertyPath: m_Name
-      value: PirateShip
+      value: PlayerShip
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6343cb297d6689b40879a1531acff763, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 703826543}
+    m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
@@ -567,15 +581,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: RenderWave.Runtime::RenderWave.Runtime.Buoyancy.BuoyancyBody
   settings:
     sampleMode: 1
-    buoyancyForce: 15
-    verticalDamping: 3
+    buoyancyForce: 12
+    verticalDamping: 5
     submersionDepthClamp: 3
-    surfaceOffset: 0
+    surfaceOffset: -0.3
     samplePointOffset: {x: 0, y: 0, z: 0}
-    sampleFootprintHalfExtents: {x: 1.5, y: 5}
+    sampleFootprintHalfExtents: {x: 1, y: 3}
     forceRampDuration: 0.25
-    alignmentStrength: 1.5
-    alignmentDamping: 2
+    alignmentStrength: 0.2
+    alignmentDamping: 5
 --- !u!54 &1542415238
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -585,8 +599,8 @@ Rigidbody:
   m_GameObject: {fileID: 1542415236}
   serializedVersion: 5
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_LinearDamping: 1.5
+  m_AngularDamping: 2
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -620,9 +634,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fd017b30066c964e8bbdd8ffb8172c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipController
-  acceleration: 5
+  acceleration: 15
   turnAcceleration: 2
   boostMultiplier: 1.5
+  maxTurnSpeed: 0.6
 --- !u!114 &1542415241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,4 +657,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 188316197}
   - {fileID: 423872185}
+  - {fileID: 703826543}
   - {fileID: 1143382772}
