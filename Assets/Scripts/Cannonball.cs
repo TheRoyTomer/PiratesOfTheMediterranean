@@ -3,9 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Cannonball : MonoBehaviour
 {
+    //private Vector3 launchPosition;
+    //private static float totalDistance;
+    //private static int landedCannonballs;
+    
+    
     [Header("Flight")]
-    [SerializeField] private float upwardSpeed = 2.5f;
-    [SerializeField] private float gravityStrength = 3.5f;
+    [SerializeField] private float upwardSpeed = 1.2f;
+    [SerializeField] private float gravityStrength = 4.7f;
 
     [Header("Pool")]
     [SerializeField] private float waterDeathHeight = -3f;
@@ -31,7 +36,9 @@ public class Cannonball : MonoBehaviour
     {
         pool = cannonballPool;
         lifeTimer = 0f;
-
+        
+        //launchPosition = transform.position;
+        
         rb.linearVelocity =
             direction.normalized * speed +
             Vector3.up * upwardSpeed;
@@ -48,8 +55,12 @@ public class Cannonball : MonoBehaviour
             ForceMode.Acceleration
         );
 
-        if (transform.position.y <= waterDeathHeight ||
-            lifeTimer >= maxLifetime)
+        if (transform.position.y <= waterDeathHeight)
+        {
+            //LogDistance();
+            ReturnToPool();
+        }
+        else if (lifeTimer >= maxLifetime)
         {
             ReturnToPool();
         }
@@ -62,4 +73,24 @@ public class Cannonball : MonoBehaviour
 
         pool.ReturnCannonball(gameObject);
     }
+    
+    
+    // private void LogDistance()
+    // {
+    //     Vector3 start = Vector3.ProjectOnPlane(launchPosition, Vector3.up);
+    //     Vector3 end = Vector3.ProjectOnPlane(transform.position, Vector3.up);
+    //
+    //     float distance = Vector3.Distance(start, end);
+    //
+    //     totalDistance += distance;
+    //     landedCannonballs++;
+    //
+    //     float averageDistance = totalDistance / landedCannonballs;
+    //
+    //     Debug.Log(
+    //         $"Cannonball distance: {distance:F1}m | " +
+    //         $"Average: {averageDistance:F1}m | " +
+    //         $"Samples: {landedCannonballs}"
+    //     );
+    // }
 }
