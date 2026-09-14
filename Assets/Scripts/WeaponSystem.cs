@@ -35,7 +35,7 @@ public class WeaponSystem : MonoBehaviour
     private void FireCannonball(Transform firePoint)
     {
         GameObject cannonballObject = cannonballPool.GetCannonball();
-
+        Debug.Log($"Firing cannonball from {firePoint.name} at {firePoint.position}");
         Cannonball cannonball = cannonballObject.GetComponent<Cannonball>();
 
         cannonballObject.transform.position = firePoint.position;

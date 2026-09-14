@@ -5,17 +5,25 @@ public class Cannonball : MonoBehaviour
 {
     [Header("Cannonball Settings")]
     [SerializeField] private float maxRange = 100f;
+    [SerializeField] private float upwardSpeed = 2f;
+
+    [Header("Trajectory")]
+    [SerializeField] private float gravityStartDistance = 65f;
+    [SerializeField] private float gravityStrength = 8f;
+
+    [Header("Pool")]
     [SerializeField] private float waterDeathHeight = -3f;
 
     private Rigidbody rb;
     private CannonballPool pool;
-
     private Vector3 startPosition;
-    private bool reachedMaxRange;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
+        // אנחנו שולטים בנפילה בעצמנו
+        rb.useGravity = false;
     }
 
     public void Launch(
@@ -24,36 +32,32 @@ public class Cannonball : MonoBehaviour
         float speed)
     {
         pool = cannonballPool;
-
         startPosition = transform.position;
-        reachedMaxRange = false;
 
-        rb.linearVelocity = direction.normalized * speed;
+        rb.linearVelocity =
+            direction.normalized * speed
+            + Vector3.up * upwardSpeed;
+
         rb.angularVelocity = Vector3.zero;
     }
 
     private void FixedUpdate()
     {
-        if (!reachedMaxRange)
+        float distanceTravelled =
+            Vector3.Distance(startPosition, transform.position);
+
+        // רק אחרי שהכדור עבר חלק גדול מהטווח,
+        // מתחילים למשוך אותו משמעותית למטה.
+        if (distanceTravelled >= gravityStartDistance)
         {
-            float distanceTravelled =
-                Vector3.Distance(startPosition, transform.position);
-
-            if (distanceTravelled >= maxRange)
-            {
-                reachedMaxRange = true;
-
-                // מפסיק את התנועה האופקית,
-                // ומכאן הכדור נופל למים בגלל Gravity.
-                rb.linearVelocity = new Vector3(
-                    0f,
-                    rb.linearVelocity.y,
-                    0f
-                );
-            }
+            rb.AddForce(
+                Vector3.down * gravityStrength,
+                ForceMode.Acceleration
+            );
         }
 
-        if (reachedMaxRange && transform.position.y <= waterDeathHeight)
+        if (distanceTravelled >= maxRange &&
+            transform.position.y <= waterDeathHeight)
         {
             ReturnToPool();
         }
