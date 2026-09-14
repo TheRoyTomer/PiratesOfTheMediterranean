@@ -3,26 +3,24 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Cannonball : MonoBehaviour
 {
-    [Header("Cannonball Settings")]
-    [SerializeField] private float maxRange = 100f;
-    [SerializeField] private float upwardSpeed = 2f;
-
-    [Header("Trajectory")]
-    [SerializeField] private float gravityStartDistance = 65f;
-    [SerializeField] private float gravityStrength = 8f;
+    [Header("Flight")]
+    [SerializeField] private float upwardSpeed = 2.5f;
+    [SerializeField] private float gravityStrength = 3.5f;
 
     [Header("Pool")]
     [SerializeField] private float waterDeathHeight = -3f;
+    [SerializeField] private float maxLifetime = 8f;
 
     private Rigidbody rb;
     private CannonballPool pool;
-    private Vector3 startPosition;
+
+    private float lifeTimer;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
 
-        // אנחנו שולטים בנפילה בעצמנו
+        // We control gravity ourselves.
         rb.useGravity = false;
     }
 
@@ -32,32 +30,26 @@ public class Cannonball : MonoBehaviour
         float speed)
     {
         pool = cannonballPool;
-        startPosition = transform.position;
+        lifeTimer = 0f;
 
         rb.linearVelocity =
-            direction.normalized * speed
-            + Vector3.up * upwardSpeed;
+            direction.normalized * speed +
+            Vector3.up * upwardSpeed;
 
         rb.angularVelocity = Vector3.zero;
     }
 
     private void FixedUpdate()
     {
-        float distanceTravelled =
-            Vector3.Distance(startPosition, transform.position);
+        lifeTimer += Time.fixedDeltaTime;
 
-        // רק אחרי שהכדור עבר חלק גדול מהטווח,
-        // מתחילים למשוך אותו משמעותית למטה.
-        if (distanceTravelled >= gravityStartDistance)
-        {
-            rb.AddForce(
-                Vector3.down * gravityStrength,
-                ForceMode.Acceleration
-            );
-        }
+        rb.AddForce(
+            Vector3.down * gravityStrength,
+            ForceMode.Acceleration
+        );
 
-        if (distanceTravelled >= maxRange &&
-            transform.position.y <= waterDeathHeight)
+        if (transform.position.y <= waterDeathHeight ||
+            lifeTimer >= maxLifetime)
         {
             ReturnToPool();
         }
