@@ -10,6 +10,7 @@ public class ShipController : MonoBehaviour
     [SerializeField] private float maxTurnSpeed = 0.6f;
 
     private Rigidbody rb;
+    private ShipHealth shipHealth;
 
     private float throttleInput;
     private float steeringInput;
@@ -18,10 +19,43 @@ public class ShipController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        shipHealth = GetComponent<ShipHealth>();
+    }
+
+    private void OnEnable()
+    {
+        if (shipHealth == null)
+            return;
+
+        shipHealth.OnDeath += StopMovement;
+
+        if (shipHealth.IsDead)
+            StopMovement();
+    }
+
+    private void OnDisable()
+    {
+        if (shipHealth != null)
+            shipHealth.OnDeath -= StopMovement;
+    }
+
+    private void StopMovement()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        throttleInput = 0f;
+        steeringInput = 0f;
+        boostActive = false;
     }
 
     private void FixedUpdate()
     {
+        if (shipHealth != null && shipHealth.IsDead)
+        {
+            StopMovement();
+            return;
+        }
+
         ApplyMovement();
         ApplySteering();
     }

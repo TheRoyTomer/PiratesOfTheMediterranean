@@ -10,6 +10,8 @@ public class WeaponSystem : MonoBehaviour
     [SerializeField] private float cooldownDuration = 2.5f;
     [SerializeField] private float extraCooldownPenalty = 2f;
 
+    private ShipHealth shipHealth;
+
     private float frontCooldown;
     private float leftCooldown;
     private float rightCooldown;
@@ -27,6 +29,11 @@ public class WeaponSystem : MonoBehaviour
     public float LeftCooldown => leftCooldown;
     public float RightCooldown => rightCooldown;
 
+    private void Awake()
+    {
+        shipHealth = GetComponent<ShipHealth>();
+    }
+
     private void Update()
     {
         frontCooldown = UpdateCooldown(frontCooldown);
@@ -37,6 +44,9 @@ public class WeaponSystem : MonoBehaviour
 
     public void Fire(FiringDirection direction)
     {
+        if (shipHealth != null && shipHealth.IsDead)
+            return;
+
         if (IsOnCooldown(direction))
             return;
 

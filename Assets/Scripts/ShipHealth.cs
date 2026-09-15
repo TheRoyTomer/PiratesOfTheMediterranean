@@ -12,6 +12,8 @@ public class ShipHealth : MonoBehaviour
     public float MaxHealth => maxHealth;
     public bool IsDead => isDead;
 
+    public event System.Action OnDeath;
+
     private void Awake()
     {
         currentHealth = maxHealth;
@@ -39,6 +41,7 @@ public class ShipHealth : MonoBehaviour
             return;
 
         isDead = true;
+        OnDeath?.Invoke();
 
         Debug.Log($"{name} destroyed");
     }
