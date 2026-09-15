@@ -147,7 +147,8 @@ public class WeaponSystem : MonoBehaviour
         cannonball.Launch(
             cannonballPool,
             firingDirection,
-            cannonballSpeed
+            cannonballSpeed,
+            GetComponent<ShipHealth>()
         );
     }
 }

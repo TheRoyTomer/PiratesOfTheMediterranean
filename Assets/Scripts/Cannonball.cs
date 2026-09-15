@@ -1,13 +1,26 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Cannonball : MonoBehaviour
 {
-    //private Vector3 launchPosition;
-    //private static float totalDistance;
-    //private static int landedCannonballs;
-    
-    
+    private ShipHealth owner;
+    private bool hasHit;
+
+    [Header("Damage")]
+    [SerializeField] private float damage = 10f;
+
+    [Header("Impact Effects")]
+    [SerializeField] private GameObject impactExplosionEffect;
+    [SerializeField] private GameObject impactAftermathEffect;
+
+    [SerializeField] private float impactSurfaceSearchDistance = 5f;
+    [SerializeField] private float impactSurfaceOffset = 0.2f;
+
+    [SerializeField] private float explosionLifetime = 2f;
+    [SerializeField] private float aftermathEmissionDuration = 10f;
+    [SerializeField] private float aftermathFadeDuration = 5f;
+
     [Header("Flight")]
     [SerializeField] private float upwardSpeed = 1.2f;
     [SerializeField] private float gravityStrength = 4.7f;
@@ -18,7 +31,6 @@ public class Cannonball : MonoBehaviour
 
     private Rigidbody rb;
     private CannonballPool pool;
-
     private float lifeTimer;
 
     private void Awake()
@@ -32,13 +44,15 @@ public class Cannonball : MonoBehaviour
     public void Launch(
         CannonballPool cannonballPool,
         Vector3 direction,
-        float speed)
+        float speed,
+        ShipHealth cannonballOwner)
     {
         pool = cannonballPool;
+        owner = cannonballOwner;
+
         lifeTimer = 0f;
-        
-        //launchPosition = transform.position;
-        
+        hasHit = false;
+
         rb.linearVelocity =
             direction.normalized * speed +
             Vector3.up * upwardSpeed;
@@ -57,13 +71,87 @@ public class Cannonball : MonoBehaviour
 
         if (transform.position.y <= waterDeathHeight)
         {
-            //LogDistance();
             ReturnToPool();
         }
         else if (lifeTimer >= maxLifetime)
         {
             ReturnToPool();
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (hasHit)
+            return;
+
+        ShipHealth shipHealth = other.GetComponentInParent<ShipHealth>();
+
+        if (shipHealth == null || shipHealth == owner)
+            return;
+
+        hasHit = true;
+
+        Vector3 incomingDirection = rb.linearVelocity.normalized;
+
+        Vector3 outsidePoint =
+            transform.position -
+            incomingDirection * impactSurfaceSearchDistance;
+
+        Vector3 hitPoint =
+            other.ClosestPoint(outsidePoint);
+
+        hitPoint -=
+            incomingDirection * impactSurfaceOffset;
+
+        SpawnImpactEffects(hitPoint);
+
+        shipHealth.TakeDamage(damage);
+        ReturnToPool();
+    }
+
+    private void SpawnImpactEffects(Vector3 hitPoint)
+    {
+        if (impactExplosionEffect != null)
+        {
+            GameObject explosion = Instantiate(
+                impactExplosionEffect,
+                hitPoint,
+                Quaternion.identity
+            );
+
+            Destroy(explosion, explosionLifetime);
+        }
+
+        if (impactAftermathEffect != null)
+        {
+            GameObject aftermath = Instantiate(
+                impactAftermathEffect,
+                hitPoint,
+                Quaternion.identity
+            );
+
+            StartCoroutine(FadeOutAftermath(aftermath));
+        }
+    }
+
+    private IEnumerator FadeOutAftermath(GameObject aftermath)
+    {
+        yield return new WaitForSeconds(aftermathEmissionDuration);
+
+        ParticleSystem[] particleSystems =
+            aftermath.GetComponentsInChildren<ParticleSystem>();
+
+        foreach (ParticleSystem particleSystem in particleSystems)
+        {
+            particleSystem.Stop(
+                false,
+                ParticleSystemStopBehavior.StopEmitting
+            );
+        }
+
+        yield return new WaitForSeconds(aftermathFadeDuration);
+
+        Destroy(aftermath);
     }
 
     private void ReturnToPool()
@@ -73,24 +161,4 @@ public class Cannonball : MonoBehaviour
 
         pool.ReturnCannonball(gameObject);
     }
-    
-    
-    // private void LogDistance()
-    // {
-    //     Vector3 start = Vector3.ProjectOnPlane(launchPosition, Vector3.up);
-    //     Vector3 end = Vector3.ProjectOnPlane(transform.position, Vector3.up);
-    //
-    //     float distance = Vector3.Distance(start, end);
-    //
-    //     totalDistance += distance;
-    //     landedCannonballs++;
-    //
-    //     float averageDistance = totalDistance / landedCannonballs;
-    //
-    //     Debug.Log(
-    //         $"Cannonball distance: {distance:F1}m | " +
-    //         $"Average: {averageDistance:F1}m | " +
-    //         $"Samples: {landedCannonballs}"
-    //     );
-    // }
 }
