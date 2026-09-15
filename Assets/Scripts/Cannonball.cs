@@ -105,7 +105,7 @@ public class Cannonball : MonoBehaviour
 
         SpawnImpactEffects(hitPoint);
 
-        shipHealth.TakeDamage(damage);
+        shipHealth.TakeDamage(damage, hitPoint);
         ReturnToPool();
     }
 

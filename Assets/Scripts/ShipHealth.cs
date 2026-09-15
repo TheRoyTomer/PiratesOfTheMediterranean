@@ -11,6 +11,7 @@ public class ShipHealth : MonoBehaviour
     public float CurrentHealth => currentHealth;
     public float MaxHealth => maxHealth;
     public bool IsDead => isDead;
+    public Vector3 FinalHitPosition { get; private set; }
 
     public event System.Action OnDeath;
 
@@ -22,6 +23,12 @@ public class ShipHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        // Damage without a contact point uses the ship's world position.
+        TakeDamage(damage, transform.position);
+    }
+
+    public void TakeDamage(float damage, Vector3 hitPosition)
+    {
         if (isDead)
             return;
 
@@ -31,6 +38,7 @@ public class ShipHealth : MonoBehaviour
 
         if (currentHealth <= 0f)
         {
+            FinalHitPosition = hitPosition;
             Die();
         }
     }
