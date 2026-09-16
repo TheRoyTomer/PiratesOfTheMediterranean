@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0d5a06a1526eb46448c4b3a931a02d99
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Data/Models/Motorboat/textures/CutoutMask_Birp.mat
+  uploadId: 984188

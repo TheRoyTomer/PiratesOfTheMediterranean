@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 26cc1b2e4fe1a324aa615f67b3877f0f
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/WaterResources/Shaders/Resources/Common/StencilMask/WaterMaskIgnore_HDRP.shader
+  uploadId: 984188

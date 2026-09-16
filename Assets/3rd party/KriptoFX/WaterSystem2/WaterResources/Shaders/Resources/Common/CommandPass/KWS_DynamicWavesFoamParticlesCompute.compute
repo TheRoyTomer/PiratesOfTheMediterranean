@@ -1,0 +1,817 @@
+﻿#define KWS_USE_DYNAMIC_WAVES
+#define KWS_LIGHTING_RECEIVE_DIR_SHADOWS
+
+#define WARPS_COUNT 64
+#define FOAM_TIME_SLICING_FRAMES 4
+
+// #define FOAM_MIN_LIFE_TIME 1.5
+// #define FOAM_MAX_LIFE_TIME 3
+#define FOAM_SHORELINE_ADDITIONAL_LIFE_TIME 4
+
+#define FOAM_MIN_LOD_COUNT 0.02
+#define SPLASH_MIN_LOD_COUNT 0.2
+
+#define FOAM_MIN_DIVERGENCE_CHANCE 0.3
+#define SPLASH_MIN_DIVERGENCE_CHANCE 0.94
+#define SPLASH_DIVERGENCE_SHORELINE_MUL 0.5
+
+#define SPLASH_MIN_PARTICLES_PER_TILE 15
+#define SPLASH_MAX_PARTICLES_PER_TILE 50
+
+#define SPLASH_SPEED_MULTIPLIER 1.0
+
+
+#define FOAM_HEIGHT_OFFSET 0.05
+
+#define TILE_SIZE 64
+#define TILE_SIZE_FOAM 8
+
+#pragma kernel ClearCounters
+#pragma kernel SpawnParticles
+#pragma kernel UpdateParticlesDispatchArgs
+#pragma kernel UpdateParticles
+
+#pragma kernel ParticlesToScreenDispatchArgs
+
+#pragma kernel ClearScreenSpaceParticlesBuffer
+#pragma kernel RenderParticlesToScreenSpaceBuffer
+
+#pragma kernel ShiftParticles
+
+#pragma enable_d3d11_debug_symbols
+
+#pragma multi_compile KWS_FOAM_MODE KWS_SPLASH_MODE
+#pragma multi_compile _ KWS_LOCAL_DYNAMIC_WAVES_USE_COLOR
+//#pragma shader_feature _ KWS_BAKED_ZONE
+
+#include_with_pragmas "../../Common/KWS_WaterHelpers.cginc"
+
+
+RWStructuredBuffer<uint> KWS_CounterBufferSpawn;
+RWStructuredBuffer<uint> KWS_CounterBufferUpdate;
+RWStructuredBuffer<uint> KWS_CounterBufferRender;
+RWStructuredBuffer<uint> KWS_UpdateIndirectArgs;
+
+#ifdef KWS_FOAM_MODE
+RWStructuredBuffer<FoamParticle> KWS_FoamParticlesBuffer1;
+RWStructuredBuffer<FoamParticle> KWS_FoamParticlesBuffer2;
+
+RWStructuredBuffer<uint> KWS_ScreenSpaceFoamDispatchIndirectArgs;
+RWStructuredBuffer<uint> ScreenSpaceFoamBufferRW0;
+RWStructuredBuffer<uint> ScreenSpaceFoamBufferRW1;
+RWStructuredBuffer<uint> ScreenSpaceFoamBufferRW2;
+
+
+#endif
+
+#ifdef KWS_SPLASH_MODE
+RWStructuredBuffer<uint> KWS_ParticlesIndirectArgs;
+
+RWStructuredBuffer<SplashParticle> KWS_SplashParticlesBuffer1;
+RWStructuredBuffer<SplashParticle> KWS_SplashParticlesBuffer2;
+
+RWStructuredBuffer<uint> KWS_TileParticleCount;
+
+#endif
+
+
+float KWS_deltaTime;
+float KWS_UnscaledDeltaTime;
+float KWS_ParticlesFoamInterpolationTime;
+
+uint maxParticles;
+uint KWS_CurrentFrame;
+uint KWS_TilesCount;
+
+uint KWS_UsePhytoplanktonEmission;
+uint KWS_ReceiveWaterFlowFromOtherZones;
+uint KWS_CurrentScreenSpaceBufferLodIndex;
+
+float2 KWS_DistancePerPixel;
+
+float KWS_DynamicWavesFlowSpeedMultiplier;
+float KWS_FoamStrength;
+
+float KWS_FoamEmissionRate;
+float KWS_SplashEmissionRate;
+float KWS_WaterfallEmissionRateSplash;
+
+float KWS_MaxFoamRenderingDistance;
+float KWS_MaxSplashRenderingDistance;
+float KWS_FoamParticlesScale;
+float KWS_FoamParticleLifetime;
+float KWS_FoamClumping;
+
+float KWS_SplashParticlesBudgetNormalized;
+float2 KWS_CurrentScreenSize;
+float2 KWS_TilesSize;
+
+
+float3 KWS_OriginShift;
+RWStructuredBuffer<SplashParticle> KWS_SplashParticlesBufferRW;
+RWStructuredBuffer<FoamParticle> KWS_FoamParticlesBufferRW;
+
+uint GenerateSeed(uint2 id, float offset)
+{
+    return (uint)(dot(asuint(float4(id, offset, KWS_Time)), uint4(19349669, 83492837, 73856131, 4785773)));
+}
+
+
+inline uint NextRandom(uint state)
+{
+	state = state * 747796405u + 2891336453u;
+
+	uint shift = (state >> 28u) + 4u;
+	uint result = ((state >> shift) ^ state) * 277803737u;
+
+	return (result >> 22u) ^ result;
+}
+
+inline float GenerateRandom02(uint seed)
+{
+	seed ^= seed << 13u;
+	seed ^= seed >> 17u;
+	seed ^= seed << 5u;
+
+	return (float)seed * 2.3283064365386963e-10f;
+}
+
+inline float GenerateRandom01(uint state)
+{
+	uint randomValue = NextRandom(state);
+	return (float)randomValue * 2.3283064365386963e-10f;
+}
+
+float3 GetDynamicWavesWorldPosFromUV(float2 uv, float height)
+{
+    float2 local = (uv - 0.5) * KWS_DynamicWavesZoneSize.xz;
+
+    float2 rotated = float2(
+        dot(local, KWS_DynamicWavesZoneRotationMatrix.xy),
+        dot(local, KWS_DynamicWavesZoneRotationMatrix.zw)
+    );
+
+    float2 worldXZ = KWS_DynamicWavesZonePosition.xz + rotated;
+    return float3(worldXZ.x, height, worldXZ.y);
+}
+
+static const uint2 offsets[4] =
+{
+    uint2(0, 0),
+    uint2(1, 0),
+    uint2(0, 1),
+    uint2(1, 1)
+};
+
+#ifdef KWS_SPLASH_MODE
+
+bool TryReserveSplashTileSlots(float3 worldPos, uint count, uint maxParticlesPerTile)
+{
+	float2 uv = WorldPosToScreenPos(worldPos);
+
+	if (IsOutsideUV(uv)) return false;
+
+	uint2 screenSize = (uint2)KWS_CurrentScreenSize.xy;
+
+	uint tilesX = (uint)KWS_TilesSize.x;
+	uint tilesY = (uint)KWS_TilesSize.y;
+
+	uint2 pixel = min((uint2)(uv * screenSize), screenSize - 1u);
+	uint2 tile = min(pixel / (uint)TILE_SIZE, uint2(tilesX - 1u, tilesY - 1u));
+
+	uint tileIndex = tile.y * tilesX + tile.x;
+	if (tileIndex >= KWS_TilesCount) return false;
+
+	uint oldCount = 0;
+	InterlockedAdd(KWS_TileParticleCount[tileIndex], count, oldCount);
+
+	return oldCount < maxParticlesPerTile;
+}
+
+#endif
+
+
+
+
+
+
+
+
+
+[numthreads(1,1,1)]
+void ClearCounters(uint3 id : SV_DispatchThreadID)
+{
+    KWS_CounterBufferSpawn[0] = 0;
+    KWS_CounterBufferUpdate[0] = 0;
+    KWS_CounterBufferRender[0] = 0;
+
+    KWS_UpdateIndirectArgs[0] = 1;
+    KWS_UpdateIndirectArgs[1] = 1;
+    KWS_UpdateIndirectArgs[2] = 1;
+
+    #ifdef KWS_FOAM_MODE
+    KWS_ScreenSpaceFoamDispatchIndirectArgs[0] = 1;
+    KWS_ScreenSpaceFoamDispatchIndirectArgs[1] = 1;
+    KWS_ScreenSpaceFoamDispatchIndirectArgs[2] = 1;
+    #endif
+}
+
+
+
+
+[numthreads(8, 8, 1)]
+void SpawnParticles(uint2 id : SV_DispatchThreadID)
+{
+    uint2 pixel = id.xy;
+    //uint slice = (pixel.x + pixel.y) % FOAM_TIME_SLICING_FRAMES;
+    //
+    //if (slice != KWS_ParticlesTimeSlicingFrame)
+    //	return;
+
+    float2 uv = (pixel + 0.5) * KWS_DynamicWaves_TexelSize.xy;
+
+    float bounds = 0.04;
+    if (uv.x < bounds || uv.x > (1.0 - bounds) || uv.y < bounds || uv.y > (1.0 - bounds)) return;
+
+    float4 dynamicWaves = GetDynamicWavesZone(uv);
+    float dynamicWaveMask = GetDynamicWavesMask(uv).x;
+    if (dynamicWaveMask > 0.0) return;
+
+    uint currentCount = KWS_CounterBufferSpawn[0];
+
+    #ifdef KWS_FOAM_MODE
+    uint maxNewFoamParticles = 10;
+    maxNewFoamParticles *= 1 + 10 * (maxParticles / 3000000.0);
+    uint foamParticlesPerFrame = KWS_deltaTime * maxNewFoamParticles * 60;
+	if (currentCount + foamParticlesPerFrame + (uint)(maxParticles * 0.05) >= maxParticles)  return;
+    #else
+    uint maxNewSplashParticles = 5;
+	if (currentCount + maxNewSplashParticles + 1u >= maxParticles) return;
+    #endif
+
+
+    float4 dynamicWavesRight = GetDynamicWavesZone(uv + float2(KWS_DynamicWaves_TexelSize.x, 0));
+    float4 dynamicWavesTop = GetDynamicWavesZone(uv + float2(0, KWS_DynamicWaves_TexelSize.y));
+    float3 zoneNormal = GetDynamicWavesZoneNormals(uv).xyz;
+    float waterfallThreshold = GetDynamicWavesWaterfallTreshold(zoneNormal);
+
+    float borderFade = GetDynamicWavesBorderFading(uv);
+    float borderFadeParticles = 1 - KWS_Pow3(1 - borderFade);
+    dynamicWaves.z *= borderFade;
+
+    float4 dynamicWavesAdditionalData = KWS_DynamicWavesAdditionalDataRT.SampleLevel(sampler_linear_clamp, uv, 0);
+
+    float shorelineMask = dynamicWavesAdditionalData.y;
+    float foamMask = dynamicWavesAdditionalData.z;
+    float shorelineMaskBorder = saturate(shorelineMask * 1000);
+
+    float divergence = length(dynamicWavesRight.xy - dynamicWaves.xy) + length(dynamicWavesTop.xy - dynamicWaves.xy);
+    float waveSpeed = length(dynamicWaves.xy);
+
+    if (dynamicWaves.z < 0.05 || waveSpeed < 0.05 || divergence < 0.1) return;
+
+    float clampedDivergence = saturate(divergence * 0.35);
+    uint seed = GenerateSeed(uint2(id.xy * 2.5), 355.23324 + KWS_Time * 123.654);
+    float randomValue = GenerateRandom01(seed);
+
+    float waterLevel = KWS_WaterLevel;
+    float currentHeight = dynamicWaves.z + dynamicWaves.w + waterLevel;
+    float3 currentPos = GetDynamicWavesWorldPosFromUV(uv, currentHeight);
+
+    float3 cameraToParticle = normalize(currentPos - KWS_WorldSpaceCameraPos);
+    float cameraDistance = length(KWS_WorldSpaceCameraPos - currentPos);
+
+
+    #ifdef KWS_SPLASH_MODE
+    float maxEmissionRate = lerp(1.0, 0.998, KWS_SplashParticlesBudgetNormalized);
+    float minEmissionRate = lerp(0.998, 0.99, KWS_SplashParticlesBudgetNormalized);
+    bool isVisible = dot(cameraToParticle, KWS_CameraForward) > 0.45 || (waveSpeed > 3 && randomValue > lerp(minEmissionRate, maxEmissionRate, saturate(cameraDistance * 0.01)));
+    if (!isVisible || cameraDistance > lerp(100.0, KWS_MaxSplashRenderingDistance, KWS_SplashParticlesBudgetNormalized)) return;
+    #endif
+
+
+    #ifdef KWS_FOAM_MODE
+    float normalizedDistance = saturate(cameraDistance / KWS_MaxFoamRenderingDistance); //500 meters
+    float farDistance = 1 - normalizedDistance;
+    float lodDistance = 1 - KWS_Pow5(saturate(farDistance + 0.15));
+    bool isVisible = dot(cameraToParticle, KWS_CameraForward) > 0.45;
+    if (!isVisible || lodDistance > randomValue * randomValue + FOAM_MIN_LOD_COUNT)
+    {
+        return;
+    }
+    #endif
+
+
+    #ifdef KWS_FOAM_MODE
+    
+    
+	    float3 pixelSize = float3(KWS_DistancePerPixel.x, 0, KWS_DistancePerPixel.y);
+		
+		float divergenceStrength = 1.0 - KWS_FoamEmissionRate;
+		divergenceStrength = lerp(divergenceStrength, 1.0, normalizedDistance);
+		float foamMaskByDivergence = lerp(0.5, 0.1, KWS_FoamEmissionRate);
+		float speedMaskByDivergence = lerp(1.5, 0.2, KWS_FoamEmissionRate);
+
+		if ((foamMask > foamMaskByDivergence || divergence > speedMaskByDivergence) && randomValue * borderFadeParticles > (FOAM_MIN_DIVERGENCE_CHANCE + divergenceStrength * (1 - FOAM_MIN_DIVERGENCE_CHANCE))) // && waterfallThreshold < 0.1
+		{
+			uint iterations = (uint)lerp(1.01 + shorelineMask, foamParticlesPerFrame, saturate(clampedDivergence * dynamicWaves.z));
+
+			float2 flowDir = normalize(dynamicWaves.xy + float2(0, 0.001));
+			float2 perpDir = float2(-flowDir.y, flowDir.x);
+			
+			uint startIndex = 0;
+			InterlockedAdd(KWS_CounterBufferSpawn[0], iterations, startIndex);
+			if (startIndex + iterations >= maxParticles) return;
+			
+			float minLifetime = KWS_FoamParticleLifetime - KWS_FoamParticleLifetime * 0.4;
+			float maxLifeTime = KWS_FoamParticleLifetime + KWS_FoamParticleLifetime * 0.4;
+			
+			for (uint i = 0; i < iterations; i++)
+			{
+				FoamParticle particle = (FoamParticle)0;
+
+				float randOffsetX = GenerateRandom01(GenerateSeed(id.xy * 353.897 + KWS_Time * i, (float)i + 1.234));
+				float randOffsetY = GenerateRandom01(GenerateSeed(id.xy * 13.123 + KWS_Time * i * 234.123, (float)i + 32.12423));
+
+				particle.initialRandom01 = randOffsetX;
+
+				particle.shorelineMask = shorelineMask;
+				particle.velocity.xz = dynamicWaves.xy * KWS_DynamicWavesFlowSpeedMultiplier;
+
+				float randSide = (randOffsetX * 2 - 1);
+				float randBack = randOffsetY;
+
+				float2 offset = perpDir * randSide + (-flowDir) * randBack;
+				particle.position = currentPos + pixelSize * float3(offset.x, 0, offset.y) * KWS_Pow2(KWS_deltaTime * 15.0) * lerp(0.75, 5.0, normalizedDistance); //60 fps 4 slices = 15
+				
+				particle.prevPosition = particle.position;
+
+				particle.currentLifetime = lerp(minLifetime, maxLifeTime, randOffsetX);
+				//if (shorelineMask > 0.001 && shorelineMask < 0.25) particle.currentLifetime += FOAM_SHORELINE_ADDITIONAL_LIFE_TIME;
+				
+				particle.prevLifetime = particle.currentLifetime;
+				particle.maxLifeTime = particle.currentLifetime;
+			
+				if (waveSpeed > 7) particle.isFreeMoving = 1;
+
+				KWS_FoamParticlesBuffer1[startIndex + i] = particle;
+			}
+		}
+	
+    #endif
+
+	#ifdef KWS_SPLASH_MODE
+		float normalizedDistance = saturate(cameraDistance / KWS_MaxSplashRenderingDistance); //500 meters
+		float3 randomStartPos = 0.25 * float3(KWS_DistancePerPixel.x, 0, KWS_DistancePerPixel.y);
+		float3 randomVelocityPos = -0.5 * float3(KWS_DistancePerPixel.x, 0, KWS_DistancePerPixel.y);
+
+		float divergenceStrength = 1.0 - KWS_SplashEmissionRate;
+		divergenceStrength = lerp(divergenceStrength, 1.0, normalizedDistance);
+		float shorelineMaskInverse = lerp(0.0, 1.0 - shorelineMask, shorelineMaskBorder);
+		float shorelineMaskRemaped = saturate(shorelineMask * 10);
+	
+
+		if (dynamicWaves.z > 0.2 && divergence > 0.4 && randomValue * borderFadeParticles > (SPLASH_MIN_DIVERGENCE_CHANCE + divergenceStrength * (1 - SPLASH_MIN_DIVERGENCE_CHANCE)))
+		{
+			uint iterations = (uint)lerp(1.0 + shorelineMaskBorder,  (float)maxNewSplashParticles, saturate(clampedDivergence * dynamicWaves.z));
+		
+			UNITY_LOOP
+			for (uint i = 0; i < iterations; i++)
+			{
+				uint maxParticlesPerTile = (uint)lerp(SPLASH_MIN_PARTICLES_PER_TILE, SPLASH_MAX_PARTICLES_PER_TILE, KWS_SplashParticlesBudgetNormalized);
+				
+				if (!TryReserveSplashTileSlots(currentPos, 1u, maxParticlesPerTile))  break;
+	
+				uint particleIndex  = 0;
+				InterlockedAdd(KWS_CounterBufferSpawn[0], 1u, particleIndex );
+				if (particleIndex >= maxParticles)  break;
+				
+				
+				SplashParticle particle = (SplashParticle)0;
+
+				float randOffsetX = GenerateRandom01(GenerateSeed(id.xy, i + 3.234 + frac(KWS_Time) * 1.0));
+				float randOffsetY = GenerateRandom01(GenerateSeed(id.xy, i + 12.12423 + frac(KWS_Time) * 30.5));
+				float3 randomPos = float3(randOffsetX * 2 - 1, 0, randOffsetY * 2 - 1);
+				particle.initialRandom01 = randOffsetY;
+				particle.shorelineMask = shorelineMask;
+
+
+				float maxHeightVelocity = lerp(1.0, 4.0, shorelineMaskRemaped);
+				particle.velocity = float3(dynamicWaves.x, clamp(divergence * 1.5, -maxHeightVelocity, maxHeightVelocity), dynamicWaves.y) * KWS_DynamicWavesFlowSpeedMultiplier * SPLASH_SPEED_MULTIPLIER;
+				particle.position = currentPos - randomPos * randomStartPos * float3(1, 0.1, 1);
+				particle.position.xz -= particle.velocity.xz * randomPos.xz * randomVelocityPos.xz;
+				
+				
+				particle.position.xz += saturate(dynamicWaves.xy * 10) * shorelineMaskBorder * 1.0;
+				
+				if (waterfallThreshold > 0.05) particle.velocity.xz = clamp(particle.velocity.xz, -3, 3);
+				particle.velocity.xz += particle.velocity.xz * (1.2 + particle.initialRandom01 * 0.1) * shorelineMaskInverse * saturate(dynamicWaves.z * 0.3) * (1 - waterfallThreshold) * 1.25;
+				particle.position.xz += particle.velocity.xz * 0.25 * saturate(dynamicWaves.z * 0.3) * shorelineMaskInverse;
+				
+				particle.prevPosition = particle.position;
+
+				particle.initialSpeed = waveSpeed * (1.0 + shorelineMaskRemaped);
+
+				particle.uvOffset = 0.25 * (int) (randOffsetX * 4);
+
+				particle.currentLifetime = lerp(0.75, 1.25, particle.initialRandom01);
+				particle.prevLifetime = particle.currentLifetime;
+			
+				
+
+				KWS_SplashParticlesBuffer1[particleIndex ] = particle;
+			}
+		}
+	#endif
+
+}
+
+[numthreads(1, 1, 1)]
+void UpdateParticlesDispatchArgs(uint2 id : SV_DispatchThreadID)
+{
+    uint activeParticles = min(KWS_CounterBufferSpawn[0], (uint)maxParticles);
+    KWS_CounterBufferUpdate[0] = 0;
+
+	uint groups =	(activeParticles + (uint)WARPS_COUNT - 1u) /	(uint)WARPS_COUNT;
+    groups = clamp(groups, 1u, 65500u);
+
+    KWS_UpdateIndirectArgs[0] = groups;
+    KWS_UpdateIndirectArgs[1] = 1;
+    KWS_UpdateIndirectArgs[2] = 1;
+	
+	#ifdef KWS_SPLASH_MODE
+	for (uint tileIndex = 0; tileIndex < KWS_TilesCount; tileIndex++)
+	{
+		KWS_TileParticleCount[tileIndex] = 0;
+	}
+		
+	#endif
+}
+
+
+[numthreads(WARPS_COUNT, 1, 1)]
+void UpdateParticles(uint2 id : SV_DispatchThreadID)
+{
+    uint activeParticles = KWS_CounterBufferSpawn[0];
+    uint particleIndex = id.x;
+    if (particleIndex >= activeParticles) return;
+
+
+    #ifdef KWS_FOAM_MODE
+    FoamParticle particle = KWS_FoamParticlesBuffer[particleIndex];
+    #else
+    if (id.x >= activeParticles) return;
+    SplashParticle particle = KWS_SplashParticlesBuffer[id.x];
+    #endif
+
+
+    particle.prevLifetime = particle.currentLifetime;
+    particle.currentLifetime -= KWS_deltaTime;
+    #ifdef KWS_FOAM_MODE
+
+    if (particle.shorelineMask > 0.001 && particle.shorelineMask < 0.25) particle.currentLifetime += KWS_deltaTime * 0.5;
+
+    #endif
+
+    float cameraDistance = length(KWS_WorldSpaceCameraPos - particle.position);
+
+    #ifdef KWS_FOAM_MODE
+    if (cameraDistance > KWS_MaxFoamRenderingDistance || particle.currentLifetime <= KWS_deltaTime) return;
+    #endif
+
+    #ifdef KWS_SPLASH_MODE
+    if (cameraDistance > KWS_MaxSplashRenderingDistance || particle.currentLifetime <= KWS_deltaTime) return;
+    #endif
+
+
+    float2 dynamicWavesUV = GetDynamicWavesUVRotated(particle.position);
+
+    if (dynamicWavesUV.x < 0.01 || dynamicWavesUV.x > 0.99 || dynamicWavesUV.y < 0.01 || dynamicWavesUV.y > 0.99)
+    {
+        return;
+    }
+
+    float farDistance = 1 - saturate(cameraDistance * 0.004);
+    float lodDistance = 1 - KWS_Pow5(saturate(farDistance + 0.1));
+    float3 cameraToParticle = normalize(particle.position - KWS_WorldSpaceCameraPos);
+    bool isVisible = dot(cameraToParticle, KWS_CameraForward) > 0.45;
+
+    #ifdef KWS_FOAM_MODE
+
+    if (!isVisible || lodDistance > particle.initialRandom01 * particle.initialRandom01 + FOAM_MIN_LOD_COUNT)
+    {
+        return;
+    }
+
+    #endif
+
+    #ifdef KWS_SPLASH_MODE
+
+    if ((!isVisible && particle.initialSpeed < 3) && lodDistance > saturate(particle.initialSpeed * 0.15) * 0.75 + 0.25 * KWS_Pow5(particle.initialRandom01) + SPLASH_MIN_LOD_COUNT)
+    {
+        return;
+    }
+
+    #endif
+
+    float borderFade = GetDynamicWavesBorderFading(dynamicWavesUV);
+    float4 dynamicWaves = GetDynamicWavesZone(dynamicWavesUV);
+
+    #ifdef KWS_FOAM_MODE
+    //if (dynamicWaveMask > 0.0 || (dynamicWaves.w > 0 && particle.position.y < dynamicWaves.w + KWS_WaterLevel)) return;
+    if ((dynamicWaves.w > 0 && particle.position.y < dynamicWaves.w + KWS_WaterLevel)) return;
+    #else
+    //if (dynamicWaveMask > 0.0) return; 
+    #endif
+    float waveSpeed = length(dynamicWaves.xy);
+    dynamicWaves.z *= borderFade;
+
+    float currentHeight = dynamicWaves.z + dynamicWaves.w + KWS_WaterLevel;
+    
+    float deltaHeight = (currentHeight - particle.position.y) / KWS_deltaTime;
+    float previousDeltaHeight = particle.prevPosition.y - particle.position.y;
+
+    if (particle.prevPosition.y < particle.position.y - 1) return;
+
+    particle.prevPosition = particle.position;
+
+
+    #ifdef KWS_FOAM_MODE
+		
+		particle.isFreeMoving = previousDeltaHeight > 2.0;
+		float slicedDeltaTime = KWS_deltaTime * FOAM_TIME_SLICING_FRAMES * 3.5;
+		//if(dynamicWaves.z < 0.02 && !particle.isFreeMoving) return;
+
+		dynamicWaves.xy = NormalizeDynamicWavesVelocity(dynamicWaves.xy);
+
+		if (particle.isFreeMoving > 0)
+		{
+			float airDragMultiplier = 1 + particle.initialRandom01 * 1;
+			float3 airDrag = -particle.velocity * KWS_deltaTime * airDragMultiplier;
+			
+			particle.velocity.xyz += float3(0, -9.8, 0) * slicedDeltaTime + airDrag;
+			particle.position += particle.velocity * KWS_deltaTime ;
+			particle.position.y = lerp(max(currentHeight, particle.position.y), particle.position.y, particle.initialRandom01);
+		}
+		else
+		{
+			float angle = KWS_Time * 2; 
+			float2 offset = float2(cos(angle), sin(angle)) * 0.25; 
+			
+			float scaledTime = KWS_Time * KWS_SimulationTimeScale;
+			
+			#ifdef KWS_BAKED_ZONE
+				float scaledTime = 
+				float2 time = frac(scaledTime * 0.001) * 1000;
+				float noiseScale = 0.5;
+				float2 noise = float2(SimpleNoise1(particle.position.xz * noiseScale + scaledTime * 1.5), SimpleNoise1(particle.position.xz * noiseScale - (scaledTime * 2 + 40))) ;
+				dynamicWaves.xy += noise * lerp(0.25, 2.0, frac(particle.initialRandom01 + scaledTime * 0.25)) * saturate(0.35 + waveSpeed * 0.25);
+			#endif
+			
+			
+			float groundDragMulitplier = KWS_Pow2(particle.initialRandom01 * (1-saturate(dynamicWaves.z * 0.35)));
+			groundDragMulitplier = lerp(1.0, 0.2, groundDragMulitplier);
+			
+			float normalizedLifeTime = saturate(particle.currentLifetime / particle.maxLifeTime);
+			
+			dynamicWaves.xy *= KWS_DynamicWavesFlowSpeedMultiplier;
+			dynamicWaves.xy *= groundDragMulitplier;
+			particle.velocity.xz *= groundDragMulitplier;
+
+			float3 curl = SampleCurlNoiseArray(particle.position.xz, KWS_Time, 0.05, 0.2, 32.0); 
+			
+			float particleForceMul = lerp(saturate(0.25 + particle.currentLifetime * 0.5) * 0.7, 1.0, particle.initialRandom01);
+			particle.velocity.xz = lerp(particle.velocity.xz, lerp(dynamicWaves.xy, curl.yz, 0.1), particleForceMul);
+			
+			float3 perlin = KWS_PerlinNoise.SampleLevel(sampler_linear_repeat, particle.position.xz * 0.075 * 4 + clamp(dynamicWaves.xy * 0.5, -2, 2) + curl.xz * 0.5, 0).xyz * 2 - 1;
+			float clumpingLifetime = saturate(sin((normalizedLifeTime) * 3.1415) * 4);
+			float clumpingByVelocity = 1-saturate(length(particle.velocity * 0.35));
+			float attractionFactor = clumpingLifetime * clumpingByVelocity * 0.25;
+			particle.position.xz += saturate(attractionFactor + 0.1) * perlin.xy  * KWS_FoamClumping;
+
+
+			#ifdef KWS_BAKED_ZONE
+				particle.position.xz += noise * lerp(0.2, 0.75, frac(particle.initialRandom01 + scaledTime * 0.5)) * (1-saturate(dynamicWaves.z * 0.75));
+			#endif
+			
+			
+
+			particle.position.xz = particle.position.xz + particle.velocity.xz * slicedDeltaTime * 1;
+			particle.position.y = currentHeight;
+		}
+		
+		
+		particle.currentLifetime -= lerp(particle.initialRandom01 * 0.5, 0, KWS_Pow3(borderFade));
+
+	#endif
+
+
+
+	#ifdef KWS_SPLASH_MODE
+
+	float speedFactor = 2.0 + particle.initialRandom01 * 0.5;
+
+	float airDragMultiplier = 0.5 + particle.initialRandom01 * 0.5;
+	float3 airDrag = -particle.velocity * KWS_deltaTime * airDragMultiplier;
+		
+	particle.velocity.xyz += float3(0, -9.8, 0) * KWS_deltaTime + airDrag;
+	particle.position += particle.velocity * KWS_deltaTime * speedFactor * 0.75;
+	particle.position.y = lerp(max(currentHeight, particle.position.y), particle.position.y, particle.initialRandom01);
+
+	if (particle.position.y > currentHeight + 1.5) particle.distanceToSurface = max(particle.distanceToSurface, particle.position.y - currentHeight);
+	
+	#endif
+	
+	
+
+    #ifdef KWS_FOAM_MODE
+    uint dstIndex;
+    InterlockedAdd(KWS_CounterBufferUpdate[0], 1u, dstIndex);
+    if (dstIndex < maxParticles) KWS_FoamParticlesBuffer2[dstIndex] = particle;
+    #endif
+
+    #ifdef KWS_SPLASH_MODE
+    uint dstIndex;
+    InterlockedAdd(KWS_CounterBufferUpdate[0], 1u, dstIndex);
+    if (dstIndex < maxParticles) KWS_SplashParticlesBuffer2[dstIndex] = particle;
+    
+    #endif
+}
+
+
+[numthreads(1, 1, 1)]
+void ParticlesToScreenDispatchArgs(uint2 id : SV_DispatchThreadID)
+{
+    uint visibleParticles = min(KWS_CounterBufferUpdate[0], (uint)maxParticles);
+
+    KWS_CounterBufferSpawn[0] = visibleParticles;
+    KWS_CounterBufferRender[0] = visibleParticles;
+
+    uint groups = (visibleParticles + (uint)WARPS_COUNT - 1u) / (uint)WARPS_COUNT;
+    groups = clamp(groups, 1u, 65500u);
+
+    #ifdef KWS_FOAM_MODE
+    KWS_ScreenSpaceFoamDispatchIndirectArgs[0] = groups;
+    KWS_ScreenSpaceFoamDispatchIndirectArgs[1] = 1;
+    KWS_ScreenSpaceFoamDispatchIndirectArgs[2] = 1;
+    #endif
+    #ifdef KWS_SPLASH_MODE
+    KWS_ParticlesIndirectArgs[1] = visibleParticles;
+    #endif
+}
+
+
+[numthreads(WARPS_COUNT,1,1)]
+void ClearScreenSpaceParticlesBuffer(uint id : SV_DispatchThreadID)
+{
+	#ifdef KWS_FOAM_MODE
+    
+	float2 size = ScreenSpaceFoamBufferSizes[0];
+
+	switch (KWS_CurrentScreenSpaceBufferLodIndex)
+	{
+	case 0u:
+		if (id >= (uint)(ScreenSpaceFoamBufferSizes[0].x * ScreenSpaceFoamBufferSizes[0].y)) return;
+		ScreenSpaceFoamBufferRW0[id] = 0;
+		break;
+
+	case 1u:
+		if (id >= (uint)(ScreenSpaceFoamBufferSizes[1].x * ScreenSpaceFoamBufferSizes[1].y)) return;
+		ScreenSpaceFoamBufferRW1[id] = 0;
+		break;
+
+	case 2u:
+		if (id >= (uint)(ScreenSpaceFoamBufferSizes[2].x * ScreenSpaceFoamBufferSizes[2].y)) return;
+		ScreenSpaceFoamBufferRW2[id] = 0;
+		break;
+	}
+	#endif
+	
+	#ifdef KWS_SPLASH_MODE
+	if (id < KWS_TilesCount) KWS_TileParticleCount[id] = 0;
+	#endif
+}
+
+
+[numthreads(WARPS_COUNT, 1, 1)]
+void RenderParticlesToScreenSpaceBuffer(uint id : SV_DispatchThreadID)
+{
+    #ifdef KWS_FOAM_MODE
+    uint particleIndex = id;
+    if (particleIndex >= KWS_CounterBufferRender[0] || particleIndex >= maxParticles) return;
+
+    FoamParticle particle = KWS_FoamParticlesBuffer[id];
+
+    float3 center = lerp(particle.prevPosition, particle.position, KWS_ParticlesFoamInterpolationTime);
+    center.y += FOAM_HEIGHT_OFFSET;
+    //float currentLifeTime = lerp(particle.prevLifetime, particle.currentLifetime, KWS_ParticlesFoamInterpolationTime);
+    //float normalizedLifeTime = currentLifeTime / particle.maxLifeTime;
+    //float alpha =  saturate(sin((normalizedLifeTime - 0.25) * 3.1415) * 5);
+    //uint alphaEncoded = (uint)(normalizedLifeTime * 256);
+
+
+    float4 clip = WorldPosToScreenPos(center);
+    float2 uv = clip.xy;
+
+	float distanceToWaterLevel = saturate(abs(_WorldSpaceCameraPos.y - KWS_WaterLevel) * 0.2);
+	float depthOffset = lerp(0.5, 3, distanceToWaterLevel);
+	
+    float sceneEyeDepth = LinearEyeDepthUniversal(GetSceneDepth(uv));
+    float waterEyeDepth = LinearEyeDepthUniversal(GetWaterDepth(uv));
+    float particleDepth = LinearEyeDepthUniversal(clip.z / clip.w);
+	
+    if (sceneEyeDepth < particleDepth || waterEyeDepth < particleDepth - depthOffset) return;
+
+
+    if (uv.x < 0 || uv.x >= 1 || uv.y < 0 || uv.y >= 1)
+        return;
+
+    float particleScreenSize = (1.0 / clip.w) * ScreenSpaceFoamBufferSizes[0].y;
+
+    particleScreenSize *= lerp(0.25, 1, saturate(KWS_FoamParticlesScale)) * (1 + saturate(KWS_FoamParticlesScale - 1));
+    float lod0 = 150;
+    float lod1 = 350;
+
+    if (particleScreenSize + particle.initialRandom01 * lod0 * 0.35 <= lod0)
+    {
+        uint2 pixel = uint2(uv * ScreenSpaceFoamBufferSizes[0].xy);
+        uint index =pixel.y * (uint) ScreenSpaceFoamBufferSizes[0].x + pixel.x;
+
+        InterlockedAdd(ScreenSpaceFoamBufferRW0[index], 1u);
+    }
+
+    else if (particleScreenSize + particle.initialRandom01 * lod1 * 0.35 <= lod1)
+    {
+        uint2 pixel = uint2(uv * ScreenSpaceFoamBufferSizes[1].xy);
+        uint index = pixel.y * (uint) ScreenSpaceFoamBufferSizes[1].x + pixel.x;
+
+        InterlockedAdd(ScreenSpaceFoamBufferRW1[index], 1u);
+    }
+    else
+    {
+        uint2 pixel = uint2(uv * ScreenSpaceFoamBufferSizes[2].xy);
+        uint index = pixel.y * (uint) ScreenSpaceFoamBufferSizes[2].x + pixel.x;
+
+        InterlockedAdd(ScreenSpaceFoamBufferRW2[index], 1u);
+    }
+
+    //
+    // float velocitySizeFactor = saturate(length(particle.velocity.xz * 1));
+    //
+    // float3 pos0 = particle.prevPosition;
+    // float3 pos1 = particle.position;
+    //
+    // float4 clip0 = mul(KWS_MATRIX_VP, float4(pos0, 1));
+    // float4 clip1 = mul(KWS_MATRIX_VP, float4(pos1, 1));
+    //
+    // float2 uv0 = clip0.xy / clip0.w;
+    // float2 uv1 = clip1.xy / clip1.w;
+    //
+    // float2 dir = normalize(uv1 - uv0);
+    //
+    //
+    // float2 pixelPos0 = uv * ScreenSpaceFoamBufferSizes[0];
+    // float2 dirPx0 = dir * ScreenSpaceFoamBufferSizes[0];
+    //
+    // float len = length(dirPx0);
+    // if (len < 1e-5) return;
+    //
+    // float2 stepDir = dirPx0 / len; 
+    // float rand = frac(sin(dot(pixelPos0, float2(12.9898,78.233))) * 43758.5453);
+    //
+    // int steps = (int)lerp(1, 1, velocitySizeFactor);
+    //
+    // for (int i = 0; i < steps; i++)
+    // {
+    // 	float2 pixelOffset = pixelPos0 + stepDir * i * Test4.x;
+    //
+    // 	uint2 pixel = uint2(pixelOffset);
+    //
+    // 	if (pixel.x >= ScreenSpaceFoamBufferSizes[0].x || pixel.y >= ScreenSpaceFoamBufferSizes[0].y)
+    // 		continue;
+    //
+    // 	uint index = pixel.y * ScreenSpaceFoamBufferSizes[0].x + pixel.x;
+    //
+    // 	InterlockedAdd(ScreenSpaceFoamBufferRW0[index], 1);
+    // }
+    
+    #endif
+}
+
+
+[numthreads(256,1,1)]
+void ShiftParticles(uint3 id : SV_DispatchThreadID)
+{
+    #ifdef KWS_FOAM_MODE
+    FoamParticle p = KWS_FoamParticlesBuffer1[id.x];
+    p.position -= KWS_OriginShift;
+    p.prevPosition -= KWS_OriginShift;
+    KWS_FoamParticlesBuffer1[id.x] = p;
+
+    #else
+    SplashParticle p = KWS_SplashParticlesBuffer1[id.x];
+    p.position -= KWS_OriginShift;
+    p.prevPosition -= KWS_OriginShift;
+    KWS_SplashParticlesBuffer1[id.x] = p;
+    #endif
+}

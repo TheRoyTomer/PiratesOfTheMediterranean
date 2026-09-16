@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a0feb4c7ce222ca4cacde9cb92b34aa8
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Data/ShooterDemo/FPSLazer.shader
+  uploadId: 984188

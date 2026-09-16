@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2c97e793007cafd4dbe39b840a85ff22
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/WaterResources/Resources/Prefabs/BakedSplashParticleSystem.prefab
+  uploadId: 984188

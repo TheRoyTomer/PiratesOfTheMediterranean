@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0dbce3500b313664e8375121087ef353
+timeCreated: 1512745373
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Data/ShooterDemo/Materials/01
+    - Default.mat
+  uploadId: 984188

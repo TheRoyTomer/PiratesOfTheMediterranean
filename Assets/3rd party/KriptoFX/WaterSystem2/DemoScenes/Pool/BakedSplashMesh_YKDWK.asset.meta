@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5cdd78aeaa7f80748ba4a1df9be5e0c5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4300000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Pool/BakedSplashMesh_YKDWK.asset
+  uploadId: 984188

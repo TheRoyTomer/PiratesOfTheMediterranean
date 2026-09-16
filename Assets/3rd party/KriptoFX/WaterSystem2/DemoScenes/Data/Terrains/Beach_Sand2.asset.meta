@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8e394d4c1d0a3a748b9e8faa03647972
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 15600000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Data/Terrains/Beach_Sand2.asset
+  uploadId: 984188

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b5b7bdf1bb48e35428eca629a282ad44
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/WaterResources/Effects(RequireShaderGraph)/Prefabs/WaterSplashes2.prefab
+  uploadId: 984188

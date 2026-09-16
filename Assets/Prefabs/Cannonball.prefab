@@ -156,6 +156,9 @@ MonoBehaviour:
   damage: 10
   impactExplosionEffect: {fileID: 100008, guid: e561ea0fe7aa99d4995974a95980c128, type: 3}
   impactAftermathEffect: {fileID: 100000, guid: 5e3bde61298d8a8409fe06c3df5175d4, type: 3}
+  impactSurfaceSearchDistance: 5
+  impactSurfaceOffset: 0.2
+  explosionLifetime: 2
   upwardSpeed: 1.2
   gravityStrength: 4.7
   waterDeathHeight: -3

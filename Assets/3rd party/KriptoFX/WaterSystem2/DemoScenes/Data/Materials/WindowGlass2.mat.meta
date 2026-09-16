@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 732f612ace4d9314e901fea8304be52c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Data/Materials/WindowGlass2.mat
+  uploadId: 984188

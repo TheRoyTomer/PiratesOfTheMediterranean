@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f126ca97d14bdf943814bc4d385f1580
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/WaterResources/Shaders/Resources/Common/API/EffectShaders/TransparentUnlit.shadergraph1
+  uploadId: 984188

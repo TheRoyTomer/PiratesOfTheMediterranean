@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1a6da13921441204eb74323383fff396
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/WaterResources/Effects(RequireShaderGraph)/EffectResources/DecalFoamBubbles
+    1.mat
+  uploadId: 984188

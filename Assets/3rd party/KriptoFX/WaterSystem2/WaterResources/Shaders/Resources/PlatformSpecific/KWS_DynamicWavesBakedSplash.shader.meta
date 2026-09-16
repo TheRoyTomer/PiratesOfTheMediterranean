@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0ec3c056f8ad3d84d80cc6864cca12f8
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/WaterResources/Shaders/Resources/PlatformSpecific/KWS_DynamicWavesBakedSplash.shader
+  uploadId: 984188

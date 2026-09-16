@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ceba8deba57ca934ead60cf82777e8e1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/BeachDemo/Beach SunsetSettings.lighting
+  uploadId: 984188

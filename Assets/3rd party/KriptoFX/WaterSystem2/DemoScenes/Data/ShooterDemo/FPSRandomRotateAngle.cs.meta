@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: a7a83f50808621b43bd26cd127393a40
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Data/ShooterDemo/FPSRandomRotateAngle.cs
+  uploadId: 984188

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7299a2a749c5834408e65e4ba73b3477
+timeCreated: 1486576502
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323662
+  packageName: KWS2 Dynamic Water System
+  packageVersion: 1.1.0f
+  assetPath: Assets/KriptoFX/WaterSystem2/DemoScenes/Cave/mat_plank_01.mat
+  uploadId: 984188
