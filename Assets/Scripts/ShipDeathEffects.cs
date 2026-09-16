@@ -3,19 +3,15 @@ using UnityEngine;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(ShipHealth))]
+[RequireComponent(typeof(ShipConfiguration))]
 public class ShipDeathEffects : MonoBehaviour
 {
+    private ShipConfig config;
     [Header("Death Explosions")]
     [SerializeField] private GameObject deathExplosionPrefab;
-    [Tooltip("Seconds between consecutive explosions. Initial pacing: half a second.")]
-    [Min(0f)]
-    [SerializeField] private float explosionDelay = 0.5f;
 
     [Header("Death Smoke")]
     [SerializeField] private GameObject deathSmokePrefab;
-    [Tooltip("Seconds after each individual explosion before its smoke spawns.")]
-    [Min(0f)]
-    [SerializeField] private float smokeDelay = 2f;
 
     [Header("Explosion Points (1 = Bow, 2 = Middle, 3 = Stern)")]
     [SerializeField] private Transform bowExplosionPoint;
@@ -27,6 +23,7 @@ public class ShipDeathEffects : MonoBehaviour
 
     private void Awake()
     {
+        config = GetComponent<ShipConfiguration>().Config;
         shipHealth = GetComponent<ShipHealth>();
     }
 
@@ -75,7 +72,7 @@ public class ShipDeathEffects : MonoBehaviour
 
     private IEnumerator ExplodeInOrder(Transform first, Transform second, Transform third)
     {
-        var delay = new WaitForSeconds(Mathf.Max(0f, explosionDelay));
+        var delay = new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.ExplosionDelay));
         SpawnExplosion(first);
         yield return delay;
         SpawnExplosion(second);
@@ -96,7 +93,7 @@ public class ShipDeathEffects : MonoBehaviour
         if (deathSmokePrefab == null)
             yield break;
 
-        yield return new WaitForSeconds(Mathf.Max(0f, smokeDelay));
+        yield return new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.SmokeDelay));
 
         if (deathSmokePrefab != null)
         {

@@ -1,15 +1,16 @@
 using UnityEngine;
 
+[RequireComponent(typeof(ShipConfiguration))]
 public class ShipHealth : MonoBehaviour
 {
-    [Header("Health")]
-    [SerializeField] private float maxHealth = 100f;
+    private ShipConfig config;
 
     private float currentHealth;
     private bool isDead;
 
     public float CurrentHealth => currentHealth;
-    public float MaxHealth => maxHealth;
+    // Also available to other components before this component's Awake.
+    public float MaxHealth => (config != null ? config : GetComponent<ShipConfiguration>().Config).Combat.MaxHealth;
     public bool IsDead => isDead;
     public Vector3 FinalHitPosition { get; private set; }
 
@@ -17,7 +18,8 @@ public class ShipHealth : MonoBehaviour
 
     private void Awake()
     {
-        currentHealth = maxHealth;
+        config = GetComponent<ShipConfiguration>().Config;
+        currentHealth = config.Combat.MaxHealth;
         isDead = false;
     }
 
@@ -34,8 +36,6 @@ public class ShipHealth : MonoBehaviour
 
         currentHealth = Mathf.Max(0f, currentHealth - damage);
 
-        Debug.Log($"{name} took {damage} damage. HP: {currentHealth}");
-
         if (currentHealth <= 0f)
         {
             FinalHitPosition = hitPosition;
@@ -50,7 +50,5 @@ public class ShipHealth : MonoBehaviour
 
         isDead = true;
         OnDeath?.Invoke();
-
-        Debug.Log($"{name} destroyed");
     }
 }

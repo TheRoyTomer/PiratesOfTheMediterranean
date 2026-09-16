@@ -1,13 +1,11 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(ShipConfiguration))]
 public class ShipController : MonoBehaviour
 {
-    [SerializeField] private float acceleration = 15f;
-    [SerializeField] private float turnAcceleration = 2f;
-    [SerializeField] private float boostMultiplier = 1.5f;
+    private ShipConfig config;
     
-    [SerializeField] private float maxTurnSpeed = 0.6f;
 
     private Rigidbody rb;
     private ShipHealth shipHealth;
@@ -18,6 +16,7 @@ public class ShipController : MonoBehaviour
 
     private void Awake()
     {
+        config = GetComponent<ShipConfiguration>().Config;
         rb = GetComponent<Rigidbody>();
         shipHealth = GetComponent<ShipHealth>();
     }
@@ -80,12 +79,12 @@ public class ShipController : MonoBehaviour
 
     private void ApplyMovement()
     {
-        float multiplier = boostActive ? boostMultiplier : 1f;
+        float multiplier = boostActive ? config.Movement.BoostMultiplier : 1f;
 
         Vector3 force =
             transform.forward *
             throttleInput *
-            acceleration *
+            config.Movement.Acceleration *
             multiplier;
 
         rb.AddForce(force, ForceMode.Acceleration);
@@ -93,12 +92,12 @@ public class ShipController : MonoBehaviour
 
     private void ApplySteering()
     {
-        if (Mathf.Abs(rb.angularVelocity.y) < maxTurnSpeed)
+        if (Mathf.Abs(rb.angularVelocity.y) < config.Movement.MaxTurnSpeed)
         {
             Vector3 torque =
                 Vector3.up *
                 steeringInput *
-                turnAcceleration;
+                config.Movement.TurnAcceleration;
 
             rb.AddTorque(torque, ForceMode.Acceleration);
         }

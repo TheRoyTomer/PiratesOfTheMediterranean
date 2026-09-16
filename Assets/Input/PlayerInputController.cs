@@ -24,6 +24,11 @@ public class PlayerInputController : MonoBehaviour
         inputActions.Player.Disable();
     }
 
+    private void OnDestroy()
+    {
+        inputActions?.Dispose();
+    }
+
     private void Update()
     {
         Vector2 moveInput = inputActions.Player.Move.ReadValue<Vector2>();

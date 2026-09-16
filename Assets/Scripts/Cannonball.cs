@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -18,8 +17,6 @@ public class Cannonball : MonoBehaviour
     [SerializeField] private float impactSurfaceOffset = 0.2f;
 
     [SerializeField] private float explosionLifetime = 2f;
-    [SerializeField] private float aftermathEmissionDuration = 10f;
-    [SerializeField] private float aftermathFadeDuration = 5f;
 
     [Header("Flight")]
     [SerializeField] private float upwardSpeed = 1.2f;
@@ -124,34 +121,12 @@ public class Cannonball : MonoBehaviour
 
         if (impactAftermathEffect != null)
         {
-            GameObject aftermath = Instantiate(
+            Instantiate(
                 impactAftermathEffect,
                 hitPoint,
                 Quaternion.identity
             );
-
-            StartCoroutine(FadeOutAftermath(aftermath));
         }
-    }
-
-    private IEnumerator FadeOutAftermath(GameObject aftermath)
-    {
-        yield return new WaitForSeconds(aftermathEmissionDuration);
-
-        ParticleSystem[] particleSystems =
-            aftermath.GetComponentsInChildren<ParticleSystem>();
-
-        foreach (ParticleSystem particleSystem in particleSystems)
-        {
-            particleSystem.Stop(
-                false,
-                ParticleSystemStopBehavior.StopEmitting
-            );
-        }
-
-        yield return new WaitForSeconds(aftermathFadeDuration);
-
-        Destroy(aftermath);
     }
 
     private void ReturnToPool()

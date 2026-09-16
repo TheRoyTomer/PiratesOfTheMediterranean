@@ -1,14 +1,13 @@
 using UnityEngine;
 
+[RequireComponent(typeof(ShipConfiguration))]
 public class WeaponSystem : MonoBehaviour
 {
+    private ShipConfig config;
 
     [Header("Effects")]
     [SerializeField] private GameObject cannonFireEffect;
 
-    [Header("Cooldown")]
-    [SerializeField] private float cooldownDuration = 2.5f;
-    [SerializeField] private float extraCooldownPenalty = 2f;
 
     private ShipHealth shipHealth;
 
@@ -23,7 +22,6 @@ public class WeaponSystem : MonoBehaviour
 
     [Header("Cannon Settings")]
     [SerializeField] private CannonballPool cannonballPool;
-    [SerializeField] private float cannonballSpeed = 150f;
     
     public float FrontCooldown => frontCooldown;
     public float LeftCooldown => leftCooldown;
@@ -31,6 +29,7 @@ public class WeaponSystem : MonoBehaviour
 
     private void Awake()
     {
+        config = GetComponent<ShipConfiguration>().Config;
         shipHealth = GetComponent<ShipHealth>();
     }
 
@@ -84,8 +83,8 @@ public class WeaponSystem : MonoBehaviour
         }
 
         float newCooldown = anotherCooldownActive
-            ? cooldownDuration + extraCooldownPenalty
-            : cooldownDuration;
+            ? config.Combat.CooldownDuration + config.Combat.ExtraCooldownPenalty
+            : config.Combat.CooldownDuration;
 
         switch (direction)
         {
@@ -117,13 +116,13 @@ public class WeaponSystem : MonoBehaviour
     private void AddPenaltyToOtherActiveCooldowns(FiringDirection direction)
     {
         if (direction != FiringDirection.Front && frontCooldown > 0f)
-            frontCooldown += extraCooldownPenalty;
+            frontCooldown += config.Combat.ExtraCooldownPenalty;
 
         if (direction != FiringDirection.Left && leftCooldown > 0f)
-            leftCooldown += extraCooldownPenalty;
+            leftCooldown += config.Combat.ExtraCooldownPenalty;
 
         if (direction != FiringDirection.Right && rightCooldown > 0f)
-            rightCooldown += extraCooldownPenalty;
+            rightCooldown += config.Combat.ExtraCooldownPenalty;
     }
 
     private Transform[] GetFirePoints(FiringDirection direction)
@@ -157,8 +156,8 @@ public class WeaponSystem : MonoBehaviour
         cannonball.Launch(
             cannonballPool,
             firingDirection,
-            cannonballSpeed,
-            GetComponent<ShipHealth>()
+            config.Combat.CannonballSpeed,
+            shipHealth
         );
     }
 }

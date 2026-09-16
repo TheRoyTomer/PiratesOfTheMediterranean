@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d91cfc0ffe383644a12c2a6e8362ba5, type: 3}
+  m_Name: DefaultShipConfig
+  m_EditorClassIdentifier: Assembly-CSharp::ShipConfig
+  movement:
+    acceleration: 15
+    turnAcceleration: 2
+    boostMultiplier: 1.5
+    maxTurnSpeed: 0.6
+  combat:
+    maxHealth: 100
+    cooldownDuration: 2
+    extraCooldownPenalty: 2
+    cannonballSpeed: 150
+  deathEffects:
+    explosionDelay: 1
+    smokeDelay: 2
+  sinking:
+    sinkingStartDelay: 8
+    centerlineThreshold: 0.5
+    rollAngle: 80
+    rollDuration: 6
+    rollDropDistance: 2
+    sinkSpeed: 2
+    sinkDepth: 30
