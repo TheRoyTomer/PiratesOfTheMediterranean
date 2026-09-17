@@ -21,6 +21,10 @@ public class ShipDeathEffects : MonoBehaviour
     private ShipHealth shipHealth;
     private bool sequenceStarted;
 
+    public bool ExplosionPhaseFinished { get; private set; }
+    public bool HasFinalExplosionStarted { get; private set; }
+    public event System.Action FinalExplosionStarted;
+
     private void Awake()
     {
         config = GetComponent<ShipConfiguration>().Config;
@@ -49,6 +53,8 @@ public class ShipDeathEffects : MonoBehaviour
             middleExplosionPoint == null || sternExplosionPoint == null)
         {
             Debug.LogError($"{name}: ShipDeathEffects requires a death explosion prefab and all three explosion points.", this);
+            ExplosionPhaseFinished = true;
+            SignalFinalExplosionStarted();
             return;
         }
 
@@ -72,34 +78,56 @@ public class ShipDeathEffects : MonoBehaviour
 
     private IEnumerator ExplodeInOrder(Transform first, Transform second, Transform third)
     {
+        var points = new[] { first, second, third };
+        var positions = new Vector3[3];
+        var rotations = new Quaternion[3];
+        var explosions = new GameObject[3];
         var delay = new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.ExplosionDelay));
-        SpawnExplosion(first);
-        yield return delay;
-        SpawnExplosion(second);
-        yield return delay;
-        SpawnExplosion(third);
-    }
-
-    private void SpawnExplosion(Transform point)
-    {
-        Vector3 position = point.position;
-        Quaternion rotation = point.rotation;
-        Instantiate(deathExplosionPrefab, position, rotation);
-        StartCoroutine(SpawnSmokeAfterDelay(position, rotation));
-    }
-
-    private IEnumerator SpawnSmokeAfterDelay(Vector3 position, Quaternion rotation)
-    {
-        if (deathSmokePrefab == null)
-            yield break;
-
-        yield return new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.SmokeDelay));
-
-        if (deathSmokePrefab != null)
+        for (int i = 0; i < points.Length; i++)
         {
-            // Retain the prefab's authored orientation and scale at this point.
-            Instantiate(deathSmokePrefab, position,
-                rotation * deathSmokePrefab.transform.localRotation);
+            positions[i] = points[i].position;
+            rotations[i] = points[i].rotation;
+            explosions[i] = Instantiate(deathExplosionPrefab, positions[i], rotations[i]);
+            if (i == points.Length - 1)
+                SignalFinalExplosionStarted();
+            if (deathSmokePrefab != null)
+                StartCoroutine(SpawnSmokeAfterExplosion(positions[i], rotations[i]));
+            if (i < points.Length - 1)
+                yield return delay;
         }
+
+        // Let newly spawned systems initialize; include surviving child particles.
+        yield return null;
+        while (EffectsAreAlive(explosions))
+            yield return null;
+
+        ExplosionPhaseFinished = true;
+    }
+
+    private IEnumerator SpawnSmokeAfterExplosion(Vector3 position, Quaternion rotation)
+    {
+        yield return new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.SmokeStartAfterExplosion));
+        // Independent playback; this coroutine never controls the roll/capsize phases.
+        Instantiate(deathSmokePrefab, position, rotation * deathSmokePrefab.transform.localRotation);
+    }
+
+    private void SignalFinalExplosionStarted()
+    {
+        HasFinalExplosionStarted = true;
+        FinalExplosionStarted?.Invoke();
+    }
+
+    private static bool EffectsAreAlive(GameObject[] effects)
+    {
+        foreach (var effect in effects)
+        {
+            // AutoDestruct may already have destroyed or deactivated the effect.
+            if (effect == null || !effect.activeInHierarchy)
+                continue;
+            foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>())
+                if (particles.IsAlive(true))
+                    return true;
+        }
+        return false;
     }
 }

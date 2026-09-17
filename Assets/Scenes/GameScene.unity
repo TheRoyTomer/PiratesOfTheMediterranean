@@ -458,7 +458,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4113165919380411610, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 4113165919380411610, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
       propertyPath: m_LocalPosition.z
@@ -497,99 +497,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
---- !u!1 &326712880
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 326712882}
-  - component: {fileID: 326712881}
-  m_Layer: 4
-  m_Name: Water Settings
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &326712881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 326712880}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93eb560ae5ebcd8459ef03cd3eccbd16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: KriptoFX.KWS2.Core.Runtime::KWS.WaterSystem
-  Transparent: 10
-  WaterColor: {r: 1, g: 1, b: 1, a: 1}
-  TurbidityColor: {r: 0.02745098, g: 0.25490198, b: 0.3137255, a: 1}
-  ScreenSpaceReflection: 0
-  PlanarReflection: 0
-  AnisotropicReflectionsScale: 0.5
-  OverrideSkyColor: 0
-  CustomSkyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  ReflectSun: 1
-  ReflectedSunCloudinessStrength: 0.04
-  ReflectedSunStrength: 1
-  RefractionMode: 1
-  RefractionSimpleStrength: 0.25
-  RefractionDispersion: 0
-  RefractionDispersionStrength: 0.35
-  WetEffect: 0
-  WetStrength: 1
-  WetnessHeightAboveWater: 2
-  WetDecalLayerMask:
-    serializedVersion: 0
-    m_Bits: 1
-  VolumetricLighting: 0
-  VolumetricLightTemporalReprojectionAccumulationFactor: 0.35
-  VolumetricLightUseBlur: 1
-  VolumetricLightBlurRadius: 2
-  VolumetricLightCausticMode: 0
-  CausticEffect: 0
-  CausticStrength: 2.5
-  OceanCausticDispersionStrength: 1
-  DisableCausticsInShadow: 0
-  UnderwaterEffect: 0
-  UnderwaterReflectionMode: 1
-  UseUnderwaterHalfLineTensionEffect: 1
-  UseWaterDropsEffect: 1
-  WaterDropsEffectTimeScale: 1
-  UseUnderwaterNoiseBlur: 0
-  UnderwaterNoiseBlurRadius: 10
-  UnderwaterHalfLineTensionScale: 0.5
-  OverrideUnderwaterTransparent: 0
-  UnderwaterTransparentOffset: 5
-  ShowColorSettings: 1
-  ShowReflectionSettings: 0
-  ShowRefractionSettings: 0
-  ShowWetSettings: 0
-  ShowVolumetricSettings: 0
-  ShowCausticEffectSettings: 0
-  ShowUnderwaterEffectSettings: 0
-  ShowRenderingSettings: 0
-  AutoUpdateIntersections: 1
---- !u!4 &326712882
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 326712880}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 67.15561, y: 0, z: -235.49713}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &398633013
 GameObject:
   m_ObjectHideFlags: 0
@@ -1121,9 +1028,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1647142251936397325, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1647142251936397325, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1647142251936397325, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1647142251936397325, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1647142251936397325, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3629679408435547744, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
       propertyPath: m_Name
-      value: PlayerShip
+      value: Ship
       objectReference: {fileID: 0}
     - target: {fileID: 3789036662880822991, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
       propertyPath: cannonballPool
@@ -1135,7 +1062,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4113165919380411610, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 4113165919380411610, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1167,6 +1094,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4113165919380411610, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8879189590244400217, guid: 3bcb38c2177df2b4094c727dd1034597, type: 3}
+      propertyPath: m_Materials.Array.size
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1210,6 +1141,99 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fd017b30066c964e8bbdd8ffb8172c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipController
+--- !u!1 &1176686106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1176686108}
+  - component: {fileID: 1176686107}
+  m_Layer: 4
+  m_Name: Water Settings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1176686107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176686106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93eb560ae5ebcd8459ef03cd3eccbd16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KriptoFX.KWS2.Core.Runtime::KWS.WaterSystem
+  Transparent: 10
+  WaterColor: {r: 1, g: 1, b: 1, a: 1}
+  TurbidityColor: {r: 0.02745098, g: 0.25490198, b: 0.3137255, a: 1}
+  ScreenSpaceReflection: 0
+  PlanarReflection: 0
+  AnisotropicReflectionsScale: 0.5
+  OverrideSkyColor: 0
+  CustomSkyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  ReflectSun: 1
+  ReflectedSunCloudinessStrength: 0.04
+  ReflectedSunStrength: 1
+  RefractionMode: 1
+  RefractionSimpleStrength: 0.25
+  RefractionDispersion: 0
+  RefractionDispersionStrength: 0.35
+  WetEffect: 0
+  WetStrength: 1
+  WetnessHeightAboveWater: 2
+  WetDecalLayerMask:
+    serializedVersion: 0
+    m_Bits: 1
+  VolumetricLighting: 0
+  VolumetricLightTemporalReprojectionAccumulationFactor: 0.35
+  VolumetricLightUseBlur: 1
+  VolumetricLightBlurRadius: 2
+  VolumetricLightCausticMode: 0
+  CausticEffect: 0
+  CausticStrength: 2.5
+  OceanCausticDispersionStrength: 1
+  DisableCausticsInShadow: 0
+  UnderwaterEffect: 0
+  UnderwaterReflectionMode: 1
+  UseUnderwaterHalfLineTensionEffect: 1
+  UseWaterDropsEffect: 1
+  WaterDropsEffectTimeScale: 1
+  UseUnderwaterNoiseBlur: 0
+  UnderwaterNoiseBlurRadius: 10
+  UnderwaterHalfLineTensionScale: 0.5
+  OverrideUnderwaterTransparent: 0
+  UnderwaterTransparentOffset: 5
+  ShowColorSettings: 1
+  ShowReflectionSettings: 0
+  ShowRefractionSettings: 0
+  ShowWetSettings: 0
+  ShowVolumetricSettings: 0
+  ShowCausticEffectSettings: 0
+  ShowUnderwaterEffectSettings: 0
+  ShowRenderingSettings: 0
+  AutoUpdateIntersections: 1
+--- !u!4 &1176686108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176686106}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 67.15561, y: 0, z: -235.49713}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1233688084
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,7 +1267,7 @@ MonoBehaviour:
   FollowTarget: {fileID: 1542415236}
   IntersectionLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967279
+    m_Bits: 39
   SimulationResolutionPerMeter: 2
   SimulationWaveSpeedMultiplier: 0.65
   FlowSpeedMultiplier: 0.75
@@ -1260,24 +1284,24 @@ MonoBehaviour:
   FoamTextureScaleMultiplier: 1
   FoamAlpha: 1
   TurbulenceFoamStrength: 0.2
-  WaveCrestFoamStrength: 0.5
+  WaveCrestFoamStrength: 0.75
   ShorelineFoamStrength: 0.5
   FoamDisappearSpeed: 0.75
-  UseFoamParticles: 0
-  MaxFoamParticlesBudget: 1000000
-  MaxFoamRenderingDistance: 200
+  UseFoamParticles: 1
+  MaxFoamParticlesBudget: 100000
+  MaxFoamRenderingDistance: 150
   FoamParticlesScale: 1
-  FoamParticlesAlphaMultiplier: 0.7
-  FoamEmissionRate: 0.5
-  FoamClumping: 0.4
-  FoamParticleLifetime: 1.5
+  FoamParticlesAlphaMultiplier: 0.8
+  FoamEmissionRate: 0.6
+  FoamClumping: 0.45
+  FoamParticleLifetime: 2
   UsePhytoplanktonEmission: 0
-  UseSplashParticles: 0
-  MaxSplashParticlesBudget: 15000
-  MaxSplashRenderingDistance: 400
-  SplashParticlesScale: 0.6
-  SplashParticlesAlphaMultiplier: 0.6
-  SplashEmissionRate: 0.5
+  UseSplashParticles: 1
+  MaxSplashParticlesBudget: 5000
+  MaxSplashRenderingDistance: 200
+  SplashParticlesScale: 0.53
+  SplashParticlesAlphaMultiplier: 0.526
+  SplashEmissionRate: 0.2
   BakedSplashEmissionRate: 1
   CastShadowMode: 0
   ReceiveShadowMode: 2
@@ -1293,17 +1317,17 @@ MonoBehaviour:
   SavedMeshMaterial: {fileID: 0}
   SavedSplashMesh: {fileID: 0}
   SavedSplashMaterial: {fileID: 0}
-  BakedAreaPos: {x: 2.2319248, y: 0, z: -107.11477}
+  BakedAreaPos: {x: 2.2319248, y: -5, z: -107.11477}
   BakedAreaSize: {x: 180, y: 30, z: 180}
   BakedAreaRotation: {x: 0, y: 0, z: 0, w: 1}
   BakedRotationMatrix: {x: 1, y: 0, z: -0, w: 1}
-  BakedNearFarSizeXZ: {x: 15, y: 30, z: 180, w: 180}
+  BakedNearFarSizeXZ: {x: 10, y: 30, z: 180, w: 180}
   BakedTextureSize: {x: 360, y: 360}
   bakedBounds:
-    m_Center: {x: 2.2319248, y: 0, z: -107.11477}
+    m_Center: {x: 2.2319248, y: -5, z: -107.11477}
     m_Extent: {x: 90, y: 15, z: 90}
   bakedOrientedBounds:
-    m_Center: {x: 2.231926, y: 0, z: -107.11478}
+    m_Center: {x: 2.231926, y: -5, z: -107.11478}
     m_Extent: {x: 90, y: 15, z: 90}
   bakedSimSize: 2
   bakedWaterLevel: 0
@@ -1317,7 +1341,7 @@ Transform:
   m_GameObject: {fileID: 1233688084}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.2319248, y: 0, z: -107.11477}
+  m_LocalPosition: {x: 2.2319248, y: -5, z: -107.11477}
   m_LocalScale: {x: 180, y: 30, z: 180}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1877,5 +1901,5 @@ SceneRoots:
   - {fileID: 1639046756}
   - {fileID: 2103075566}
   - {fileID: 36074432}
-  - {fileID: 326712882}
   - {fileID: 1233688086}
+  - {fileID: 1176686108}

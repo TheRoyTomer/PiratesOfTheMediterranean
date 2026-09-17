@@ -45,24 +45,33 @@ public sealed class ShipConfig : ScriptableObject
     {
         [Tooltip("Seconds between consecutive death explosions.")]
         [Min(0f)] [SerializeField] private float explosionDelay = 1f;
-        [Tooltip("Seconds after each explosion before its smoke spawns.")]
-        [Min(0f)] [SerializeField] private float smokeDelay = 2f;
+        [Tooltip("Seconds after each individual explosion starts before its smoke starts.")]
+        [UnityEngine.Serialization.FormerlySerializedAs("smokeDelay")]
+        [Min(0f)] [SerializeField] private float smokeStartAfterExplosion = 0.7f;
 
         public float ExplosionDelay => explosionDelay;
-        public float SmokeDelay => smokeDelay;
+        public float SmokeStartAfterExplosion => smokeStartAfterExplosion;
     }
 
     [Serializable]
     public sealed class SinkingSettings
     {
-        [Tooltip("Seconds after death before rolling begins.")]
+        [Tooltip("Fallback delay only for ships without active ShipDeathEffects. Otherwise explosion completion starts slow roll.")]
         [Min(0f)] [SerializeField] private float sinkingStartDelay = 8f;
         [Tooltip("Local-space centerline band in which the roll side is chosen randomly.")]
         [Min(0f)] [SerializeField] private float centerlineThreshold = 0.5f;
         [Tooltip("Roll angle relative to the death orientation, in degrees.")]
         [Range(0f, 90f)] [SerializeField] private float rollAngle = 80f;
-        [Tooltip("Seconds to roll and settle. Zero completes the roll immediately.")]
+        [Tooltip("Legacy setting. Phased capsize now uses slowRollSpeed and fastRollSpeed.")]
         [Min(0f)] [SerializeField] private float rollDuration = 6f;
+        [Tooltip("Degrees per second during slow roll; holds at slowRollTargetAngle until the phase timer ends.")]
+        [Min(0.01f)] [SerializeField] private float slowRollSpeed = 3.0f;
+        [Tooltip("Seconds in the slow-roll phase before fast capsize begins, independent of smoke.")]
+        [Min(0f)] [SerializeField] private float slowRollPhaseDuration = 5f;
+        [Tooltip("Degrees per second after the slow-roll phase timer ends.")]
+        [Min(0.01f)] [SerializeField] private float fastRollSpeed = 15f;
+        [Tooltip("Maximum subtle lean during the slow-roll phase, relative to the death orientation.")]
+        [Range(0f, 45f)] [SerializeField] private float slowRollTargetAngle = 15f;
         [Tooltip("World-space downward distance covered during the roll.")]
         [Min(0f)] [SerializeField] private float rollDropDistance = 2f;
         [Tooltip("World units per second during sinking. Must be greater than zero.")]
@@ -74,6 +83,10 @@ public sealed class ShipConfig : ScriptableObject
         public float CenterlineThreshold => centerlineThreshold;
         public float RollAngle => rollAngle;
         public float RollDuration => rollDuration;
+        public float SlowRollSpeed => slowRollSpeed;
+        public float SlowRollPhaseDuration => slowRollPhaseDuration;
+        public float FastRollSpeed => fastRollSpeed;
+        public float SlowRollTargetAngle => slowRollTargetAngle;
         public float RollDropDistance => rollDropDistance;
         public float SinkSpeed => sinkSpeed;
         public float SinkDepth => sinkDepth;

@@ -24,12 +24,16 @@ MonoBehaviour:
     cannonballSpeed: 150
   deathEffects:
     explosionDelay: 1
-    smokeDelay: 2
+    smokeStartAfterExplosion: 0.7
   sinking:
     sinkingStartDelay: 8
     centerlineThreshold: 0.5
     rollAngle: 80
     rollDuration: 6
+    slowRollSpeed: 3
+    slowRollPhaseDuration: 5
+    fastRollSpeed: 15
+    slowRollTargetAngle: 15
     rollDropDistance: 2
     sinkSpeed: 2
     sinkDepth: 30
