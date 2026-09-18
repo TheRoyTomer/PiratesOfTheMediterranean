@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1953259897 &8574412962073106934
+TerrainLayer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: KWS_Cliff_Rock_Surface
+  m_DiffuseTexture: {fileID: 2800000, guid: 3db67d75295ce99479a0c115738406a5, type: 3}
+  m_NormalMapTexture: {fileID: 2800000, guid: c0d2f4a068d45ea43b6eb16ca8f71503, type: 3}
+  m_MaskMapTexture: {fileID: 0}
+  m_TileSize: {x: 65, y: 65}
+  m_TileOffset: {x: 0, y: 0}
+  m_Specular: {r: 0, g: 0, b: 0, a: 0}
+  m_Metallic: 0.289
+  m_Smoothness: 0
+  m_NormalScale: 0.8
+  m_DiffuseRemapMin: {x: 0, y: 0, z: 0, w: 0}
+  m_DiffuseRemapMax: {x: 1, y: 1, z: 1, w: 1}
+  m_MaskMapRemapMin: {x: 0, y: 0, z: 0, w: 0}
+  m_MaskMapRemapMax: {x: 1, y: 1, z: 1, w: 1}
+  m_SmoothnessSource: 1

@@ -1,10 +1,12 @@
 using UnityEngine;
+using KWS;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Cannonball : MonoBehaviour
 {
     private ShipHealth owner;
     private bool hasHit;
+    private bool hasSplashed;
 
     [Header("Damage")]
     [SerializeField] private float damage = 10f;
@@ -18,12 +20,15 @@ public class Cannonball : MonoBehaviour
 
     [SerializeField] private float explosionLifetime = 2f;
 
+    [Header("Water Impact")]
+    [SerializeField] private GameObject waterSplashEffect;
+    [SerializeField] private float waterSplashLifetime = 4f;
+
     [Header("Flight")]
     [SerializeField] private float upwardSpeed = 1.2f;
     [SerializeField] private float gravityStrength = 4.7f;
 
     [Header("Pool")]
-    [SerializeField] private float waterDeathHeight = -3f;
     [SerializeField] private float maxLifetime = 8f;
 
     private Rigidbody rb;
@@ -33,8 +38,6 @@ public class Cannonball : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-
-        // We control gravity ourselves.
         rb.useGravity = false;
     }
 
@@ -49,6 +52,7 @@ public class Cannonball : MonoBehaviour
 
         lifeTimer = 0f;
         hasHit = false;
+        hasSplashed = false;
 
         rb.linearVelocity =
             direction.normalized * speed +
@@ -66,11 +70,19 @@ public class Cannonball : MonoBehaviour
             ForceMode.Acceleration
         );
 
-        if (transform.position.y <= waterDeathHeight)
+        if (!hasHit && !hasSplashed && WaterSystem.Instance != null)
         {
-            ReturnToPool();
+            float waterY = WaterSystem.Instance.WaterLevel;
+
+            if (transform.position.y <= waterY)
+            {
+                SpawnWaterSplash(waterY);
+                ReturnToPool();
+                return;
+            }
         }
-        else if (lifeTimer >= maxLifetime)
+
+        if (lifeTimer >= maxLifetime)
         {
             ReturnToPool();
         }
@@ -78,7 +90,7 @@ public class Cannonball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (hasHit)
+        if (hasHit || hasSplashed)
             return;
 
         ShipHealth shipHealth = other.GetComponentInParent<ShipHealth>();
@@ -104,6 +116,48 @@ public class Cannonball : MonoBehaviour
 
         shipHealth.TakeDamage(damage, hitPoint);
         ReturnToPool();
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (hasHit || hasSplashed)
+            return;
+
+        int shorelineLayer = LayerMask.NameToLayer("ShorelineBoundary");
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            ContactPoint contact = collision.GetContact(i);
+            Collider other = contact.otherCollider;
+            if (other == null || other.isTrigger ||
+                other.gameObject.layer == shorelineLayer ||
+                other.GetComponentInParent<ShipHealth>() != null)
+                continue;
+
+            hasHit = true;
+            Vector3 hitPoint = contact.point + contact.normal * 0.05f;
+            SpawnImpactEffects(hitPoint);
+            ReturnToPool();
+            return;
+        }
+    }
+
+    private void SpawnWaterSplash(float waterY)
+    {
+        hasSplashed = true;
+
+        if (waterSplashEffect == null)
+            return;
+
+        Vector3 splashPosition = transform.position;
+        splashPosition.y = waterY;
+
+        GameObject splash = Instantiate(
+            waterSplashEffect,
+            splashPosition,
+            Quaternion.LookRotation(Vector3.up)
+        );
+
+        Destroy(splash, waterSplashLifetime);
     }
 
     private void SpawnImpactEffects(Vector3 hitPoint)

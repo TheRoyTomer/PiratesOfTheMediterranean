@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefaultShipConfig
   m_EditorClassIdentifier: Assembly-CSharp::ShipConfig
   movement:
-    acceleration: 30
+    acceleration: 45
     turnAcceleration: 2
     boostMultiplier: 1.5
     maxTurnSpeed: 0.6
@@ -21,7 +21,7 @@ MonoBehaviour:
     maxHealth: 100
     cooldownDuration: 2
     extraCooldownPenalty: 2
-    cannonballSpeed: 150
+    cannonballSpeed: 200
   deathEffects:
     explosionDelay: 1
     smokeStartAfterExplosion: 0.7

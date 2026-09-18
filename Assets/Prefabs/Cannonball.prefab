@@ -159,7 +159,8 @@ MonoBehaviour:
   impactSurfaceSearchDistance: 5
   impactSurfaceOffset: 0.2
   explosionLifetime: 2
-  upwardSpeed: 1.2
-  gravityStrength: 4.7
-  waterDeathHeight: -3
+  waterSplashEffect: {fileID: 7151254913210794864, guid: 079ded7fdcdbb154fa28b8bac2560b49, type: 3}
+  waterSplashLifetime: 4
+  upwardSpeed: 3.037
+  gravityStrength: 2.305
   maxLifetime: 8
