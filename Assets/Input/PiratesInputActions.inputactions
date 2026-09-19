@@ -1,130 +1,170 @@
 {
-    "version": 1,
-    "name": "PiratesInputActions",
-    "maps": [
+  "version": 1,
+  "name": "PiratesInputActions",
+  "maps": [
+    {
+      "name": "Player",
+      "id": "9f92268b-25be-4d28-b11b-18b7e48a54b9",
+      "actions": [
         {
-            "name": "Player",
-            "id": "9f92268b-25be-4d28-b11b-18b7e48a54b9",
-            "actions": [
-                {
-                    "name": "Move",
-                    "type": "Value",
-                    "id": "20b1c464-a85c-4668-87d8-e24c0b232a1e",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "CycleFiringDirection",
-                    "type": "Button",
-                    "id": "eb0d2110-4e65-4d0d-90a2-444abca7eb69",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Fire",
-                    "type": "Button",
-                    "id": "2f452ca4-6856-45a8-8ac5-b42f043ceee9",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "2D Vector",
-                    "id": "aa82afbf-223e-4c31-ba5f-6535b30f68c1",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "up",
-                    "id": "203159c7-8b92-4b2c-82f7-709fa909d4ba",
-                    "path": "<Keyboard>/w",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "down",
-                    "id": "d9eb1026-edc1-470f-96ff-ecf3add37d5d",
-                    "path": "<Keyboard>/s",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "left",
-                    "id": "4bffdf7e-301b-49f7-821f-b14c159e1493",
-                    "path": "<Keyboard>/a",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "42715918-7dd6-4eeb-bcdb-d89d2d60873f",
-                    "path": "<Keyboard>/d",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "90bd97cd-a57d-4845-b0f6-f04973ce0966",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "CycleFiringDirection",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e9060ebd-069b-42dc-a8d7-b8931a803cc2",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Fire",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "506981af-c673-423d-bbd0-338c2a76aef4",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Fire",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
+          "name": "Move",
+          "type": "Value",
+          "id": "20b1c464-a85c-4668-87d8-e24c0b232a1e",
+          "expectedControlType": "Vector2",
+          "processors": "",
+          "interactions": "",
+          "initialStateCheck": true
+        },
+        {
+          "name": "CycleFiringDirection",
+          "type": "Button",
+          "id": "eb0d2110-4e65-4d0d-90a2-444abca7eb69",
+          "expectedControlType": "",
+          "processors": "",
+          "interactions": "",
+          "initialStateCheck": false
+        },
+        {
+          "name": "Fire",
+          "type": "Button",
+          "id": "2f452ca4-6856-45a8-8ac5-b42f043ceee9",
+          "expectedControlType": "",
+          "processors": "",
+          "interactions": "",
+          "initialStateCheck": false
+        },
+        {
+          "name": "ToggleFiringCamera",
+          "type": "Button",
+          "id": "6d585422-c52c-42cc-9da6-0ce687b3beeb",
+          "expectedControlType": "Button",
+          "processors": "",
+          "interactions": "",
+          "initialStateCheck": false
+        },
+        {
+          "name": "ReverseCamera",
+          "type": "Button",
+          "id": "646a1ccf-a7f0-454a-8df8-105ab51fb49a",
+          "expectedControlType": "Button",
+          "processors": "",
+          "interactions": "",
+          "initialStateCheck": true
         }
-    ],
-    "controlSchemes": []
+      ],
+      "bindings": [
+        {
+          "name": "2D Vector",
+          "id": "aa82afbf-223e-4c31-ba5f-6535b30f68c1",
+          "path": "2DVector",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "Move",
+          "isComposite": true,
+          "isPartOfComposite": false
+        },
+        {
+          "name": "up",
+          "id": "203159c7-8b92-4b2c-82f7-709fa909d4ba",
+          "path": "<Keyboard>/w",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "Move",
+          "isComposite": false,
+          "isPartOfComposite": true
+        },
+        {
+          "name": "down",
+          "id": "d9eb1026-edc1-470f-96ff-ecf3add37d5d",
+          "path": "<Keyboard>/s",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "Move",
+          "isComposite": false,
+          "isPartOfComposite": true
+        },
+        {
+          "name": "left",
+          "id": "4bffdf7e-301b-49f7-821f-b14c159e1493",
+          "path": "<Keyboard>/a",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "Move",
+          "isComposite": false,
+          "isPartOfComposite": true
+        },
+        {
+          "name": "right",
+          "id": "42715918-7dd6-4eeb-bcdb-d89d2d60873f",
+          "path": "<Keyboard>/d",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "Move",
+          "isComposite": false,
+          "isPartOfComposite": true
+        },
+        {
+          "name": "",
+          "id": "90bd97cd-a57d-4845-b0f6-f04973ce0966",
+          "path": "<Keyboard>/q",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "CycleFiringDirection",
+          "isComposite": false,
+          "isPartOfComposite": false
+        },
+        {
+          "name": "",
+          "id": "e9060ebd-069b-42dc-a8d7-b8931a803cc2",
+          "path": "<Keyboard>/space",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "Fire",
+          "isComposite": false,
+          "isPartOfComposite": false
+        },
+        {
+          "name": "",
+          "id": "506981af-c673-423d-bbd0-338c2a76aef4",
+          "path": "<Mouse>/leftButton",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "Fire",
+          "isComposite": false,
+          "isPartOfComposite": false
+        },
+        {
+          "name": "",
+          "id": "cefa9202-a2a0-4516-aa28-b020952f4450",
+          "path": "<Keyboard>/e",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "ToggleFiringCamera",
+          "isComposite": false,
+          "isPartOfComposite": false
+        },
+        {
+          "name": "",
+          "id": "91eb7a05-fb63-4c95-921a-d6180fcb76a3",
+          "path": "<Keyboard>/tab",
+          "interactions": "",
+          "processors": "",
+          "groups": "",
+          "action": "ReverseCamera",
+          "isComposite": false,
+          "isPartOfComposite": false
+        }
+      ]
+    }
+  ],
+  "controlSchemes": []
 }

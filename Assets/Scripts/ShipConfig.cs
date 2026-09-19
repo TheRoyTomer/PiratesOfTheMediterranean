@@ -9,6 +9,10 @@ public sealed class ShipConfig : ScriptableObject
     {
         [Tooltip("Forward acceleration in world units per second squared.")]
         [SerializeField] private float acceleration = 15f;
+        [Tooltip("Longitudinal braking acceleration in world units per second squared.")]
+        [Min(0f)] [SerializeField] private float brakeAcceleration = 10f;
+        [Tooltip("Horizontal sideways velocity damping rate per second.")]
+        [Min(0f)] [SerializeField] private float lateralDrag = 1f;
         [Tooltip("Steering torque acceleration.")]
         [SerializeField] private float turnAcceleration = 2f;
         [Tooltip("Acceleration multiplier while boosting.")]
@@ -17,6 +21,8 @@ public sealed class ShipConfig : ScriptableObject
         [SerializeField] private float maxTurnSpeed = 0.6f;
 
         public float Acceleration => acceleration;
+        public float BrakeAcceleration => brakeAcceleration;
+        public float LateralDrag => lateralDrag;
         public float TurnAcceleration => turnAcceleration;
         public float BoostMultiplier => boostMultiplier;
         public float MaxTurnSpeed => maxTurnSpeed;

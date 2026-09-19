@@ -1,9 +1,0 @@
-fileFormatVersion: 2
-guid: 96e71a8059dac694a9b3564aa78e6214
-AssetOrigin:
-  serializedVersion: 1
-  productId: 370516
-  packageName: "RenderWave \u2013 Scalable Ocean System"
-  packageVersion: 1.1.0
-  assetPath: Assets/RenderWave/Runtime/Core/OceanChunkSystem.cs
-  uploadId: 917504

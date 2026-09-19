@@ -1,9 +1,0 @@
-fileFormatVersion: 2
-guid: f71135cbd4dfcdf40ae519242b3d5445
-AssetOrigin:
-  serializedVersion: 1
-  productId: 370516
-  packageName: "RenderWave \u2013 Scalable Ocean System"
-  packageVersion: 1.1.0
-  assetPath: Assets/RenderWave/Runtime/Data/WaterZoneType.cs
-  uploadId: 917504

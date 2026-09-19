@@ -1,9 +1,0 @@
-fileFormatVersion: 2
-guid: 5ef5f810e4d2b30449e474a2245130d7
-AssetOrigin:
-  serializedVersion: 1
-  productId: 370516
-  packageName: "RenderWave \u2013 Scalable Ocean System"
-  packageVersion: 1.1.0
-  assetPath: Assets/RenderWave/Runtime/Underwater/UnderwaterStateController.cs
-  uploadId: 917504

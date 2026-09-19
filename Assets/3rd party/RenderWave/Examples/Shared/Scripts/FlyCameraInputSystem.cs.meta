@@ -1,9 +1,0 @@
-fileFormatVersion: 2
-guid: bf8b9334b9f73dc4b8793c37e5117ec2
-AssetOrigin:
-  serializedVersion: 1
-  productId: 370516
-  packageName: "RenderWave \u2013 Scalable Ocean System"
-  packageVersion: 1.1.0
-  assetPath: Assets/RenderWave/Examples/Shared/Scripts/FlyCameraInputSystem.cs
-  uploadId: 917504

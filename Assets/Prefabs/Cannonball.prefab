@@ -153,12 +153,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04332f8aa1055664583bfbdaa1cb4511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cannonball
-  damage: 10
+  damage: 5
   impactExplosionEffect: {fileID: 100008, guid: e561ea0fe7aa99d4995974a95980c128, type: 3}
   impactAftermathEffect: {fileID: 100000, guid: 5e3bde61298d8a8409fe06c3df5175d4, type: 3}
   impactSurfaceSearchDistance: 5
   impactSurfaceOffset: 0.2
-  explosionLifetime: 2
+  explosionLifetime: 4
   waterSplashEffect: {fileID: 7151254913210794864, guid: 079ded7fdcdbb154fa28b8bac2560b49, type: 3}
   waterSplashLifetime: 4
   upwardSpeed: 3.037

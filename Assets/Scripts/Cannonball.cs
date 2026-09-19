@@ -9,7 +9,7 @@ public class Cannonball : MonoBehaviour
     private bool hasSplashed;
 
     [Header("Damage")]
-    [SerializeField] private float damage = 10f;
+    [SerializeField] private float damage = 5f;
 
     [Header("Impact Effects")]
     [SerializeField] private GameObject impactExplosionEffect;

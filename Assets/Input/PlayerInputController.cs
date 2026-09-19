@@ -6,6 +6,7 @@ public class PlayerInputController : MonoBehaviour
     [SerializeField] private ShipController shipController;
     [SerializeField] private FiringDirectionController firingDirectionController;
     [SerializeField] private WeaponSystem weaponSystem;
+    [SerializeField] private CameraModeController cameraModeController;
 
     private PiratesInputActions inputActions;
 
@@ -22,6 +23,8 @@ public class PlayerInputController : MonoBehaviour
     private void OnDisable()
     {
         inputActions.Player.Disable();
+        if (cameraModeController != null)
+            cameraModeController.ResetToMain();
     }
 
     private void OnDestroy()
@@ -39,6 +42,13 @@ public class PlayerInputController : MonoBehaviour
         if (inputActions.Player.CycleFiringDirection.WasPressedThisFrame())
         {
             firingDirectionController.CycleDirection();
+        }
+
+        if (cameraModeController != null)
+        {
+            cameraModeController.SetInput(
+                inputActions.Player.ToggleFiringCamera.WasPressedThisFrame(),
+                inputActions.Player.ReverseCamera.IsPressed());
         }
         
         if (inputActions.Player.Fire.WasPressedThisFrame())

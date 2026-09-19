@@ -1,9 +1,0 @@
-fileFormatVersion: 2
-guid: 4a726ad6726cede498b0b2bfbd40e4c9
-AssetOrigin:
-  serializedVersion: 1
-  productId: 370516
-  packageName: "RenderWave \u2013 Scalable Ocean System"
-  packageVersion: 1.1.0
-  assetPath: Assets/RenderWave/Runtime/Buoyancy/BuoyancyBody.cs
-  uploadId: 917504

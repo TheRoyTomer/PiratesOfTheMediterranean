@@ -118,6 +118,24 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleFiringCamera"",
+                    ""type"": ""Button"",
+                    ""id"": ""6d585422-c52c-42cc-9da6-0ce687b3beeb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ReverseCamera"",
+                    ""type"": ""Button"",
+                    ""id"": ""646a1ccf-a7f0-454a-8df8-105ab51fb49a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -208,6 +226,28 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cefa9202-a2a0-4516-aa28-b020952f4450"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleFiringCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""91eb7a05-fb63-4c95-921a-d6180fcb76a3"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ReverseCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -219,6 +259,8 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_CycleFiringDirection = m_Player.FindAction("CycleFiringDirection", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
+        m_Player_ToggleFiringCamera = m_Player.FindAction("ToggleFiringCamera", throwIfNotFound: true);
+        m_Player_ReverseCamera = m_Player.FindAction("ReverseCamera", throwIfNotFound: true);
     }
 
     ~@PiratesInputActions()
@@ -302,6 +344,8 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_CycleFiringDirection;
     private readonly InputAction m_Player_Fire;
+    private readonly InputAction m_Player_ToggleFiringCamera;
+    private readonly InputAction m_Player_ReverseCamera;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -325,6 +369,14 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Fire".
         /// </summary>
         public InputAction @Fire => m_Wrapper.m_Player_Fire;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleFiringCamera".
+        /// </summary>
+        public InputAction @ToggleFiringCamera => m_Wrapper.m_Player_ToggleFiringCamera;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ReverseCamera".
+        /// </summary>
+        public InputAction @ReverseCamera => m_Wrapper.m_Player_ReverseCamera;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -360,6 +412,12 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
             @Fire.started += instance.OnFire;
             @Fire.performed += instance.OnFire;
             @Fire.canceled += instance.OnFire;
+            @ToggleFiringCamera.started += instance.OnToggleFiringCamera;
+            @ToggleFiringCamera.performed += instance.OnToggleFiringCamera;
+            @ToggleFiringCamera.canceled += instance.OnToggleFiringCamera;
+            @ReverseCamera.started += instance.OnReverseCamera;
+            @ReverseCamera.performed += instance.OnReverseCamera;
+            @ReverseCamera.canceled += instance.OnReverseCamera;
         }
 
         /// <summary>
@@ -380,6 +438,12 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
             @Fire.started -= instance.OnFire;
             @Fire.performed -= instance.OnFire;
             @Fire.canceled -= instance.OnFire;
+            @ToggleFiringCamera.started -= instance.OnToggleFiringCamera;
+            @ToggleFiringCamera.performed -= instance.OnToggleFiringCamera;
+            @ToggleFiringCamera.canceled -= instance.OnToggleFiringCamera;
+            @ReverseCamera.started -= instance.OnReverseCamera;
+            @ReverseCamera.performed -= instance.OnReverseCamera;
+            @ReverseCamera.canceled -= instance.OnReverseCamera;
         }
 
         /// <summary>
@@ -441,5 +505,19 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnFire(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleFiringCamera" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleFiringCamera(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ReverseCamera" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnReverseCamera(InputAction.CallbackContext context);
     }
 }

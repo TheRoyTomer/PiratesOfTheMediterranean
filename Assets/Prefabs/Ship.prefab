@@ -830,6 +830,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4113165919380411610}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7286369366200913178
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3771852236388502622}
+  - component: {fileID: 7001360359744490565}
+  m_Layer: 10
+  m_Name: Bow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3771852236388502622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7286369366200913178}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 3, z: 15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7039674245910725396}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &7001360359744490565
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7286369366200913178}
+  m_Material: {fileID: 13400000, guid: e143abbb0464170428da7dc0e288cafd, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 9, y: 7, z: 12}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7401610967521657656
 GameObject:
   m_ObjectHideFlags: 0
@@ -861,6 +914,40 @@ Transform:
   m_Children: []
   m_Father: {fileID: 666233791150449963}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!1 &7623055083341263252
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7039674245910725396}
+  m_Layer: 10
+  m_Name: ShipCollisionHull
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7039674245910725396
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7623055083341263252}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7402160610569162555}
+  - {fileID: 3771852236388502622}
+  - {fileID: 3844133998418204939}
+  m_Father: {fileID: 4113165919380411610}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7715482210647253173
 GameObject:
   m_ObjectHideFlags: 0
@@ -954,6 +1041,112 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7262745615747665297}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!1 &8417000373225875490
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7402160610569162555}
+  - component: {fileID: 7932673682105812279}
+  m_Layer: 10
+  m_Name: Middle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7402160610569162555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8417000373225875490}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 3, z: -4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7039674245910725396}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &7932673682105812279
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8417000373225875490}
+  m_Material: {fileID: 13400000, guid: e143abbb0464170428da7dc0e288cafd, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 12, y: 7, z: 28}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &8448998156909050885
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3844133998418204939}
+  - component: {fileID: 6301382729170993803}
+  m_Layer: 10
+  m_Name: Stern
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3844133998418204939
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8448998156909050885}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 3, z: -23}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7039674245910725396}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6301382729170993803
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8448998156909050885}
+  m_Material: {fileID: 13400000, guid: e143abbb0464170428da7dc0e288cafd, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 7, z: 12}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2869504652648186464
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1408,6 +1601,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: 998951887976980638}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6343cb297d6689b40879a1531acff763, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7039674245910725396}
     - targetCorrespondingSourceObject: {fileID: -8659561370395249653, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8610208078297873813}
@@ -1475,6 +1671,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: 991127941670471151}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6443810067013141756}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2223314928491433426}
     - targetCorrespondingSourceObject: {fileID: -2027628932786962548, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2242081418832413387}
@@ -1728,14 +1930,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipSinking
   waterDeathSplashPrefab: {fileID: 7151254913210794864, guid: 3583fea4d6626ab439eb69caba51c3f0, type: 3}
   waterSplashLifetime: 5
-  hullImpactBowPort: {fileID: 0}
-  hullImpactMidPort: {fileID: 0}
-  hullImpactSternPort: {fileID: 0}
-  mastImpactPort: {fileID: 0}
-  hullImpactBowStarboard: {fileID: 0}
-  hullImpactMidStarboard: {fileID: 0}
-  hullImpactSternStarboard: {fileID: 0}
-  mastImpactStarboard: {fileID: 0}
 --- !u!114 &2460244918450269897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1770,7 +1964,7 @@ MonoBehaviour:
   SlicesPerAxisY: 4
   SlicesPerAxisZ: 4
   isConcave: 0
-  WaterDrag: 1.2
+  WaterDrag: 0.4
   Drag: 0.1
   VelocityForce: 0.5
 --- !u!114 &7257831583904534870
@@ -1840,6 +2034,38 @@ MonoBehaviour:
   sideBubblesPerMeter: 0.06
   minimumFoamSpeed: 0.5
   fullFoamSpeed: 4
+--- !u!114 &6443810067013141756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629679408435547744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c79a9df61b7854f4e971d0b68edb4dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipCollisionResponse
+  collisionHull: {fileID: 7039674245910725396}
+--- !u!114 &2223314928491433426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629679408435547744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60bc1283c09df8c4e88c7279b7ac9af6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipRammingDamage
+  collisionHull: {fileID: 7039674245910725396}
+  minimumClosingSpeed: 5
+  damageCoefficient: 0.03
+  maxDamagePerImpact: 15
+  rammerSelfDamageFraction: 0.25
+  pairCooldown: 1.5
+  requiredSeparation: 0.25
 --- !u!4 &4113165919380411610 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6343cb297d6689b40879a1531acff763, type: 3}

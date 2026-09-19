@@ -59,6 +59,7 @@ public class ShipController : MonoBehaviour
         }
 
         ApplyMovement();
+        ApplyLateralDamping();
         ApplySteering();
     }
 
@@ -79,6 +80,19 @@ public class ShipController : MonoBehaviour
 
     private void ApplyMovement()
     {
+        if (throttleInput < 0f)
+        {
+            // Brake only along the horizontal forward axis, preserving lateral and vertical motion.
+            Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+            float speed = Vector3.Dot(rb.linearVelocity, forward);
+            float nextSpeed = Mathf.MoveTowards(
+                speed, 0f,
+                Mathf.Max(0f, config.Movement.BrakeAcceleration) * -throttleInput * Time.fixedDeltaTime);
+
+            rb.linearVelocity += forward * (nextSpeed - speed);
+            return;
+        }
+
         float multiplier = boostActive ? config.Movement.BoostMultiplier : 1f;
 
         Vector3 force =
@@ -88,6 +102,30 @@ public class ShipController : MonoBehaviour
             multiplier;
 
         rb.AddForce(force, ForceMode.Acceleration);
+    }
+
+    private void ApplyLateralDamping()
+    {
+        float drag = Mathf.Max(0f, config.Movement.LateralDrag);
+        float deltaTime = Time.fixedDeltaTime;
+        if (drag <= 0f || deltaTime <= 0f || rb.isKinematic)
+            return;
+
+        Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+        if (forward.sqrMagnitude < 0.000001f)
+            return;
+        forward.Normalize();
+
+        Vector3 right = Vector3.ProjectOnPlane(transform.right, Vector3.up);
+        right -= forward * Vector3.Dot(right, forward);
+        if (right.sqrMagnitude < 0.000001f)
+            right = Vector3.Cross(Vector3.up, forward);
+        right.Normalize();
+
+        float sideSpeed = Vector3.Dot(rb.linearVelocity, right);
+        float dampingFraction = 1f - Mathf.Exp(-drag * deltaTime);
+        // Center-of-mass force preserves forward/Y components and adds no torque.
+        rb.AddForce(-right * (sideSpeed * dampingFraction / deltaTime), ForceMode.Acceleration);
     }
 
     private void ApplySteering()

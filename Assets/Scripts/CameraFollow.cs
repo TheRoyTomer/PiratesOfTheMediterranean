@@ -9,6 +9,9 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float distance = 65f;
     [SerializeField] private float height = 35f;
     [SerializeField] private float mouseSensitivity = 0.5f;
+    [SerializeField] private float verticalMouseSensitivity = 0.5f;
+    [SerializeField] private float minPitch = 5f;
+    [SerializeField] private float maxPitch = 28f;
 
     [Header("Camera Smoothing")]
     [SerializeField] private float rotationSmoothSpeed = 5f;
@@ -17,12 +20,24 @@ public class CameraFollow : MonoBehaviour
 
     private float targetYaw;
     private float currentYaw;
+
+    private float targetPitch;
+    private float currentPitch;
+
     private float timeSinceMouseInput;
 
     private void Start()
     {
         targetYaw = target.eulerAngles.y;
         currentYaw = targetYaw;
+
+        float startPitch = transform.eulerAngles.x;
+
+        if (startPitch > 180f)
+            startPitch -= 360f;
+
+        targetPitch = Mathf.Clamp(startPitch, minPitch, maxPitch);
+        currentPitch = targetPitch;
     }
 
     private void LateUpdate()
@@ -30,7 +45,10 @@ public class CameraFollow : MonoBehaviour
         if (target == null)
             return;
 
-        float mouseX = Mouse.current.delta.ReadValue().x;
+        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+
+        float mouseX = mouseDelta.x;
+        float mouseY = mouseDelta.y;
 
         if (Mathf.Abs(mouseX) > 0.01f)
         {
@@ -40,6 +58,17 @@ public class CameraFollow : MonoBehaviour
         else
         {
             timeSinceMouseInput += Time.deltaTime;
+        }
+
+        if (Mathf.Abs(mouseY) > 0.01f)
+        {
+            targetPitch -= mouseY * verticalMouseSensitivity;
+
+            targetPitch = Mathf.Clamp(
+                targetPitch,
+                minPitch,
+                maxPitch
+            );
         }
 
         if (timeSinceMouseInput >= returnDelay)
@@ -59,9 +88,23 @@ public class CameraFollow : MonoBehaviour
             rotationSmoothSpeed * Time.deltaTime
         );
 
-        Quaternion rotation = Quaternion.Euler(0f, currentYaw, 0f);
+        currentPitch = Mathf.LerpAngle(
+            currentPitch,
+            targetPitch,
+            rotationSmoothSpeed * Time.deltaTime
+        );
 
-        Vector3 offset = rotation * new Vector3(0f, height, -distance);
+        Quaternion rotation = Quaternion.Euler(
+            currentPitch,
+            currentYaw,
+            0f
+        );
+
+        Vector3 offset = rotation * new Vector3(
+            0f,
+            height,
+            -distance
+        );
 
         transform.position = target.position + offset;
 

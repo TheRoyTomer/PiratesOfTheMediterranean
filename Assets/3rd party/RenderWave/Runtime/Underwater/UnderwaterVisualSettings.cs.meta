@@ -1,9 +1,0 @@
-fileFormatVersion: 2
-guid: a36648d962c54b5478d895aabbc31c7f
-AssetOrigin:
-  serializedVersion: 1
-  productId: 370516
-  packageName: "RenderWave \u2013 Scalable Ocean System"
-  packageVersion: 1.1.0
-  assetPath: Assets/RenderWave/Runtime/Underwater/UnderwaterVisualSettings.cs
-  uploadId: 917504

@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: DefaultShipConfig
   m_EditorClassIdentifier: Assembly-CSharp::ShipConfig
   movement:
-    acceleration: 45
-    turnAcceleration: 2
+    acceleration: 30
+    brakeAcceleration: 3
+    lateralDrag: 8
+    turnAcceleration: 1.25
     boostMultiplier: 1.5
-    maxTurnSpeed: 0.6
+    maxTurnSpeed: 0.3
   combat:
     maxHealth: 100
     cooldownDuration: 2

@@ -16,7 +16,7 @@ TagManager:
   - 
   - ShipPhysical
   - ShorelineBoundary
-  - 
+  - ShipCollision
   - 
   - 
   - 
