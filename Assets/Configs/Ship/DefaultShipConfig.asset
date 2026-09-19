@@ -21,7 +21,7 @@ MonoBehaviour:
     maxTurnSpeed: 0.3
   combat:
     maxHealth: 100
-    cooldownDuration: 2
+    cooldownDuration: 4
     extraCooldownPenalty: 2
     cannonballSpeed: 200
   deathEffects:
