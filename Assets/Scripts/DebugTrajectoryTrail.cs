@@ -7,7 +7,7 @@ public sealed class DebugTrajectoryTrail : MonoBehaviour
 {
     private TrailRenderer trajectory;
     private Material trailMaterial;
-    private bool visible = true;
+    private bool visible = false;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -47,7 +47,8 @@ public sealed class DebugTrajectoryTrail : MonoBehaviour
         trail.sharedMaterial = controller.trailMaterial;
         controller.trajectory = trail;
         trail.Clear();
-        trail.emitting = true;
+        trail.enabled = controller.visible;
+        trail.emitting = controller.visible;
     }
 #endif
 

@@ -18,7 +18,7 @@ public sealed class CameraModeController : MonoBehaviour
 
     private bool toggleRequested;
     private bool reverseHeld;
-    private bool debugOverride;
+    private Camera debugCamera;
 
     private void Awake()
     {
@@ -31,9 +31,11 @@ public sealed class CameraModeController : MonoBehaviour
         reverseHeld = reverseIsHeld;
     }
 
-    public void SetDebugOverride(bool active)
+    public void SetDebugCamera(Camera camera)
     {
-        debugOverride = active;
+        if (debugCamera != null && debugCamera != camera)
+            debugCamera.enabled = false;
+        debugCamera = camera;
         toggleRequested = false;
         ApplyCamera();
     }
@@ -53,7 +55,7 @@ public sealed class CameraModeController : MonoBehaviour
             Mode = CameraMode.Reverse;
         else if (Mode == CameraMode.Reverse)
             Mode = CameraMode.Main;
-        else if (toggleRequested && !debugOverride)
+        else if (toggleRequested && debugCamera == null)
             Mode = Mode == CameraMode.Main ? CameraMode.Firing : CameraMode.Main;
 
         toggleRequested = false;
@@ -78,8 +80,8 @@ public sealed class CameraModeController : MonoBehaviour
 
         if (selected == null)
             selected = mainCamera;
-        if (debugOverride)
-            selected = null;
+        if (debugCamera != null)
+            selected = debugCamera;
 
         // Disable the old view before enabling its replacement. CameraFollow
         // and the Main Camera AudioListener remain active on the GameObject.

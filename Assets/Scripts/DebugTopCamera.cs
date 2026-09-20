@@ -8,8 +8,6 @@ public sealed class DebugTopCamera : MonoBehaviour
     private Camera gameplayCamera;
     private Camera debugCamera;
     private Transform ship;
-    private bool showingDebug;
-    private bool previousCameraEnabled;
     private CameraModeController cameraModeController;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -18,7 +16,7 @@ public sealed class DebugTopCamera : MonoBehaviour
     {
         Camera main = Camera.main;
         GameObject player = GameObject.Find("PlayerShip");
-        if (main == null || player == null)
+        if (main == null || player == null || main.GetComponent<CameraModeController>() == null)
             return;
 
         GameObject root = new GameObject("DebugTopCamera");
@@ -50,45 +48,39 @@ public sealed class DebugTopCamera : MonoBehaviour
             || gameplayCamera == null || debugCamera == null || ship == null)
             return;
 
-        if (showingDebug)
+        if (cameraModeController.ActiveGameplayCamera == debugCamera)
         {
             RestoreGameplayCamera();
         }
         else
         {
             FrameCurrentArea();
-            previousCameraEnabled = gameplayCamera.enabled;
-            if (cameraModeController != null)
-                cameraModeController.SetDebugOverride(true);
-            else
-                gameplayCamera.enabled = false;
-            debugCamera.enabled = true;
-            showingDebug = true;
+            cameraModeController.SetDebugCamera(debugCamera);
         }
     }
 
     private void FrameCurrentArea()
     {
-        Vector3 forward = Vector3.ProjectOnPlane(ship.forward, Vector3.up).normalized;
-        Vector3 center = ship.position + forward * 150f;
-        // Fixed world orientation: no follow, orbit, or rotation while viewing.
+        // Center on the player while retaining the fixed world orientation.
         transform.SetPositionAndRotation(
-            center + new Vector3(0f, 1000f, -267.9492f),
+            ship.position + new Vector3(0f, 1000f, -267.9492f),
             Quaternion.Euler(75f, 0f, 0f));
+    }
+
+    private void LateUpdate()
+    {
+        if (ship != null && cameraModeController != null &&
+            cameraModeController.ActiveGameplayCamera == debugCamera)
+            FrameCurrentArea();
     }
 
     private void RestoreGameplayCamera()
     {
         if (debugCamera != null)
             debugCamera.enabled = false;
-        if (showingDebug)
-        {
-            if (cameraModeController != null)
-                cameraModeController.SetDebugOverride(false);
-            else if (gameplayCamera != null)
-                gameplayCamera.enabled = previousCameraEnabled;
-        }
-        showingDebug = false;
+        if (cameraModeController != null &&
+            cameraModeController.ActiveGameplayCamera == debugCamera)
+            cameraModeController.SetDebugCamera(null);
     }
 
     private void OnDisable()

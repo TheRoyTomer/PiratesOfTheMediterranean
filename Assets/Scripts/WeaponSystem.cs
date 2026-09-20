@@ -62,7 +62,7 @@ public class WeaponSystem : MonoBehaviour
         return Mathf.Max(0f, cooldown - Time.deltaTime);
     }
 
-    private bool IsOnCooldown(FiringDirection direction)
+    public bool IsOnCooldown(FiringDirection direction)
     {
         return direction switch
         {
