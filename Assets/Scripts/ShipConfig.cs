@@ -19,6 +19,9 @@ public sealed class ShipConfig : ScriptableObject
         [SerializeField] private float boostMultiplier = 1.5f;
         [Tooltip("Angular speed threshold for applying steering torque.")]
         [SerializeField] private float maxTurnSpeed = 0.6f;
+        [Tooltip("Forward speed at which steering reaches full effectiveness.")]
+        [Min(0.01f)]
+        [SerializeField] private float fullSteeringSpeed = 20f;
 
         public float Acceleration => acceleration;
         public float BrakeAcceleration => brakeAcceleration;
@@ -26,6 +29,7 @@ public sealed class ShipConfig : ScriptableObject
         public float TurnAcceleration => turnAcceleration;
         public float BoostMultiplier => boostMultiplier;
         public float MaxTurnSpeed => maxTurnSpeed;
+        public float FullSteeringSpeed => fullSteeringSpeed;
     }
 
     [Serializable]

@@ -18,7 +18,8 @@ MonoBehaviour:
     lateralDrag: 8
     turnAcceleration: 1.25
     boostMultiplier: 1.5
-    maxTurnSpeed: 0.3
+    maxTurnSpeed: 0.4
+    fullSteeringSpeed: 20
   combat:
     maxHealth: 100
     cooldownDuration: 4

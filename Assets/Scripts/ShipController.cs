@@ -130,12 +130,33 @@ public class ShipController : MonoBehaviour
 
     private void ApplySteering()
     {
+        Vector3 forward = Vector3.ProjectOnPlane(
+            transform.forward,
+            Vector3.up
+        );
+
+        if (forward.sqrMagnitude < 0.000001f)
+            return;
+
+        forward.Normalize();
+
+        float forwardSpeed = Mathf.Max(
+            0f,
+            Vector3.Dot(rb.linearVelocity, forward)
+        );
+
+        float steeringEffectiveness = Mathf.Clamp01(
+            forwardSpeed / config.Movement.FullSteeringSpeed
+        );
+
         if (Mathf.Abs(rb.angularVelocity.y) < config.Movement.MaxTurnSpeed)
         {
-            Vector3 torque =
-                Vector3.up *
+            float torqueAmount =
                 steeringInput *
-                config.Movement.TurnAcceleration;
+                config.Movement.TurnAcceleration *
+                steeringEffectiveness;
+
+            Vector3 torque = Vector3.up * torqueAmount;
 
             rb.AddTorque(torque, ForceMode.Acceleration);
         }

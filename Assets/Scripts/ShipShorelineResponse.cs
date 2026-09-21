@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public sealed class ShipShorelineResponse : MonoBehaviour
 {
+    [Tooltip("Optional scene-specific boundaries. When empty, use all shoreline paths in this ship's scene.")]
     public List<ShorelineBoundaryPath> boundaries = new List<ShorelineBoundaryPath>();
     Rigidbody body;
     // Published once on enable, then read only by the physics worker callback.
@@ -17,7 +18,16 @@ public sealed class ShipShorelineResponse : MonoBehaviour
     {
         body = GetComponent<Rigidbody>();
         hullIds = new HashSet<int>(); wallIds = new HashSet<int>();
-        if (boundaries == null || boundaries.Count == 0) return;
+        var resolvedBoundaries = boundaries;
+        if (resolvedBoundaries == null || resolvedBoundaries.Count == 0)
+        {
+            // Prefab assets cannot reference scene objects. Resolve once per enable,
+            // including inactive paths just as explicit scene references would.
+            resolvedBoundaries = new List<ShorelineBoundaryPath>();
+            foreach (var root in gameObject.scene.GetRootGameObjects())
+                resolvedBoundaries.AddRange(root.GetComponentsInChildren<ShorelineBoundaryPath>(true));
+        }
+        if (resolvedBoundaries.Count == 0) return;
         int layer = LayerMask.NameToLayer("ShipPhysical");
         foreach (var c in GetComponentsInChildren<Collider>())
         {
@@ -26,7 +36,7 @@ public sealed class ShipShorelineResponse : MonoBehaviour
             c.hasModifiableContacts = true;
         }
         int wallLayer = LayerMask.NameToLayer("ShorelineBoundary");
-        foreach (var boundary in boundaries)
+        foreach (var boundary in resolvedBoundaries)
         {
             if (!boundary) continue;
             foreach (var c in boundary.GetComponentsInChildren<Collider>())

@@ -409,7 +409,7 @@ public sealed class EnemyHudController : MonoBehaviour
                     camera.transform.position,
                     delta.normalized,
                     delta.magnitude,
-                    1 << 0,
+                    LayerMask.GetMask("Default", "EnvironmentOccluder"),
                     QueryTriggerInteraction.Ignore
                 )
                 && ++clearPoints >= 2)
