@@ -17,6 +17,13 @@ public class ShipSinking : MonoBehaviour
         Sinking,
         Finished
     }
+    
+    [Header("Enemy Ship Parts")]
+    [SerializeField] private GameObject shipPartsPickupPrefab;
+    [SerializeField] private float shipPartsRiseDepth = 3f;
+    [SerializeField] private float shipPartsRiseDuration = 1.5f;
+
+    private bool shipPartsPickupSpawned;
 
     private ShipHealth shipHealth;
     private Rigidbody body;
@@ -269,6 +276,7 @@ public class ShipSinking : MonoBehaviour
                 break;
 
             case SinkingPhase.Finished:
+                SpawnShipPartsPickup();
                 gameObject.SetActive(false);
                 break;
         }
@@ -388,5 +396,33 @@ public class ShipSinking : MonoBehaviour
             splash,
             waterSplashLifetime
         );
+    }
+    
+    private void SpawnShipPartsPickup()
+    {
+        if (shipPartsPickupSpawned ||
+            shipPartsPickupPrefab == null ||
+            GetComponent<AIController>() == null)
+            return;
+
+        shipPartsPickupSpawned = true;
+
+        Vector3 spawnPosition = deathPosition;
+        spawnPosition.y = WaterSystem.Instance != null
+            ? WaterSystem.Instance.WaterLevel
+            : 0f;
+
+        GameObject pickup = Instantiate(
+            shipPartsPickupPrefab,
+            spawnPosition,
+            shipPartsPickupPrefab.transform.rotation
+        );
+
+        foreach (FloatingShipPart part in pickup.GetComponentsInChildren<FloatingShipPart>())
+            part.BeginEmergence(shipPartsRiseDepth, shipPartsRiseDuration);
+
+        PickupRingVisual ring = pickup.GetComponentInChildren<PickupRingVisual>();
+        if (ring != null)
+            ring.RevealAfter(shipPartsRiseDuration);
     }
 }

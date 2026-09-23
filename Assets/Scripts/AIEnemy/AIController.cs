@@ -49,6 +49,15 @@ public class AIController : MonoBehaviour
     [Header("Ramming")]
     [SerializeField] private float ramTerminalAdjustDistance = 150f;
     [SerializeField] private float ramTerminalAdjustMaxAngle = 20f;
+    
+    [Header("Passive Recovery")]
+    [Min(0f)] [SerializeField] private float recoveryDistance = 1300f;
+    [Min(0f)] [SerializeField] private float firstRecoveryDelay = 20f;
+    [Min(0f)] [SerializeField] private float subsequentRecoveryInterval = 10f;
+    [Min(0f)] [SerializeField] private float recoveryAmount = 25f;
+
+    private float recoveryTimer;
+    private bool hasRecoveredThisPatrol;
 
     private Vector3 pendingRamInterceptPoint;
 
@@ -404,6 +413,8 @@ public class AIController : MonoBehaviour
             broadsideBlockedTimer = 0f;
         }
 
+        UpdatePassiveRecovery();
+
         ship.SetSteering(desiredSteering);
         ship.SetThrottle(desiredThrottle);
     }
@@ -412,6 +423,11 @@ public class AIController : MonoBehaviour
     {
         if (combatMode == newState)
             return;
+
+        if (combatMode == CombatMode.Patrol)
+        {
+            ResetPassiveRecovery();
+        }
 
         bool suspendedEvade =
             combatMode == CombatMode.BreakSteer &&
@@ -650,8 +666,56 @@ public class AIController : MonoBehaviour
         return false;
     }
 
+    private void UpdatePassiveRecovery()
+    {
+        if (combatMode != CombatMode.Patrol ||
+            target == null ||
+            shipHealth.IsDead ||
+            shipHealth.CurrentHealth >= shipHealth.MaxHealth)
+        {
+            ResetPassiveRecovery();
+            return;
+        }
+
+        Vector3 separation = target.position - transform.position;
+        separation.y = 0f;
+
+        if (separation.sqrMagnitude < recoveryDistance * recoveryDistance)
+        {
+            ResetPassiveRecovery();
+            return;
+        }
+
+        recoveryTimer += Time.fixedDeltaTime;
+
+        float requiredTime =
+            hasRecoveredThisPatrol
+                ? subsequentRecoveryInterval
+                : firstRecoveryDelay;
+
+        if (recoveryTimer < requiredTime)
+            return;
+
+        recoveryTimer -= requiredTime;
+        shipHealth.Heal(recoveryAmount);
+        hasRecoveredThisPatrol = true;
+
+        if (shipHealth.CurrentHealth >= shipHealth.MaxHealth)
+        {
+            ResetPassiveRecovery();
+        }
+    }
+
+    private void ResetPassiveRecovery()
+    {
+        recoveryTimer = 0f;
+        hasRecoveredThisPatrol = false;
+    }
+
     private void HandleDamage(float damage)
     {
+        ResetPassiveRecovery();
+
         bool wasPatrolling =
             combatMode == CombatMode.Patrol;
 

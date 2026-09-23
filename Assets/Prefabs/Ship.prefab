@@ -2215,6 +2215,7 @@ MonoBehaviour:
   recoveryKickSpeed: 30
   throttleLockDuration: 0.35
   frontContactDot: 0.6
+  frontNormalDot: 0.5
 --- !u!4 &4113165919380411610 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6343cb297d6689b40879a1531acff763, type: 3}

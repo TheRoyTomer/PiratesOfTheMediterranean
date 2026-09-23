@@ -25,6 +25,11 @@ public class PlayerInputController : MonoBehaviour
         inputActions.Player.Disable();
         if (cameraModeController != null)
             cameraModeController.ResetToMain();
+
+        #if UNITY_EDITOR
+        if (shipController != null)
+            shipController.SetDevelopmentBoost(false);
+        #endif
     }
 
     private void OnDestroy()
@@ -38,7 +43,14 @@ public class PlayerInputController : MonoBehaviour
 
         shipController.SetThrottle(moveInput.y);
         shipController.SetSteering(moveInput.x);
-        
+
+               #if UNITY_EDITOR
+                shipController.SetDevelopmentBoost(
+                    Keyboard.current != null &&
+                    Keyboard.current.vKey.isPressed);
+        #endif 
+
+
         if (inputActions.Player.CycleFiringDirection.WasPressedThisFrame())
         {
             firingDirectionController.CycleDirection();
