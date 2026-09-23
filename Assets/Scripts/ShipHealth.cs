@@ -15,6 +15,7 @@ public class ShipHealth : MonoBehaviour
     public Vector3 FinalHitPosition { get; private set; }
 
     public event System.Action OnDeath;
+    public event System.Action<float> OnDamaged;
 
     private void Awake()
     {
@@ -34,7 +35,12 @@ public class ShipHealth : MonoBehaviour
         if (isDead)
             return;
 
+        if (damage <= 0f)
+            return;
+
         currentHealth = Mathf.Max(0f, currentHealth - damage);
+
+        OnDamaged?.Invoke(damage);
 
         if (currentHealth <= 0f)
         {

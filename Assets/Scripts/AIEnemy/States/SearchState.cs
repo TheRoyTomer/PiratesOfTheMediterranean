@@ -38,7 +38,7 @@ public sealed class SearchState : AIState
                 Controller.SearchTimer = 0f;
 
                 Controller.DesiredSteering = 0f;
-                Controller.DesiredThrottle = 0f;
+                Controller.DesiredThrottle = 0.2f;
                 return;
             }
 
@@ -71,6 +71,6 @@ public sealed class SearchState : AIState
         }
 
         Controller.DesiredSteering = 0f;
-        Controller.DesiredThrottle = 0f;
+        Controller.DesiredThrottle = 0.2f;
     }
 }

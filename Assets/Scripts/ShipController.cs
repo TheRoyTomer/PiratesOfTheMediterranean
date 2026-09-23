@@ -14,6 +14,10 @@ public class ShipController : MonoBehaviour
     private float steeringInput;
     private bool boostActive;
 
+    private float contactRecoveryTimer;
+
+    public bool IsContactRecoveryActive => contactRecoveryTimer > 0f;
+
     private void Awake()
     {
         config = GetComponent<ShipConfiguration>().Config;
@@ -48,6 +52,8 @@ public class ShipController : MonoBehaviour
         throttleInput = 0f;
         steeringInput = 0f;
         boostActive = false;
+
+        contactRecoveryTimer = 0f;
     }
 
     private void FixedUpdate()
@@ -58,7 +64,11 @@ public class ShipController : MonoBehaviour
             return;
         }
 
-        ApplyMovement();
+        if (contactRecoveryTimer > 0f)
+            contactRecoveryTimer -= Time.fixedDeltaTime;
+        else
+            ApplyMovement();
+
         ApplyLateralDamping();
         ApplySteering();
     }
@@ -76,6 +86,37 @@ public class ShipController : MonoBehaviour
     public void SetBoost(bool active)
     {
         boostActive = active;
+    }
+
+    public void StartContactRecovery(
+        float kickSpeed,
+        float throttleLockDuration)
+    {
+        if (rb.isKinematic)
+            return;
+
+        if (shipHealth != null && shipHealth.IsDead)
+            return;
+
+        Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+
+        if (forward.sqrMagnitude < 0.000001f)
+            return;
+
+        forward.Normalize();
+
+        float currentForwardSpeed = Vector3.Dot(rb.linearVelocity, forward);
+        float targetForwardSpeed = -Mathf.Max(0f, kickSpeed);
+
+        rb.AddForce(
+            forward * (targetForwardSpeed - currentForwardSpeed),
+            ForceMode.VelocityChange
+        );
+
+        contactRecoveryTimer = Mathf.Max(
+            contactRecoveryTimer,
+            throttleLockDuration
+        );
     }
 
     private void ApplyMovement()

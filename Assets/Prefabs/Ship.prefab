@@ -1795,6 +1795,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2507710753855822279}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5847680141335547412}
     - targetCorrespondingSourceObject: {fileID: -2027628932786962548, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2242081418832413387}
@@ -2194,9 +2197,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9be5e2c4b9348346afb061def131643, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipShorelineResponse
   boundaries: []
+--- !u!114 &-5847680141335547412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629679408435547744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 951aafa15355ac242b84723ec2048ee4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipContactRecovery
+  recoveryKickSpeed: 30
+  throttleLockDuration: 0.35
+  frontContactDot: 0.6
 --- !u!4 &4113165919380411610 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6343cb297d6689b40879a1531acff763, type: 3}

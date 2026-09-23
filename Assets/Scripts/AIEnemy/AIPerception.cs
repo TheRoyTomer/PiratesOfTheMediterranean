@@ -4,7 +4,13 @@ public class AIPerception : MonoBehaviour
 {
     [Header("Detection")]
     [SerializeField] private float detectionRange = 1100f;
-    [SerializeField, Range(0f, 180f)] private float fieldOfViewHalfAngle = 120f;
+
+    [SerializeField, Range(0f, 180f)]
+    private float fieldOfViewHalfAngle = 180f;
+
+    [SerializeField, Range(0f, 180f)]
+    private float patrolFieldOfViewHalfAngle = 120f;
+
     [SerializeField] private LayerMask visibilityOccluderMask;
     [SerializeField] private float visionOriginHeight = 10f;
     [SerializeField] private float visionTargetHeight = 10f;
@@ -13,7 +19,32 @@ public class AIPerception : MonoBehaviour
     public float DetectionRange => detectionRange;
     public float LoseTargetRange => loseTargetRange;
 
-    public bool CanSeeTarget(Transform target, float allowedRange)
+    public bool CanSeeTarget(
+        Transform target,
+        float allowedRange)
+    {
+        return CanSeeTargetInternal(
+            target,
+            allowedRange,
+            fieldOfViewHalfAngle
+        );
+    }
+
+    public bool CanSeeTargetFromPatrol(
+        Transform target,
+        float allowedRange)
+    {
+        return CanSeeTargetInternal(
+            target,
+            allowedRange,
+            patrolFieldOfViewHalfAngle
+        );
+    }
+
+    private bool CanSeeTargetInternal(
+        Transform target,
+        float allowedRange,
+        float fovHalfAngle)
     {
         if (!IsTargetValid(target))
             return false;
@@ -26,8 +57,12 @@ public class AIPerception : MonoBehaviour
         if (distance > allowedRange)
             return false;
 
-        if (!IsTargetInsideFov(target))
+        if (!IsTargetInsideFov(
+                target,
+                fovHalfAngle))
+        {
             return false;
+        }
 
         if (!HasClearLineOfSight(target))
             return false;
@@ -48,8 +83,11 @@ public class AIPerception : MonoBehaviour
             target.position +
             Vector3.up * visionTargetHeight;
 
-        Vector3 direction = targetPoint - origin;
-        float distance = direction.magnitude;
+        Vector3 direction =
+            targetPoint - origin;
+
+        float distance =
+            direction.magnitude;
 
         if (distance <= 0.001f)
             return true;
@@ -67,18 +105,22 @@ public class AIPerception : MonoBehaviour
         return !blocked;
     }
 
-    private bool IsTargetInsideFov(Transform target)
+    private bool IsTargetInsideFov(
+        Transform target,
+        float fovHalfAngle)
     {
         if (target == null)
             return false;
 
-        Vector3 flatForward = Vector3.ProjectOnPlane(
-            transform.forward,
-            Vector3.up
-        );
+        Vector3 flatForward =
+            Vector3.ProjectOnPlane(
+                transform.forward,
+                Vector3.up
+            );
 
         Vector3 flatToTarget =
-            target.position - transform.position;
+            target.position -
+            transform.position;
 
         flatToTarget.y = 0f;
 
@@ -88,12 +130,13 @@ public class AIPerception : MonoBehaviour
         if (flatForward.sqrMagnitude <= 0.001f)
             return false;
 
-        float angleToTarget = Vector3.Angle(
-            flatForward,
-            flatToTarget
-        );
+        float angleToTarget =
+            Vector3.Angle(
+                flatForward,
+                flatToTarget
+            );
 
-        return angleToTarget <= fieldOfViewHalfAngle;
+        return angleToTarget <= fovHalfAngle;
     }
 
     private bool IsTargetValid(Transform target)
@@ -107,8 +150,11 @@ public class AIPerception : MonoBehaviour
         ShipHealth targetHealth =
             target.GetComponentInParent<ShipHealth>();
 
-        if (targetHealth != null && targetHealth.IsDead)
+        if (targetHealth != null &&
+            targetHealth.IsDead)
+        {
             return false;
+        }
 
         return true;
     }
