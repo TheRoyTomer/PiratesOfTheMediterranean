@@ -136,6 +136,15 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Repair"",
+                    ""type"": ""Button"",
+                    ""id"": ""08fdf5d5-916b-49de-a6aa-a34ec8e234d2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -248,6 +257,17 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""ReverseCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""08a174bf-118f-4a24-9b82-f08fa02e1fc6"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Repair"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -261,6 +281,7 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_ToggleFiringCamera = m_Player.FindAction("ToggleFiringCamera", throwIfNotFound: true);
         m_Player_ReverseCamera = m_Player.FindAction("ReverseCamera", throwIfNotFound: true);
+        m_Player_Repair = m_Player.FindAction("Repair", throwIfNotFound: true);
     }
 
     ~@PiratesInputActions()
@@ -346,6 +367,7 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_ToggleFiringCamera;
     private readonly InputAction m_Player_ReverseCamera;
+    private readonly InputAction m_Player_Repair;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -377,6 +399,10 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ReverseCamera".
         /// </summary>
         public InputAction @ReverseCamera => m_Wrapper.m_Player_ReverseCamera;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Repair".
+        /// </summary>
+        public InputAction @Repair => m_Wrapper.m_Player_Repair;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -418,6 +444,9 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
             @ReverseCamera.started += instance.OnReverseCamera;
             @ReverseCamera.performed += instance.OnReverseCamera;
             @ReverseCamera.canceled += instance.OnReverseCamera;
+            @Repair.started += instance.OnRepair;
+            @Repair.performed += instance.OnRepair;
+            @Repair.canceled += instance.OnRepair;
         }
 
         /// <summary>
@@ -444,6 +473,9 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
             @ReverseCamera.started -= instance.OnReverseCamera;
             @ReverseCamera.performed -= instance.OnReverseCamera;
             @ReverseCamera.canceled -= instance.OnReverseCamera;
+            @Repair.started -= instance.OnRepair;
+            @Repair.performed -= instance.OnRepair;
+            @Repair.canceled -= instance.OnRepair;
         }
 
         /// <summary>
@@ -519,5 +551,12 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnReverseCamera(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Repair" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRepair(InputAction.CallbackContext context);
     }
 }

@@ -7,12 +7,19 @@ public class PlayerInputController : MonoBehaviour
     [SerializeField] private FiringDirectionController firingDirectionController;
     [SerializeField] private WeaponSystem weaponSystem;
     [SerializeField] private CameraModeController cameraModeController;
+    
+    [SerializeField, Range(0f, 1f)] private float repairFraction = 0.25f;
+
+    private ShipHealth shipHealth;
+    private PlayerInventory playerInventory;
 
     private PiratesInputActions inputActions;
 
     private void Awake()
     {
         inputActions = new PiratesInputActions();
+        shipHealth = GetComponent<ShipHealth>();
+        playerInventory = GetComponent<PlayerInventory>();
     }
 
     private void OnEnable()
@@ -66,6 +73,20 @@ public class PlayerInputController : MonoBehaviour
         if (inputActions.Player.Fire.WasPressedThisFrame())
         {
             weaponSystem.Fire(firingDirectionController.SelectedDirection);
+        }
+        
+        if (inputActions.Player.Repair.WasPressedThisFrame() &&
+            shipHealth != null &&
+            playerInventory != null &&
+            playerInventory.ShipParts > 0 &&
+            !shipHealth.IsDead &&
+            shipHealth.CurrentHealth < shipHealth.MaxHealth)
+        {
+            float healthBeforeRepair = shipHealth.CurrentHealth;
+            shipHealth.Heal(shipHealth.MaxHealth * repairFraction);
+
+            if (shipHealth.CurrentHealth > healthBeforeRepair)
+                playerInventory.TryUseShipPart();
         }
     }
 }

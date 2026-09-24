@@ -418,11 +418,8 @@ public class ShipSinking : MonoBehaviour
             shipPartsPickupPrefab.transform.rotation
         );
 
-        foreach (FloatingShipPart part in pickup.GetComponentsInChildren<FloatingShipPart>())
-            part.BeginEmergence(shipPartsRiseDepth, shipPartsRiseDuration);
-
-        PickupRingVisual ring = pickup.GetComponentInChildren<PickupRingVisual>();
-        if (ring != null)
-            ring.RevealAfter(shipPartsRiseDuration);
+        ShipPartsController partsController = pickup.GetComponent<ShipPartsController>();
+        if (partsController != null)
+            partsController.BeginPickup();
     }
 }

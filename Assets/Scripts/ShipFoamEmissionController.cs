@@ -6,6 +6,8 @@ public sealed class ShipFoamEmissionController : MonoBehaviour
 {
     [SerializeField] private ParticleSystem mainFoam;
     [SerializeField] private ParticleSystem bubbles;
+    [SerializeField, Min(0f)] private float mainFoamPerMeter = 0.4f;
+    [SerializeField, Min(0f)] private float bubblesPerMeter = 0.15f;
 
     private Rigidbody body;
 
@@ -33,13 +35,13 @@ public sealed class ShipFoamEmissionController : MonoBehaviour
         if (mainFoam != null)
         {
             var emission = mainFoam.emission;
-            emission.rateOverDistance = 0.4f * multiplier;
+            emission.rateOverDistance = mainFoamPerMeter * multiplier;
         }
 
         if (bubbles != null)
         {
             var emission = bubbles.emission;
-            emission.rateOverDistance = 0.15f * multiplier;
+            emission.rateOverDistance = bubblesPerMeter * multiplier;
         }
     }
 }

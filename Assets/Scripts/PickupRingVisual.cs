@@ -9,13 +9,14 @@ public class PickupRingVisual : MonoBehaviour
     [SerializeField] private float baseWidth = 4f;
     [SerializeField] private Color ringColor = new Color(0.72f, 0.3f, 1f, 1f);
     [SerializeField] private float pulseSpeed = 4f;
-    private float revealTime = -1f;
 
     private const int Segments = 64;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
     private LineRenderer lineRenderer;
     private MaterialPropertyBlock propertyBlock;
+    public Vector3 WorldCenter => transform.position;
+    public float WorldRadius => transform.TransformVector(Vector3.right * radius).magnitude;
 
     private void OnEnable()
     {
@@ -35,15 +36,9 @@ public class PickupRingVisual : MonoBehaviour
 
     private void Update()
     {
-        if (Application.isPlaying && revealTime >= 0f && Time.time >= revealTime)
-        {
-            lineRenderer.enabled = true;
-            revealTime = -1f;
-        }
-        
         if (!Application.isPlaying || lineRenderer == null)
             return;
-        
+
         float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) * 0.5f;
 
         lineRenderer.widthMultiplier = baseWidth * Mathf.Lerp(0.85f, 1.25f, pulse);
@@ -95,13 +90,19 @@ public class PickupRingVisual : MonoBehaviour
         }
     }
     
-    
-    public void RevealAfter(float delay)
+    public void Show()
     {
         if (lineRenderer == null)
             lineRenderer = GetComponent<LineRenderer>();
 
-        revealTime = Time.time + Mathf.Max(0f, delay);
+        lineRenderer.enabled = true;
+    }
+
+    public void Hide()
+    {
+        if (lineRenderer == null)
+            lineRenderer = GetComponent<LineRenderer>();
+
         lineRenderer.enabled = false;
     }
 }

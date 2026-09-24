@@ -248,6 +248,9 @@ public class AIController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (shipHealth.IsDead || shipHealth.CurrentHealth <= 0f)
+            return;
+
         desiredSteering = 0f;
         desiredThrottle = 0f;
 
@@ -714,6 +717,9 @@ public class AIController : MonoBehaviour
 
     private void HandleDamage(float damage)
     {
+        if (shipHealth.IsDead || shipHealth.CurrentHealth <= 0f)
+            return;
+
         ResetPassiveRecovery();
 
         bool wasPatrolling =

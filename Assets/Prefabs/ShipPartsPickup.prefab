@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 3342318801399307720}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 6, z: 0}
+  m_LocalPosition: {x: 3.3, y: 6, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -230,6 +230,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1794000437977273576}
+  - component: {fileID: 2380630399498207413}
   m_Layer: 0
   m_Name: ShipPartsPickup
   m_TagString: Untagged
@@ -263,6 +264,23 @@ Transform:
   - {fileID: 6118172725467013777}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2380630399498207413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5820370527258009469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587d5ba58c7eef04bacbb126524a2b8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipPartsController
+  riseDepth: 8
+  riseDuration: 1.5
+  visibleLifetime: 60
+  sinkingDepth: 8
+  sinkingDuration: 1.5
 --- !u!1001 &2017879577044278226
 PrefabInstance:
   m_ObjectHideFlags: 0

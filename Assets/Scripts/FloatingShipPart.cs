@@ -19,9 +19,14 @@ public class FloatingShipPart : MonoBehaviour
     private float verticalOffset;
     private float verticalVelocity;
     
+    
     private float emergenceDepth;
     private float emergenceDuration;
     private float emergenceElapsed;
+    private float sinkingDepth;
+    private float sinkingDuration;
+    private float sinkingElapsed;
+    private bool isSinking;
 
     private void Awake()
     {
@@ -88,6 +93,18 @@ public class FloatingShipPart : MonoBehaviour
             anchor.y -= emergenceDepth * (1f - progress);
         }
         
+        if (isSinking)
+        {
+            sinkingElapsed = Mathf.Min(
+                sinkingElapsed + Time.deltaTime,
+                sinkingDuration
+            );
+
+            float progress = sinkingElapsed / sinkingDuration;
+            progress = Mathf.SmoothStep(0f, 1f, progress);
+            anchor.y -= sinkingDepth * progress;
+        }
+        
         transform.position = anchor;
 
         transform.localRotation = baseLocalRotation *
@@ -103,5 +120,13 @@ public class FloatingShipPart : MonoBehaviour
         emergenceDepth = Mathf.Max(0f, depth);
         emergenceDuration = Mathf.Max(0.01f, duration);
         emergenceElapsed = 0f;
+    }
+    
+    public void BeginSinking(float depth, float duration)
+    {
+        sinkingDepth = Mathf.Max(0f, depth);
+        sinkingDuration = Mathf.Max(0.01f, duration);
+        sinkingElapsed = 0f;
+        isSinking = true;
     }
 }

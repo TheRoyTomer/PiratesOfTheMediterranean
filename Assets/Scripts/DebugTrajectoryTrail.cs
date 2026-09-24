@@ -58,7 +58,7 @@ public sealed class DebugTrajectoryTrail : MonoBehaviour
         if (keyboard == null || trajectory == null)
             return;
 
-        if (keyboard.tKey.wasPressedThisFrame)
+        if (keyboard.nKey.wasPressedThisFrame)
         {
             visible = !visible;
             // Start a fresh segment on re-enable; never bridge an unrecorded journey.
@@ -68,7 +68,7 @@ public sealed class DebugTrajectoryTrail : MonoBehaviour
             trajectory.emitting = visible;
         }
 
-        if (keyboard.rKey.wasPressedThisFrame)
+        if (keyboard.mKey.wasPressedThisFrame)
             trajectory.Clear();
     }
 

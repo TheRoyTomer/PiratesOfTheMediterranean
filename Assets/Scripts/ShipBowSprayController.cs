@@ -6,6 +6,7 @@ public sealed class ShipBowSprayController : MonoBehaviour
 {
     [SerializeField] private ParticleSystem leftSpray;
     [SerializeField] private ParticleSystem rightSpray;
+    [SerializeField, Min(0f)] private float maximumEmissionRate = 10f;
 
     private Rigidbody body;
 
@@ -33,13 +34,13 @@ public sealed class ShipBowSprayController : MonoBehaviour
         if (leftSpray != null)
         {
             var emission = leftSpray.emission;
-            emission.rateOverTime = 10f * multiplier;
+            emission.rateOverTime = maximumEmissionRate * multiplier;
         }
 
         if (rightSpray != null)
         {
             var emission = rightSpray.emission;
-            emission.rateOverTime = 10f * multiplier;
+            emission.rateOverTime = maximumEmissionRate * multiplier;
         }
     }
 }

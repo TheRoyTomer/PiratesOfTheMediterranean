@@ -59,7 +59,7 @@ public sealed class DebugEnemyCamera : MonoBehaviour
             return;
         }
 
-        if (Keyboard.current != null && Keyboard.current.capsLockKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.bKey.wasPressedThisFrame)
         {
             if (cameraModeController.ActiveGameplayCamera == view)
                 RestorePlayerCamera();

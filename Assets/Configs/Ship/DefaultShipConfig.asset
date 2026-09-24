@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefaultShipConfig
   m_EditorClassIdentifier: Assembly-CSharp::ShipConfig
   movement:
-    acceleration: 30
+    acceleration: 20
     brakeAcceleration: 3
     lateralDrag: 8
     turnAcceleration: 1.25
