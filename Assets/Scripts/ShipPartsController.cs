@@ -9,7 +9,7 @@ public class ShipPartsController : MonoBehaviour
     [SerializeField] private float sinkingDuration = 1.5f;
 
     private PickupRingVisual ring;
-    private FloatingShipPart[] parts;
+    private FloatingPart[] parts;
     
     private enum Phase
     {
@@ -21,21 +21,21 @@ public class ShipPartsController : MonoBehaviour
 
     private Phase phase;
     private float phaseEndTime;
-    private PlayerInventory playerInventory;
+    private PlayerShipParts playerInventory;
     private Collider playerHull;
     private bool collected;
 
     private void Awake()
     {
         ring = GetComponentInChildren<PickupRingVisual>();
-        parts = GetComponentsInChildren<FloatingShipPart>();
+        parts = GetComponentsInChildren<FloatingPart>();
     }
     
     public void BeginPickup()
     {
         ring.Hide();
 
-        foreach (FloatingShipPart part in parts)
+        foreach (FloatingPart part in parts)
             part.BeginEmergence(riseDepth, riseDuration);
 
         phase = Phase.Rising;
@@ -58,7 +58,7 @@ public class ShipPartsController : MonoBehaviour
             case Phase.Available:
                 ring.Hide();
 
-                foreach (FloatingShipPart part in parts)
+                foreach (FloatingPart part in parts)
                     part.BeginSinking(sinkingDepth, sinkingDuration);
 
                 phase = Phase.Sinking;
@@ -78,7 +78,7 @@ public class ShipPartsController : MonoBehaviour
 
         if (playerInventory == null)
         {
-            playerInventory = FindFirstObjectByType<PlayerInventory>();
+            playerInventory = FindFirstObjectByType<PlayerShipParts>();
             if (playerInventory == null)
                 return;
         }

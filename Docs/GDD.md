@@ -9,30 +9,33 @@
 | **Engine / Unity version** | Unity 6, URP, 3D |
 | **Orientation & reference resolution** | Landscape, 1920 × 1080 |
 | **Expected session length** | TBD — survival-based |
-| **Document version** | v0.2 - 2026-09-23 |
+| **Document version** | v0.3 - 2026-09-25 |
 
 ## 1. High Concept
 
-**Pirates of the Mediterranean** is a 3D single-player naval combat game set in a stylized pirate-era archipelago. The player fights successive waves of AI-controlled enemy ships, aiming to survive for as long as possible. Combat focuses on maneuvering, positioning, directional cannon fire, broadside attacks, ramming, and distinct ship playstyles.
+**Pirates of the Mediterranean** is a 3D single-player naval combat game set in a stylized pirate-era archipelago. The player fights successive waves of AI-controlled enemy ships, aiming to survive for as long as possible. Combat focuses on maneuvering, positioning, directional cannon fire, broadside attacks, ramming, and collecting resources such as Ship Parts and Explosive Barrels Sets.
 
 ### Design Pillars
 
 - **Positioning-Based Combat** - maneuvering and firing angles are central to survival.
-- **Distinct Ships, Simple Controls** - different ship types should feel meaningfully different while remaining easy to control.
+- **Simple Controls, Tactical Choices** - the ship remains easy to control while combat and resources give the player meaningful choices.
 - **Escalating Survival** - successive waves of enemy ships increase the pressure on the player and reward sustained combat and resource management.
 
 ## 2. Core Game Loop
 
-The planned match loop is survival against successive waves of enemy ships. The player fights, collects Ship Parts from defeated enemies, and uses them to repair the ship while trying to survive for as long as possible.
+The planned match loop is survival against successive waves of enemy ships. The player fights, collects Ship Parts from defeated enemies to repair the ship, and collects Explosive Barrels Sets that appear in the arena to deploy in combat while trying to survive for as long as possible.
 
-Ship movement, cannon combat, HP/damage, ship death, and combat against one AI-controlled enemy are implemented. Wave spawning, Loot, Repair, and match-level defeat and scoring are planned.
+Ship movement, cannon combat, HP/damage, ship death, combat against one AI-controlled enemy, Ship Parts loot and repair, and Explosive Barrels Set pickups and deployment are implemented. Wave spawning, match-level defeat, and scoring are planned.
 
 ```mermaid
 flowchart TD
-    A["Start Match"] --> B["Select Ship"]
-    B --> C["Spawn in Arena"]
+    A["Start Match"] --> C["Spawn in Arena"]
     C --> D["Enemy Wave Appears"]
     D --> E["Fight and Survive"]
+    E --> L["Collect Explosive Barrels Set"]
+    L --> E
+    E --> M["Deploy Barrels"]
+    M --> E
     E --> F{"Player Destroyed?"}
     F -- Yes --> G["Match Ends"]
     F -- No --> H{"Enemy Destroyed?"}
@@ -53,8 +56,9 @@ The rules for completing a wave, starting the next wave, and measuring the playe
 - The AI checks range and angle before firing. A general firing-range limit for the player's cannons is planned but not yet implemented.
 - Broadside attacks reward good side positioning.
 - Ramming damage currently depends on collision closing speed; ship size is not part of the implemented damage calculation.
-- Planned: defeated enemy ships drop Ship Parts that the player can collect.
-- Planned: the player can spend collected Ship Parts to repair the ship.
+- Defeated enemy ships drop Ship Parts that the player can collect.
+- The player can spend collected Ship Parts to repair the ship.
+- The player can collect Explosive Barrels Sets and deploy a group of four barrels in combat.
 - The player survives successive enemy waves until the player ship is destroyed.
 
 ### Parameters to Tune
@@ -63,7 +67,7 @@ Current values from the ship configuration and connected assets:
 
 | Group | Parameter | Current value |
 |---|---|---:|
-| Movement | `acceleration` | 30 |
+| Movement | `acceleration` | 20 |
 | Movement | `brakeAcceleration` | 3 |
 | Movement | `lateralDrag` | 8 |
 | Movement | `turnAcceleration` | 1.25 |
@@ -77,21 +81,22 @@ Current values from the ship configuration and connected assets:
 
 Death and sinking effects have their own settings. The current sequence uses explosions followed by a slow roll, a faster capsize, and sinking. The old `sinkingStartDelay` value of 8 seconds is a fallback when death effects do not start the sinking sequence; `rollDuration` is a legacy value and does not describe the current roll sequence.
 
-Planned values that still require design decisions:
+Additional values and open design decisions:
 
 | Parameter | What it controls | Value |
 |---|---|---|
 | Player cannon range | Whether and when the player's cannon fire is range-limited | TBD |
 | Enemy wave size and progression | How enemies appear and when the next wave begins | TBD |
-| Ship Parts drop amount | How many Parts an enemy drops | TBD |
-| Repair cost and amount | Parts spent and HP restored per repair | TBD |
+| Ship Parts drop amount | Parts awarded per defeated enemy | 1 |
+| Repair cost and amount | Parts spent and HP restored per repair | 1 Part; up to 25% of maximum HP |
+| Explosive Barrels Set spawning | When pickups appear and maximum active pickups | Initial pickup, then 17% every 30 seconds; maximum 2 active |
 | Radar range | Which enemies appear on the minimap / radar | TBD |
 
-**Where these live:** shared ship tuning is stored in `ShipConfig` and referenced by `ShipConfiguration`. Projectile, death-effect, and AI settings are configured separately. Planned wave, Loot, and Repair values will be assigned when those systems are designed.
+**Where these live:** shared ship tuning is stored in `ShipConfig` and referenced by `ShipConfiguration`. Projectile, death-effect, and AI settings are configured separately. Ship Parts, repair, and barrel values are configured in their respective components. Wave values will be assigned when that system is designed.
 
 ## 3. Controls & Input
 
-The player controls the ship from a third-person perspective. The controls below are implemented except for Repair, which is planned.
+The player controls the ship from a third-person perspective. The controls below are implemented.
 
 | Action | Keyboard / Mouse |
 |---|---|
@@ -103,7 +108,8 @@ The player controls the ship from a third-person perspective. The controls below
 | Toggle Main Camera / Firing Camera | `E` |
 | Hold rear view | `Tab` |
 | Fire selected cannons | `Left Mouse Button` / `Space` |
-| Repair using Ship Parts (planned) | `R` |
+| Repair using Ship Parts | `R` |
+| Deploy Explosive Barrels Set | `F` |
 | Rotate Main Camera | Mouse |
 
 `S` slows the ship; it does not provide normal reverse movement. Steering effectiveness depends on forward speed, so the ship cannot turn in place.
@@ -126,38 +132,14 @@ Pressing `E` toggles between the Main Camera and Firing Camera. Holding `Tab` sh
 `CameraModeController` handles switching between the camera views. Cinemachine is not currently used.
 
 
-## 4. Ships
-
-The game is planned to include different ship classes with distinct strengths and weaknesses. Sloop/Galleon differentiation is not implemented yet; both current ships share one default configuration.
-
-### Sloop
-
-- Fast and agile
-- Lower HP
-- Faster turning
-- Lower overall firepower
-- Lower ramming damage
-
-The Sloop is designed for players who prefer mobility, quick repositioning, and avoiding direct prolonged engagements.
-
-### Galleon
-
-- Slower and heavier
-- Higher HP
-- Slower turning
-- Higher overall firepower
-- Higher ramming damage
-
-The Galleon is designed for players who prefer durability, powerful attacks, and direct confrontations.
-
-## 5. Combat Mechanics
+## 4. Combat Mechanics
 
 Combat is based on maneuvering the ship into effective positions and choosing the correct attack direction.
 
 ### Cannons
 
 - Ships fire in three directions: Front, Right, and Left.
-- The current scene gives the player 6 firing points on each side. The enemy uses 4 on each side and 2 at the front. These are current configurations, not yet finalized ship-class loadouts.
+- The current scene gives the player 6 firing points on each side. The enemy uses 4 on each side and 2 at the front. These are the current scene configurations.
 - Side cannons are used for broadside attacks.
 - The AI checks range and angle before deciding to fire. The player's firing is currently limited by the selected direction's cooldown, not by target detection or target range. A player firing-range rule remains planned.
 - Cannons use cooldowns rather than limited ammunition.
@@ -170,7 +152,15 @@ Collision-based ramming damage is implemented for ships. The AI can also choose 
 
 - A collision must meet the minimum closing-speed requirement to deal ramming damage.
 - Damage is calculated from closing speed, with a maximum damage cap. The rammer may also take a smaller amount of self-damage.
-- Ship size and mass are not inputs to the current damage calculation. Whether different ship classes should affect ramming damage remains a future design decision.
+- Ship size and mass are not inputs to the current damage calculation.
+
+### Explosive Barrels
+
+- The player collects Explosive Barrels Sets from pickups in the arena.
+- Pressing `F` spends one set and deploys a group of four barrels, subject to a 1-second cooldown.
+- Once the barrels are floating, they spread out and detonate when a ship comes close. Each affected ship takes damage once per group.
+- The deploying ship is temporarily protected from its own barrels.
+- Planned: a destroyed ship cannot deploy an Explosive Barrels Set.
 
 ### Damage and Destruction
 
@@ -189,14 +179,14 @@ Local ship death and sinking are implemented. Tracking the end of a survival mat
 
 ### Repair
 
-Loot collection and player Repair are planned and not yet implemented.
+Ship Parts collection and player repair are implemented.
 
-- Defeated enemy ships will drop Ship Parts.
-- The player will collect Ship Parts and spend them to restore HP during the match.
-- Drop amount, collection rules, repair cost, and HP restored are still to be decided.
+- Each defeated enemy ship drops one Ship Parts pickup after sinking. Collecting it adds one Part to the player's inventory.
+- Pressing `R` spends one Part to restore up to 25% of maximum HP, without exceeding maximum health.
+- A destroyed ship or a ship at full health cannot repair.
 
 
-## 6. AI Behavior
+## 5. AI Behavior
 
 Combat against one AI-controlled enemy ship is implemented and has been tested in complete battles against the player. The current enemy targets the player. Multiple simultaneous enemies and wave spawning are planned.
 
@@ -214,7 +204,7 @@ The planned wave system will bring several enemy ships into the arena to fight t
 The AI's states, transitions, and decision rules are documented separately in `AI_StateMachine.md`.
 
 
-## 7. Map & Arena
+## 6. Map & Arena
 
 The game takes place in a single naval arena. The current `GameScene` includes the ocean, islands, rock formations, and a large open-water combat area.
 
@@ -228,7 +218,7 @@ The sketch below shows the original layout concept. The implemented arena is rep
 
 ![Naval Arena Map Concept](Images/map-concept.png)
 
-## 8. HUD & UI
+## 7. HUD & UI
 
 The in-game HUD presents the information the player needs during combat without obstructing the view.
 
@@ -238,10 +228,11 @@ Currently implemented:
 - **Selected firing direction**
 - **Cooldown status for each firing direction**
 - **Enemy HP and distance**, shown when the enemy is visible
+- **Current amount of Ship Parts**
+- **Current number of Explosive Barrels Sets**
 
 Planned for the survival wave system:
 
-- **Current amount of Ship Parts**
 - **Current wave**
 - **Enemies remaining in the current wave**, if waves end when all their enemies are defeated
 - **Minimap / Radar**
@@ -254,18 +245,16 @@ The current Gameplay Screen contains the combat view and the implemented HUD ele
 Planned screens:
 
 - **Main Menu** — starts a new match.
-- **Choose Loadout** — lets the player select a ship before entering the arena.
 - **Game Over** — shows the player's survival result after the ship is destroyed, with options to restart or return to the menu.
 
-## 9. Technical Design
+## 8. Technical Design
 
 The game separates player and AI decisions from the shared systems that move ships, fire weapons, apply damage, and play death effects.
 
 ### Scenes
 
-- `GameScene` (current) — contains the arena, PlayerShip, one EnemyShip, combat systems, cameras, and the current HUD.
+- `GameScene` (current) — contains the arena, PlayerShip, one EnemyShip, combat and pickup systems, cameras, and the current HUD.
 - `MainMenu` (planned) — starts a survival match.
-- `Loadout` (planned) — lets the player choose a ship before entering the arena.
 
 Game Over is planned as a UI state inside `GameScene`. Wave spawning, survival results, and match-level defeat handling are not implemented yet.
 
@@ -291,16 +280,22 @@ flowchart TD
     WEAPON --> POOL[CannonballPool]
     POOL --> BALL[Cannonball]
     BALL --> HEALTH[ShipHealth]
+    BARREL_AMMO[Barrel pickups and ammo] --> WEAPON
+    WEAPON --> BARRELS[Explosive barrels]
+    BARRELS --> HEALTH
     HEALTH --> DEATH[Death effects and sinking]
+    DEATH -- Enemy --> PARTS[Ship Parts]
+    PARTS --> REPAIR[Player repair]
+    REPAIR --> HEALTH
 ```
 
 PlayerShip and EnemyShip use the shared `Ship.prefab` and its ship movement, weapons, health, collision, and death systems. `PlayerInputController` translates player input into calls to those systems. `AIController` manages the enemy's states and decisions and calls the same movement and weapon systems.
 
 The current AI controls one enemy with a reference to the player as its target. It uses `AIPerception`, `AIObstacleAvoidance`, `AIRammingEvaluator`, and `AIEvadeEvaluator`. Target selection between multiple ships is not implemented. The planned survival mode will spawn multiple enemies in waves that fight the player.
 
-`ShipConfig` is a ScriptableObject for shared ship tuning, referenced by the root `ShipConfiguration` component. Runtime values such as current HP, weapon cooldowns, and AI state belong to each ship instance. The current ships share the default config; separate tuning for ship types remains planned.
+`ShipConfig` is a ScriptableObject for shared ship tuning, referenced by the root `ShipConfiguration` component. Runtime values such as current HP, weapon cooldowns, and AI state belong to each ship instance. The current ships share the default config.
 
-`WeaponSystem` uses the shared scene-level `CannonballPool` to reuse projectiles. Cannonballs handle movement, collision, damage, impact effects, and return to the pool. VFX are currently instantiated rather than pooled.
+`WeaponSystem` uses the shared scene-level `CannonballPool` to reuse projectiles. Cannonballs handle movement, collision, damage, impact effects, and return to the pool. VFX are currently instantiated rather than pooled. Planned: prevent barrel deployment after the deploying ship is destroyed.
 
 Ship destruction is split between `ShipHealth`, `ShipDeathEffects`, and `ShipSinking`. Collision behavior is handled separately by `ShipRammingDamage`, `ShipCollisionResponse`, `ShipShorelineResponse`, and `ShipContactRecovery`. Contact recovery pushes a ship away after a suitable frontal collision; it does not restore HP.
 
@@ -311,7 +306,7 @@ Ship destruction is split between `ShipHealth`, `ShipDeathEffects`, and `ShipSin
 | `PlayerInputController` | Reads player input and calls shared ship, weapon, and camera systems. |
 | `ShipController` | Handles forward movement, braking, and steering. Steering effectiveness depends on forward speed. |
 | `ShipConfig` / `ShipConfiguration` | Stores and supplies shared ship tuning. Runtime state remains per ship instance. |
-| `WeaponSystem` | Fires Front, Right, and Left cannon banks and manages their cooldowns. |
+| `WeaponSystem` | Fires Front, Right, and Left cannon banks, manages their cooldowns, and deploys Explosive Barrels Sets. |
 | `CannonballPool` / `Cannonball` | Reuses projectiles and handles their movement, collision, and damage. |
 | `ShipHealth` | Tracks HP, applies damage, records the lethal hit, and raises death events. |
 | `ShipDeathEffects` / `ShipSinking` | Play the explosion, smoke, capsize, and sinking sequence. |
@@ -322,9 +317,11 @@ Ship destruction is split between `ShipHealth`, `ShipDeathEffects`, and `ShipSin
 | `AIPerception` / `AIObstacleAvoidance` | Handle target visibility and shoreline obstacle detection. |
 | `AIRammingEvaluator` / `AIEvadeEvaluator` | Evaluate opportunities to ram and conditions for evasive behavior. |
 | `CameraFollow` / `CameraModeController` | Handle the third-person camera, firing views, rear view, and camera switching. |
-| Current HUD components | Display player HP, enemy HP and distance, firing direction, and cooldowns. |
+| Current HUD components | Display player HP, enemy HP and distance, firing direction, cooldowns, Ship Parts, and Explosive Barrels Sets. |
 | Wave and match management (planned) | Spawn enemies in waves, track survival progress, and end the match when the player is destroyed. |
-| Loot and Repair (planned) | Drop and collect Ship Parts, then spend them to restore player HP. |
+| `ShipSinking` / `ShipPartsController` / `PlayerShipParts` | Spawn and collect Ship Parts after an enemy sinks, track the player's Parts, and spend them to repair HP. |
+| `ExplosiveBarrelSetSpawner` / `BarrelAmmoPickupController` / `BarrelAmmo` | Spawn and collect Explosive Barrels Sets and track the player's available sets. |
+| `BarrelController` / `BarrelStrikeController` | Move the deployed barrels, detect ships, and apply explosion damage. |
 | Radar (planned) | Supply nearby-enemy information to the minimap or radar. |
 
 The scene object named `GameManager` currently hosts `CannonballPool`. It does not yet manage waves, survival results, or match state.
@@ -339,11 +336,10 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 
 ---
 
-## 10. Scope
+## 9. Scope
 
-### 10.1 MVP - Must Have
+### 9.1 MVP - Must Have
 
-- [ ] Distinct Sloop and Galleon ship configurations
 - [x] Ship movement, braking, and steering
 - [x] Main third-person camera
 - [x] Front, Right, and Left firing camera views and camera toggle
@@ -354,24 +350,25 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - [x] One AI-controlled enemy capable of fighting the player
 - [ ] Multiple enemies spawning in survival waves
 - [ ] AI Passive Recovery outside combat
-- [ ] Ship Parts drops, collection, and player Repair
+- [x] Ship Parts drops, collection, and player Repair
+- [x] Explosive Barrels Sets: spawning, collection, deployment, and detonation
+- [ ] Prevent destroyed ships from deploying Explosive Barrels Sets
 - [x] Player HP, selected firing direction, and cooldown HUD
 - [x] Enemy HP and distance display
-- [ ] Wave progress, Ship Parts, and survival result display
+- [x] Ship Parts and Explosive Barrels Sets HUD
+- [ ] Wave progress and survival result display
 - [ ] Minimap / Radar
 - [x] One enclosed naval arena
 - [ ] Game Over and survival result flow
 - [x] Hit VFX
 - [x] Short smoke effect at impact points
 - [x] Ship destruction effects: explosions, smoke, capsize, and sinking
-- [ ] Main Menu and Loadout
+- [ ] Main Menu
 - [ ] Singleton for match management, as required for the course
 
-### 10.2 Nice to Have / Polish
+### 9.2 Nice to Have / Polish
 
-- [ ] Third ship class
 - [ ] Mortar
-- [ ] Explosive barrels
 - [ ] Other special weapons
 - [ ] Captain animation
 - [ ] Advanced radar behavior
@@ -380,7 +377,7 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - [ ] Multiple visual damage stages
 - [ ] More advanced fire and destruction effects
 
-### 10.3 Explicitly Out of Scope
+### 9.3 Explicitly Out of Scope
 
 - Boarding
 - Third-person character combat
@@ -390,7 +387,7 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - Full crew system
 - Shop or long-term progression
 
-## 11. Art & Assets
+## 10. Art & Assets
 
 The game uses a stylized / semi-realistic pirate visual style.
 
@@ -399,7 +396,11 @@ The game uses a stylized / semi-realistic pirate visual style.
 **Stylized Pirate Ship by Yorakeys**  
 https://www.cgtrader.com/3d-models/vehicle/other/stylized-pirate-ship-by-yorakeys
 
-The current ships use a shared ship prefab and configuration. Distinct Sloop and Galleon gameplay configurations remain planned. The ship asset includes modular parts and weapons that may support visual differences between ship types.
+The player and enemy ships use a shared ship prefab and configuration. The ship asset includes modular parts and weapons that can support visual customization.
+
+### Explosion Effects Asset
+
+A new Explosion Effects asset pack has been added to replace the previous explosion asset. Updating the game's existing explosion effects to use the new pack is planned for a later pass.
 
 ### Water Asset
 

@@ -10,6 +10,7 @@ public class WeaponSystem : MonoBehaviour
 
 
     private ShipHealth shipHealth;
+    private BarrelAmmo barrelAmmo;
 
     private float frontCooldown;
     private float leftCooldown;
@@ -23,6 +24,13 @@ public class WeaponSystem : MonoBehaviour
     [Header("Cannon Settings")]
     [SerializeField] private CannonballPool cannonballPool;
     
+    [Header("Explosive Barrels")]
+    [SerializeField] private BarrelStrikeController barrelsGroupPrefab;
+    [SerializeField] private Transform barrelsReleasePoint;
+
+    private Rigidbody shipRigidbody;
+    private float nextBarrelReleaseTime;
+    
     public float FrontCooldown => frontCooldown;
     public float LeftCooldown => leftCooldown;
     public float RightCooldown => rightCooldown;
@@ -31,6 +39,8 @@ public class WeaponSystem : MonoBehaviour
     {
         config = GetComponent<ShipConfiguration>().Config;
         shipHealth = GetComponent<ShipHealth>();
+        shipRigidbody = GetComponent<Rigidbody>();
+        barrelAmmo = GetComponent<BarrelAmmo>();
     }
 
     private void Update()
@@ -55,6 +65,34 @@ public class WeaponSystem : MonoBehaviour
         }
 
         StartCooldown(direction);
+    }
+    
+    public void DeployBarrels()
+    {
+        if (shipHealth != null &&
+            (shipHealth.IsDead || shipHealth.CurrentHealth <= 0f))
+            return;
+
+        if (Time.time < nextBarrelReleaseTime ||
+            barrelsGroupPrefab == null ||
+            barrelsReleasePoint == null ||
+            barrelAmmo == null ||
+            barrelAmmo.Count <= 0)
+            return;
+
+        BarrelStrikeController strike = Instantiate(
+            barrelsGroupPrefab,
+            barrelsReleasePoint.position,
+            barrelsReleasePoint.rotation
+        );
+
+        Vector3 shipVelocity = shipRigidbody != null
+            ? shipRigidbody.linearVelocity
+            : Vector3.zero;
+
+        strike.BeginRelease(shipVelocity, shipHealth);
+        barrelAmmo.TryUseOne();
+        nextBarrelReleaseTime = Time.time + 1f;
     }
 
     private float UpdateCooldown(float cooldown)

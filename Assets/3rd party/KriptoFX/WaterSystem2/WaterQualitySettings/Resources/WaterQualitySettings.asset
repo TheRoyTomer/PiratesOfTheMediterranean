@@ -14,90 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   qualityLevelSettings:
   - _version: 0
-    levelName: Low
+    levelName: PC
     UseDynamicWaves: 1
     UseDynamicWavesWetEffect: 1
-    DynamicWavesMapResolution: 1
-    UseScreenSpaceReflection: 1
-    ScreenSpaceReflectionResolutionQuality: 25
-    UseScreenSpaceReflectionSky: 1
-    ScreenSpaceBordersStretching: 0.025
-    UsePlanarReflection: 0
-    PlanarCullingMask: -1
-    PlanarReflectionResolutionQuality: 368
-    ReflectionClipPlaneOffset: 0.0005
-    RenderPlanarShadows: 0
-    RenderPlanarVolumetricsAndFog: 0
-    RenderPlanarClouds: 0
-    UseAnisotropicReflections: 1
-    AnisotropicReflectionsHighQuality: 0
-    RefractionResolution: 50
-    UseRefractionDispersion: 1
-    UseOceanFoam: 1
-    UseWetEffect: 1
-    UseVolumetricLight: 1
-    VolumetricLightResolutionQuality: 20
-    VolumetricLightIteration: 8
-    VolumetricLightCausticMode: 0
-    UseCausticEffect: 1
-    OceanCausticTextureResolutionQuality: 256
-    UseOceanCausticHighQualityFiltering: 0
-    UseOceanCausticDispersion: 1
-    UseUnderwaterEffect: 1
-    DisableWaterDropsInScene: 0
-    MeshDetailingFarDistance: 2000
-    WaterMeshDetailing: 3
-    WaterTransparentSortingPriority: -2
-    DrawToPosteffectsDepth: 0
-    WideAngleCameraRenderingMode: 0
-  - _version: 0
-    levelName: Medium
-    UseDynamicWaves: 1
-    UseDynamicWavesWetEffect: 1
-    DynamicWavesMapResolution: 1
-    UseScreenSpaceReflection: 1
-    ScreenSpaceReflectionResolutionQuality: 35
-    UseScreenSpaceReflectionSky: 1
-    ScreenSpaceBordersStretching: 0.025
-    UsePlanarReflection: 0
-    PlanarCullingMask: -1
-    PlanarReflectionResolutionQuality: 368
-    ReflectionClipPlaneOffset: 0.0005
-    RenderPlanarShadows: 0
-    RenderPlanarVolumetricsAndFog: 0
-    RenderPlanarClouds: 0
-    UseAnisotropicReflections: 1
-    AnisotropicReflectionsHighQuality: 0
-    RefractionResolution: 50
-    UseRefractionDispersion: 1
-    UseOceanFoam: 1
-    UseWetEffect: 1
-    UseVolumetricLight: 1
-    VolumetricLightResolutionQuality: 30
-    VolumetricLightIteration: 8
-    VolumetricLightCausticMode: 0
-    UseCausticEffect: 1
-    OceanCausticTextureResolutionQuality: 512
-    UseOceanCausticHighQualityFiltering: 0
-    UseOceanCausticDispersion: 1
-    UseUnderwaterEffect: 1
-    DisableWaterDropsInScene: 0
-    MeshDetailingFarDistance: 2000
-    WaterMeshDetailing: 2
-    WaterTransparentSortingPriority: -2
-    DrawToPosteffectsDepth: 0
-    WideAngleCameraRenderingMode: 0
-  - _version: 0
-    levelName: High
-    UseDynamicWaves: 1
-    UseDynamicWavesWetEffect: 1
-    DynamicWavesMapResolution: 1024
+    DynamicWavesMapResolution: 512
     UseScreenSpaceReflection: 1
     ScreenSpaceReflectionResolutionQuality: 50
     UseScreenSpaceReflectionSky: 1
     ScreenSpaceBordersStretching: 0.025
     UsePlanarReflection: 0
-    PlanarCullingMask: 999
+    PlanarCullingMask: -1
     PlanarReflectionResolutionQuality: 368
     ReflectionClipPlaneOffset: 0.0005
     RenderPlanarShadows: 0
@@ -124,13 +50,50 @@ MonoBehaviour:
     WaterTransparentSortingPriority: -2
     DrawToPosteffectsDepth: 0
     WideAngleCameraRenderingMode: 0
+  - _version: 0
+    levelName: Mobile
+    UseDynamicWaves: 1
+    UseDynamicWavesWetEffect: 1
+    DynamicWavesMapResolution: 512
+    UseScreenSpaceReflection: 1
+    ScreenSpaceReflectionResolutionQuality: 50
+    UseScreenSpaceReflectionSky: 1
+    ScreenSpaceBordersStretching: 0.025
+    UsePlanarReflection: 0
+    PlanarCullingMask: -1
+    PlanarReflectionResolutionQuality: 368
+    ReflectionClipPlaneOffset: 0.0005
+    RenderPlanarShadows: 0
+    RenderPlanarVolumetricsAndFog: 0
+    RenderPlanarClouds: 0
+    UseAnisotropicReflections: 1
+    AnisotropicReflectionsHighQuality: 0
+    RefractionResolution: 50
+    UseRefractionDispersion: 1
+    UseOceanFoam: 1
+    UseWetEffect: 1
+    UseVolumetricLight: 1
+    VolumetricLightResolutionQuality: 40
+    VolumetricLightIteration: 8
+    VolumetricLightCausticMode: 0
+    UseCausticEffect: 1
+    OceanCausticTextureResolutionQuality: 768
+    UseOceanCausticHighQualityFiltering: 0
+    UseOceanCausticDispersion: 1
+    UseUnderwaterEffect: 1
+    DisableWaterDropsInScene: 0
+    MeshDetailingFarDistance: 2000
+    WaterMeshDetailing: 1
+    WaterTransparentSortingPriority: -2
+    DrawToPosteffectsDepth: 0
+    WideAngleCameraRenderingMode: 0
   ShowDynamicWavesSettings: 1
   ShowReflectionSettings: 1
   ShowRefractionSettings: 1
-  ShowFoamSettings: 0
-  ShowWetSettings: 0
-  ShowVolumetricLightSettings: 0
-  ShowCausticEffectSettings: 0
+  ShowFoamSettings: 1
+  ShowWetSettings: 1
+  ShowVolumetricLightSettings: 1
+  ShowCausticEffectSettings: 1
   ShowUnderwaterEffectSettings: 1
   ShowMeshSettings: 1
   ShowRendering: 1

@@ -469,6 +469,7 @@ GameObject:
   m_Component:
   - component: {fileID: 672704631116328687}
   - component: {fileID: 1611904880861902959}
+  - component: {fileID: 3648216397773141815}
   m_Layer: 8
   m_Name: PhysicalHull
   m_TagString: Untagged
@@ -513,6 +514,18 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -7230036262162562051, guid: 6343cb297d6689b40879a1531acff763, type: 3}
+--- !u!114 &3648216397773141815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2904776323696956992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9b1e541e63af3c4a96da164d4f7fc34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipHullRange
 --- !u!1 &3273832764448168073
 GameObject:
   m_ObjectHideFlags: 0
@@ -1798,6 +1811,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: -5847680141335547412}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6343cb297d6689b40879a1531acff763, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 708775644412360406}
     - targetCorrespondingSourceObject: {fileID: -2027628932786962548, guid: 6343cb297d6689b40879a1531acff763, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2242081418832413387}
@@ -2008,6 +2024,8 @@ MonoBehaviour:
   - {fileID: 7542103421851393810}
   - {fileID: 2164211649907376879}
   cannonballPool: {fileID: 0}
+  barrelsGroupPrefab: {fileID: 0}
+  barrelsReleasePoint: {fileID: 0}
 --- !u!114 &6401485522276906269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2049,6 +2067,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf10f2162837ff24e8f9e57c6b579d34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipSinking
+  shipPartsPickupPrefab: {fileID: 0}
+  shipPartsRiseDepth: 3
+  shipPartsRiseDuration: 1.5
   waterDeathSplashPrefab: {fileID: 7151254913210794864, guid: 3583fea4d6626ab439eb69caba51c3f0, type: 3}
   waterSplashLifetime: 5
 --- !u!114 &2460244918450269897
@@ -2102,6 +2123,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipFoamEmissionController
   mainFoam: {fileID: 9018039445380598379}
   bubbles: {fileID: 9018039445827256744}
+  mainFoamPerMeter: 0.4
+  bubblesPerMeter: 0.15
 --- !u!114 &1186519070506755072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2116,6 +2139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipBowSprayController
   leftSpray: {fileID: 7405895405782763911}
   rightSpray: {fileID: 8920446603562709411}
+  maximumEmissionRate: 10
 --- !u!114 &991127941670471151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2216,6 +2240,19 @@ MonoBehaviour:
   throttleLockDuration: 0.35
   frontContactDot: 0.6
   frontNormalDot: 0.5
+--- !u!114 &708775644412360406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629679408435547744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfc518e9dd5349c489a8aa1d2e2500c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarrelAmmo
+  startingAmmo: 0
 --- !u!4 &4113165919380411610 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6343cb297d6689b40879a1531acff763, type: 3}

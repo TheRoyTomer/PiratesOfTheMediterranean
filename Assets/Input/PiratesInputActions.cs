@@ -145,6 +145,15 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DeployBarrels"",
+                    ""type"": ""Button"",
+                    ""id"": ""19cc2745-1e96-490f-9229-433976473930"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -268,6 +277,17 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Repair"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""69e3eef6-2566-48f6-8007-b5b6d84f19be"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DeployBarrels"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -282,6 +302,7 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         m_Player_ToggleFiringCamera = m_Player.FindAction("ToggleFiringCamera", throwIfNotFound: true);
         m_Player_ReverseCamera = m_Player.FindAction("ReverseCamera", throwIfNotFound: true);
         m_Player_Repair = m_Player.FindAction("Repair", throwIfNotFound: true);
+        m_Player_DeployBarrels = m_Player.FindAction("DeployBarrels", throwIfNotFound: true);
     }
 
     ~@PiratesInputActions()
@@ -368,6 +389,7 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ToggleFiringCamera;
     private readonly InputAction m_Player_ReverseCamera;
     private readonly InputAction m_Player_Repair;
+    private readonly InputAction m_Player_DeployBarrels;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -403,6 +425,10 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Repair".
         /// </summary>
         public InputAction @Repair => m_Wrapper.m_Player_Repair;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/DeployBarrels".
+        /// </summary>
+        public InputAction @DeployBarrels => m_Wrapper.m_Player_DeployBarrels;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -447,6 +473,9 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
             @Repair.started += instance.OnRepair;
             @Repair.performed += instance.OnRepair;
             @Repair.canceled += instance.OnRepair;
+            @DeployBarrels.started += instance.OnDeployBarrels;
+            @DeployBarrels.performed += instance.OnDeployBarrels;
+            @DeployBarrels.canceled += instance.OnDeployBarrels;
         }
 
         /// <summary>
@@ -476,6 +505,9 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
             @Repair.started -= instance.OnRepair;
             @Repair.performed -= instance.OnRepair;
             @Repair.canceled -= instance.OnRepair;
+            @DeployBarrels.started -= instance.OnDeployBarrels;
+            @DeployBarrels.performed -= instance.OnDeployBarrels;
+            @DeployBarrels.canceled -= instance.OnDeployBarrels;
         }
 
         /// <summary>
@@ -558,5 +590,12 @@ public partial class @PiratesInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRepair(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DeployBarrels" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDeployBarrels(InputAction.CallbackContext context);
     }
 }

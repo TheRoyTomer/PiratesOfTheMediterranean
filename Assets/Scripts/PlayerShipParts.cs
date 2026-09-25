@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using TMPro;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerShipParts : MonoBehaviour
 {
     [SerializeField] private int shipParts;
     [SerializeField] private TMP_Text shipPartsText;

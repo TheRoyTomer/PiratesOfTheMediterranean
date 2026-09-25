@@ -11,7 +11,7 @@ public class PlayerInputController : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float repairFraction = 0.25f;
 
     private ShipHealth shipHealth;
-    private PlayerInventory playerInventory;
+    private PlayerShipParts playerInventory;
 
     private PiratesInputActions inputActions;
 
@@ -19,7 +19,7 @@ public class PlayerInputController : MonoBehaviour
     {
         inputActions = new PiratesInputActions();
         shipHealth = GetComponent<ShipHealth>();
-        playerInventory = GetComponent<PlayerInventory>();
+        playerInventory = GetComponent<PlayerShipParts>();
     }
 
     private void OnEnable()
@@ -73,6 +73,11 @@ public class PlayerInputController : MonoBehaviour
         if (inputActions.Player.Fire.WasPressedThisFrame())
         {
             weaponSystem.Fire(firingDirectionController.SelectedDirection);
+        }
+        
+        if (inputActions.Player.DeployBarrels.WasPressedThisFrame())
+        {
+            weaponSystem.DeployBarrels();
         }
         
         if (inputActions.Player.Repair.WasPressedThisFrame() &&

@@ -1,7 +1,7 @@
 using KWS;
 using UnityEngine;
 
-public class FloatingShipPart : MonoBehaviour
+public class FloatingPart : MonoBehaviour
 {
     [Tooltip("Residual bob amplitude in world units, independent of parent scale.")]
     [SerializeField, Min(0f)] private float bobHeight = 0.05f;
