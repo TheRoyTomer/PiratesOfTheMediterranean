@@ -55,12 +55,13 @@ public sealed class ShipConfig : ScriptableObject
     {
         [Tooltip("Seconds between consecutive death explosions.")]
         [Min(0f)] [SerializeField] private float explosionDelay = 1f;
-        [Tooltip("Seconds after each individual explosion starts before its smoke starts.")]
+        [Tooltip("Seconds after each individual explosion starts before its fire starts.")]
         [UnityEngine.Serialization.FormerlySerializedAs("smokeDelay")]
-        [Min(0f)] [SerializeField] private float smokeStartAfterExplosion = 0.7f;
+        [UnityEngine.Serialization.FormerlySerializedAs("smokeStartAfterExplosion")]
+        [Min(0f)] [SerializeField] private float fireStartAfterExplosion = 0.7f;
 
         public float ExplosionDelay => explosionDelay;
-        public float SmokeStartAfterExplosion => smokeStartAfterExplosion;
+        public float FireStartAfterExplosion => fireStartAfterExplosion;
     }
 
     [Serializable]
@@ -76,7 +77,7 @@ public sealed class ShipConfig : ScriptableObject
         [Min(0f)] [SerializeField] private float rollDuration = 6f;
         [Tooltip("Degrees per second during slow roll; holds at slowRollTargetAngle until the phase timer ends.")]
         [Min(0.01f)] [SerializeField] private float slowRollSpeed = 3.0f;
-        [Tooltip("Seconds in the slow-roll phase before fast capsize begins, independent of smoke.")]
+        [Tooltip("Seconds in the slow-roll phase before fast capsize begins, independent of fire.")]
         [Min(0f)] [SerializeField] private float slowRollPhaseDuration = 5f;
         [Tooltip("Degrees per second after the slow-roll phase timer ends.")]
         [Min(0.01f)] [SerializeField] private float fastRollSpeed = 15f;

@@ -10,8 +10,9 @@ public class ShipDeathEffects : MonoBehaviour
     [Header("Death Explosions")]
     [SerializeField] private GameObject deathExplosionPrefab;
 
-    [Header("Death Smoke")]
-    [SerializeField] private GameObject deathSmokePrefab;
+    [Header("Death Fire")]
+    [UnityEngine.Serialization.FormerlySerializedAs("deathSmokePrefab")]
+    [SerializeField] private GameObject deathFirePrefab;
 
     [Header("Explosion Points (1 = Bow, 2 = Middle, 3 = Stern)")]
     [SerializeField] private Transform bowExplosionPoint;
@@ -20,6 +21,8 @@ public class ShipDeathEffects : MonoBehaviour
 
     private ShipHealth shipHealth;
     private bool sequenceStarted;
+    private readonly GameObject[] deathExplosions = new GameObject[3];
+    private readonly GameObject[] deathFires = new GameObject[3];
 
     public bool ExplosionPhaseFinished { get; private set; }
     public bool HasFinalExplosionStarted { get; private set; }
@@ -42,6 +45,9 @@ public class ShipDeathEffects : MonoBehaviour
     private void OnDisable()
     {
         shipHealth.OnDeath -= PlayDeathEffects;
+        StopAllCoroutines();
+        DestroyEffects(deathFires);
+        DestroyEffects(deathExplosions);
     }
 
     private void PlayDeathEffects()
@@ -59,8 +65,8 @@ public class ShipDeathEffects : MonoBehaviour
         }
 
         sequenceStarted = true;
-        if (deathSmokePrefab == null)
-            Debug.LogError($"{name}: ShipDeathEffects requires a death smoke prefab. Smoke will be skipped; explosions will still play.", this);
+        if (deathFirePrefab == null)
+            Debug.LogError($"{name}: ShipDeathEffects requires a death fire prefab. Fire will be skipped; explosions will still play.", this);
 
         Vector3 hitPosition = shipHealth.FinalHitPosition;
         float bowDistance = (bowExplosionPoint.position - hitPosition).sqrMagnitude;
@@ -81,7 +87,7 @@ public class ShipDeathEffects : MonoBehaviour
         var points = new[] { first, second, third };
         var positions = new Vector3[3];
         var rotations = new Quaternion[3];
-        var explosions = new GameObject[3];
+        var explosions = deathExplosions;
         var delay = new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.ExplosionDelay));
         for (int i = 0; i < points.Length; i++)
         {
@@ -90,8 +96,8 @@ public class ShipDeathEffects : MonoBehaviour
             explosions[i] = Instantiate(deathExplosionPrefab, positions[i], rotations[i]);
             if (i == points.Length - 1)
                 SignalFinalExplosionStarted();
-            if (deathSmokePrefab != null)
-                StartCoroutine(SpawnSmokeAfterExplosion(positions[i], rotations[i]));
+            if (deathFirePrefab != null)
+                StartCoroutine(SpawnFireAfterExplosion(points[i], i));
             if (i < points.Length - 1)
                 yield return delay;
         }
@@ -101,14 +107,37 @@ public class ShipDeathEffects : MonoBehaviour
         while (EffectsAreAlive(explosions))
             yield return null;
 
+        DestroyEffects(explosions);
         ExplosionPhaseFinished = true;
     }
 
-    private IEnumerator SpawnSmokeAfterExplosion(Vector3 position, Quaternion rotation)
+    private IEnumerator SpawnFireAfterExplosion(Transform point, int index)
     {
-        yield return new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.SmokeStartAfterExplosion));
-        // Independent playback; this coroutine never controls the roll/capsize phases.
-        Instantiate(deathSmokePrefab, position, rotation * deathSmokePrefab.transform.localRotation);
+        yield return new WaitForSeconds(Mathf.Max(0f, config.DeathEffects.FireStartAfterExplosion));
+
+        if (deathFirePrefab == null || point == null ||
+            !point.gameObject.activeInHierarchy)
+            yield break;
+
+        GameObject fire = Instantiate(
+            deathFirePrefab,
+            point.position,
+            point.rotation * deathFirePrefab.transform.localRotation
+        );
+
+        fire.transform.SetParent(point, true);
+        deathFires[index] = fire;
+    }
+
+    private static void DestroyEffects(GameObject[] effects)
+    {
+        for (int i = 0; i < effects.Length; i++)
+        {
+            if (effects[i] != null)
+                Destroy(effects[i]);
+
+            effects[i] = null;
+        }
     }
 
     private void SignalFinalExplosionStarted()

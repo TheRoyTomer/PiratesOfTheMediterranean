@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using KWS;
 
@@ -14,6 +15,7 @@ public class Cannonball : MonoBehaviour
     [Header("Impact Effects")]
     [SerializeField] private GameObject impactExplosionEffect;
     [SerializeField] private GameObject impactAftermathEffect;
+    [SerializeField, Min(0f)] private float impactSmokeDelay = 2f;
 
     [SerializeField] private float impactSurfaceSearchDistance = 5f;
     [SerializeField] private float impactSurfaceOffset = 0.2f;
@@ -112,7 +114,7 @@ public class Cannonball : MonoBehaviour
         hitPoint -=
             incomingDirection * impactSurfaceOffset;
 
-        SpawnImpactEffects(hitPoint);
+        SpawnImpactEffects(hitPoint, shipHealth.transform);
 
         shipHealth.TakeDamage(damage, hitPoint);
         ReturnToPool();
@@ -160,7 +162,7 @@ public class Cannonball : MonoBehaviour
         Destroy(splash, waterSplashLifetime);
     }
 
-    private void SpawnImpactEffects(Vector3 hitPoint)
+    private void SpawnImpactEffects(Vector3 hitPoint, Transform hitParent = null)
     {
         if (impactExplosionEffect != null)
         {
@@ -175,12 +177,68 @@ public class Cannonball : MonoBehaviour
 
         if (impactAftermathEffect != null)
         {
-            Instantiate(
+            pool.StartCoroutine(SpawnImpactSmokeAfterDelay(
                 impactAftermathEffect,
                 hitPoint,
-                Quaternion.identity
-            );
+                Quaternion.identity,
+                impactSmokeDelay,
+                hitParent
+            ));
         }
+    }
+
+    private static IEnumerator SpawnImpactSmokeAfterDelay(
+        GameObject smokePrefab,
+        Vector3 hitPosition,
+        Quaternion hitRotation,
+        float delay,
+        Transform hitParent)
+    {
+        bool attachToShip = hitParent != null;
+        Vector3 localPosition = Vector3.zero;
+        Quaternion localRotation = Quaternion.identity;
+
+        if (attachToShip)
+        {
+            localPosition = hitParent.InverseTransformPoint(hitPosition);
+            localRotation = Quaternion.Inverse(hitParent.rotation) * hitRotation;
+        }
+
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+
+        if (smokePrefab == null)
+            yield break;
+
+        if (attachToShip)
+        {
+            if (hitParent == null || !hitParent.gameObject.activeInHierarchy)
+                yield break;
+
+            hitPosition = hitParent.TransformPoint(localPosition);
+            hitRotation = hitParent.rotation * localRotation;
+        }
+
+        GameObject smoke = Instantiate(
+            smokePrefab,
+            hitPosition,
+            hitRotation
+        );
+
+        if (!attachToShip)
+            yield break;
+
+        smoke.transform.SetParent(hitParent, true);
+
+        while (smoke != null &&
+            hitParent != null &&
+            hitParent.gameObject.activeInHierarchy)
+        {
+            yield return null;
+        }
+
+        if (smoke != null)
+            Destroy(smoke);
     }
 
     private void ReturnToPool()

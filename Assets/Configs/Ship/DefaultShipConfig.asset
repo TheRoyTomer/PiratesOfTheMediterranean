@@ -21,13 +21,13 @@ MonoBehaviour:
     maxTurnSpeed: 0.4
     fullSteeringSpeed: 20
   combat:
-    maxHealth: 100
+    maxHealth: 20
     cooldownDuration: 4
     extraCooldownPenalty: 2
     cannonballSpeed: 200
   deathEffects:
     explosionDelay: 1
-    smokeStartAfterExplosion: 0.7
+    fireStartAfterExplosion: 0.7
   sinking:
     sinkingStartDelay: 8
     centerlineThreshold: 0.5

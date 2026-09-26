@@ -154,8 +154,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cannonball
   damage: 5
-  impactExplosionEffect: {fileID: 100008, guid: e561ea0fe7aa99d4995974a95980c128, type: 3}
-  impactAftermathEffect: {fileID: 100000, guid: 5e3bde61298d8a8409fe06c3df5175d4, type: 3}
+  impactExplosionEffect: {fileID: 6535600700520297666, guid: 36660e0fd0c50ab4fbedd4a74b040361, type: 3}
+  impactAftermathEffect: {fileID: 7219602300294545178, guid: 014b628c091f3ff4aae3ee9a17981a41, type: 3}
+  impactSmokeDelay: 0.5
   impactSurfaceSearchDistance: 5
   impactSurfaceOffset: 0.2
   explosionLifetime: 4
