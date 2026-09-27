@@ -373,15 +373,17 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - [ ] Tutorial on separate screens, accessible from the Main Menu, using text and gameplay images
 - [ ] Game Manager Singleton to control the game loop, wave progression, match state, and Game Over
 - [ ] Sound effects and music
-- [ ] Distinct hull colors for the player and enemy ships
-- [ ] Black player-ship sail with a pirate emblem
+- [x] Distinct hull colors for the player and enemy ships: PlayerShipHull tint on the player hull and armor; original model material on the enemy hull and armor
+- [x] Black player-ship sails with two upright pirate emblems: one on the third Front_Sails panel from the top and one on the middle Back_Sails panel; original one-sided visibility preserved
 - [ ] Pirate character at the helm
 - [ ] Visual appearance effect for Explosive Barrels Set pickups
 - [ ] Configure Build Settings for the final game build
+- [ ] Verify and optimize gameplay performance on the development laptop (Intel Graphics), including support for 1280×720 resolution and checking HUD readability at that resolution
 - [ ] Add an overhead debug camera to the game
 
 ### 9.2 Nice to Have / Polish
 
+- [ ] Audit and remove unused third-party assets to reduce project size and import overhead; check asset dependencies and runtime loading before removal, preserve a Git recovery point, and verify scenes and the game build afterward
 - [ ] Ship breaking into separate pieces
 - [ ] Add aiming reticles to the fixed firing cameras?
 - [ ] Should Explosive Barrels Sets and Ship Parts for repairs persist between matches?
