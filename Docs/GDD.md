@@ -157,6 +157,7 @@ Collision-based ramming damage is implemented for ships. The AI can also choose 
 ### Explosive Barrels
 
 - The player collects Explosive Barrels Sets from pickups in the arena.
+- Pickup sets rise from 8 units below their floating position over 1.5 seconds, remain collectible for 90 seconds after rising, then sink 8 units over 1.5 seconds and are removed. Their collection ring and minimap marker are visible only during the collectible phase. Collection awards one set and removes the pickup immediately. This lifecycle applies only to pickup sets, not barrels deployed as weapons. Manually verified in gameplay.
 - Pressing `F` spends one set and deploys a group of four barrels, subject to a 1-second cooldown.
 - Once the barrels are floating, they spread out and detonate when a ship comes close. Each affected ship takes damage once per group.
 - The deploying ship is temporarily protected from its own barrels.
@@ -197,7 +198,7 @@ The current AI can:
 - Search for the player after losing sight of them; return to Patrol if approaching the last known position takes too long or stops making progress.
 - Evade under pressure, attempt ramming maneuvers, and break away when pursued closely.
 - Deploy Explosive Barrels Sets during Evade or Reposition, or once before the BreakSteer turn, when a pursuing player is on a suitable path. Eligible rolls have a 15% success chance with a shared 5-second interval; each success spends one set. The current enemy starts with 3 sets and cannot collect more. Deployment has been tested in-game; detailed rules are in `AI_StateMachine.md`.
-- Navigate between Patrol Points and avoid shoreline obstacles.
+- Start patrol toward the nearest Patrol Point by horizontal distance, then navigate along the points' configured connections and avoid shoreline obstacles.
 - React to damage and recover from suitable frontal contact with ships or the shoreline.
 - Passively recover 25 HP in Patrol when at least 1300 units from the player: first after 20 seconds, then every 10 seconds, up to maximum HP. Damage, leaving Patrol, or moving within that distance resets the recovery wait.
 
@@ -374,15 +375,16 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - [ ] Game Manager Singleton to control the game loop, wave progression, match state, and Game Over
 - [ ] Sound effects and music
 - [x] Distinct hull colors for the player and enemy ships: PlayerShipHull tint on the player hull and armor; original model material on the enemy hull and armor
+- [x] Player ship detail colors: Rudder and both Captain Room Door frames use PlayerShipHull; Back_Mast, Front_Mast, Directional_Mast, Mast, ShipWheel, and door wood use PlayerShipDarkWood. Mast metal accents and door glass retain their original materials; the wheel center uses PlayerShipHelmMetal. Player-only mesh copies separate material regions without changing geometry; existing textures are reused.
 - [x] Black player-ship sails with two upright pirate emblems: one on the third Front_Sails panel from the top and one on the middle Back_Sails panel; original one-sided visibility preserved
-- [ ] Pirate character at the helm
-- [ ] Visual appearance effect for Explosive Barrels Set pickups
+- [x] Visual appearance effect for Explosive Barrels Set pickups — 1.5-second rise, 90-second availability, 1.5-second sinking; manually verified in gameplay
 - [ ] Configure Build Settings for the final game build
 - [ ] Verify and optimize gameplay performance on the development laptop (Intel Graphics), including support for 1280×720 resolution and checking HUD readability at that resolution
 - [ ] Add an overhead debug camera to the game
 
 ### 9.2 Nice to Have / Polish
 
+- [ ] Pirate character at the helm
 - [ ] Audit and remove unused third-party assets to reduce project size and import overhead; check asset dependencies and runtime loading before removal, preserve a Git recovery point, and verify scenes and the game build afterward
 - [ ] Ship breaking into separate pieces
 - [ ] Add aiming reticles to the fixed firing cameras?

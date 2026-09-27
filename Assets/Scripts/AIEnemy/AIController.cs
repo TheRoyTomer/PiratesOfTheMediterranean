@@ -262,6 +262,11 @@ public class AIController : MonoBehaviour
         breakSteerState = new BreakSteerState(this);
     }
 
+    private void Start()
+    {
+        ChooseNearestPatrolPoint(false);
+    }
+
     private void OnDestroy()
     {
         if (shipHealth != null)
@@ -847,6 +852,11 @@ public class AIController : MonoBehaviour
 
     internal void ChooseSearchReturnPatrolPoint()
     {
+        ChooseNearestPatrolPoint(true);
+    }
+
+    private void ChooseNearestPatrolPoint(bool requireUnblockedDirection)
+    {
         if (allPatrolPoints == null)
             return;
 
@@ -859,7 +869,7 @@ public class AIController : MonoBehaviour
             Vector3 direction = point.transform.position - transform.position;
             direction.y = 0f;
             if (direction.sqrMagnitude >= nearestDistance ||
-                obstacleAvoidance.IsDirectionBlocked(direction))
+                (requireUnblockedDirection && obstacleAvoidance.IsDirectionBlocked(direction)))
                 continue;
             nearest = point;
             nearestDistance = direction.sqrMagnitude;

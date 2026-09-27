@@ -137,7 +137,9 @@ public class ExplosiveBarrelSetSpawner : MonoBehaviour
             point.position.z - ringOffset.z
         );
 
-        Instantiate(pickupPrefab, rootPosition, pickupPrefab.transform.rotation);
+        BarrelAmmoPickupController pickup =
+            Instantiate(pickupPrefab, rootPosition, pickupPrefab.transform.rotation);
+        pickup.BeginPickup();
         return true;
     }
 }

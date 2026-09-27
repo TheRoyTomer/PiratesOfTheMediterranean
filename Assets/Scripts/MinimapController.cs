@@ -36,6 +36,7 @@ public class MinimapController : MonoBehaviour
     {
         public BarrelAmmoPickupController Pickup;
         public PickupRingVisual Ring;
+        public LineRenderer RingLine;
         public RectTransform Marker;
     }
 
@@ -225,6 +226,7 @@ public class MinimapController : MonoBehaviour
             {
                 Pickup = pickup,
                 Ring = ring,
+                RingLine = ring.GetComponent<LineRenderer>(),
                 Marker = marker
             });
         }
@@ -246,7 +248,9 @@ public class MinimapController : MonoBehaviour
 
             bool visible =
                 entry.Pickup.gameObject.activeInHierarchy &&
-                entry.Ring.gameObject.activeInHierarchy;
+                entry.Ring.gameObject.activeInHierarchy &&
+                entry.RingLine != null &&
+                entry.RingLine.enabled;
 
             entry.Marker.gameObject.SetActive(visible);
 

@@ -93,7 +93,7 @@ Explosive barrel deployment is an action within `EVADE`, `REPOSITION`, or on ent
 
 **Status:** Implemented; initial state.
 
-In `PATROL`, the EnemyShip sails toward an assigned PatrolPoint at full throttle. When it comes within 20 units of that point, it selects a connected point. If several connections are available, it avoids immediately returning to the previous point.
+In `PATROL`, the EnemyShip sails toward its selected PatrolPoint at full throttle. At startup, it selects the nearest point under `patrolPointsRoot` by horizontal distance from its starting position, overriding the Inspector-assigned target when a point is available. This initial selection does not filter by obstacle direction; normal navigation avoidance still applies. If no points are available, it retains the assigned target. When it comes within 20 units of its target, it selects a connected point. If several connections are available, it avoids immediately returning to the previous point. Nearest-point selection is not repeated at each arrival.
 
 ### Transitions from PATROL
 

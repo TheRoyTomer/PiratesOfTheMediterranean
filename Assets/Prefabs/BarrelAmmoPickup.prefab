@@ -98,6 +98,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ee95d089f8b99f49ba673cb5fd63a22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BarrelAmmoPickupController
+  riseDepth: 8
+  riseDuration: 1.5
+  visibleLifetime: 90
+  sinkingDepth: 8
+  sinkingDuration: 1.5
 --- !u!1 &7625052201819793192
 GameObject:
   m_ObjectHideFlags: 0

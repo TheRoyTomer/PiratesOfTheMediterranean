@@ -2,6 +2,17 @@ using UnityEngine;
 
 public class BarrelAmmoPickupController : MonoBehaviour
 {
+    [SerializeField] private float riseDepth = 8f;
+    [SerializeField] private float riseDuration = 1.5f;
+    [SerializeField] private float visibleLifetime = 90f;
+    [SerializeField] private float sinkingDepth = 8f;
+    [SerializeField] private float sinkingDuration = 1.5f;
+
+    private enum Phase { Idle, Rising, Available, Sinking }
+
+    private Phase phase;
+    private float phaseEndTime;
+    private FloatingPart[] parts;
     private PickupRingVisual ring;
     private PlayerInputController playerController;
     private BarrelAmmo barrelAmmo;
@@ -12,11 +23,57 @@ public class BarrelAmmoPickupController : MonoBehaviour
     private void Awake()
     {
         ring = GetComponentInChildren<PickupRingVisual>();
+        parts = GetComponentsInChildren<FloatingPart>();
+        ring.Hide();
+    }
+
+    public void BeginPickup()
+    {
+        if (phase != Phase.Idle)
+            return;
+
+        ring.Hide();
+        foreach (FloatingPart part in parts)
+        {
+            part.BeginEmergence(riseDepth, riseDuration);
+            // Start submerged before the first render; FloatingPart rebuilds
+            // its authored anchor independently on subsequent frames.
+            part.transform.position -= Vector3.up * riseDepth;
+        }
+
+        phase = Phase.Rising;
+        phaseEndTime = Time.time + riseDuration;
+    }
+
+    private void Update()
+    {
+        if (phase == Phase.Idle || Time.time < phaseEndTime)
+            return;
+
+        switch (phase)
+        {
+            case Phase.Rising:
+                ring.Show();
+                phase = Phase.Available;
+                phaseEndTime = Time.time + visibleLifetime;
+                break;
+            case Phase.Available:
+                ring.Hide();
+                foreach (FloatingPart part in parts)
+                    part.BeginSinking(sinkingDepth, sinkingDuration);
+                phase = Phase.Sinking;
+                phaseEndTime = Time.time + sinkingDuration;
+                break;
+            case Phase.Sinking:
+                Destroy(gameObject);
+                break;
+        }
     }
 
     private void LateUpdate()
     {
-        if (collected || ring == null)
+        if (phase != Phase.Available || Time.time >= phaseEndTime ||
+            collected || ring == null)
             return;
 
         if (playerController == null)
@@ -64,6 +121,7 @@ public class BarrelAmmoPickupController : MonoBehaviour
                 continue;
 
             collected = true;
+            ring.Hide();
             barrelAmmo.Add(1);
             Destroy(gameObject);
             return;
