@@ -35,6 +35,13 @@ public class WeaponSystem : MonoBehaviour
     public float LeftCooldown => leftCooldown;
     public float RightCooldown => rightCooldown;
 
+    public Transform BarrelsReleasePoint => barrelsReleasePoint;
+    public bool CanDeployBarrels =>
+        (shipHealth == null || (!shipHealth.IsDead && shipHealth.CurrentHealth > 0f)) &&
+        Time.time >= nextBarrelReleaseTime &&
+        barrelsGroupPrefab != null && barrelsReleasePoint != null &&
+        barrelAmmo != null && barrelAmmo.Count > 0;
+
     private void Awake()
     {
         config = GetComponent<ShipConfiguration>().Config;
@@ -69,15 +76,7 @@ public class WeaponSystem : MonoBehaviour
     
     public void DeployBarrels()
     {
-        if (shipHealth != null &&
-            (shipHealth.IsDead || shipHealth.CurrentHealth <= 0f))
-            return;
-
-        if (Time.time < nextBarrelReleaseTime ||
-            barrelsGroupPrefab == null ||
-            barrelsReleasePoint == null ||
-            barrelAmmo == null ||
-            barrelAmmo.Count <= 0)
+        if (!CanDeployBarrels)
             return;
 
         BarrelStrikeController strike = Instantiate(

@@ -40,6 +40,9 @@ public class AIController : MonoBehaviour
     [SerializeField] private float lostTargetGraceTime = 2f;
     [SerializeField] private float searchTimeout = 6f;
     [SerializeField] private float searchArrivalDistance = 100f;
+    [SerializeField, Min(1f)] private float searchApproachTimeout = 45f;
+    [SerializeField, Min(1f)] private float searchNoProgressTimeout = 12f;
+    [SerializeField, Min(0.1f)] private float searchProgressDistance = 10f;
 
     [Header("Evade")]
     [SerializeField] private float evadeMinimumTime = 12f;
@@ -49,6 +52,22 @@ public class AIController : MonoBehaviour
     [Header("Ramming")]
     [SerializeField] private float ramTerminalAdjustDistance = 150f;
     [SerializeField] private float ramTerminalAdjustMaxAngle = 20f;
+
+    [Header("Explosive Barrels")]
+    [SerializeField, Min(0.1f)] private float barrelDecisionInterval = 5f;
+    [SerializeField, Range(0f, 100f)] private float barrelChancePercent = 15f;
+    [SerializeField, Min(0f)] private float barrelPursuitRange = 500f;
+    [SerializeField, Range(0f, 90f)] private float barrelRearHalfAngle = 60f;
+    [Tooltip("Estimated time spent rolling/falling with the ship's inherited velocity.")]
+    [SerializeField, Min(0f)] private float barrelDriftTime = 2f;
+    [Tooltip("Minimum predicted arrival time, allowing the barrels to float and spread.")]
+    [SerializeField, Min(0f)] private float barrelMinimumArrivalTime = 5f;
+    [SerializeField, Min(0f)] private float barrelMaximumArrivalTime = 12f;
+    [Tooltip("Allowed horizontal miss distance from the estimated deployment center.")]
+    [SerializeField, Min(0f)] private float barrelPathTolerance = 60f;
+
+    private float nextBarrelDecisionTime;
+    private Rigidbody shipRigidbody;
     
     [Header("Passive Recovery")]
     [Min(0f)] [SerializeField] private float recoveryDistance = 1300f;
@@ -127,6 +146,9 @@ public class AIController : MonoBehaviour
     internal float PatrolArrivalDistance => patrolArrivalDistance;
     internal float SearchTimeout => searchTimeout;
     internal float SearchArrivalDistance => searchArrivalDistance;
+    internal float SearchApproachTimeout => searchApproachTimeout;
+    internal float SearchNoProgressTimeout => searchNoProgressTimeout;
+    internal float SearchProgressDistance => searchProgressDistance;
 
     internal float LostTargetTimer
     {
@@ -213,6 +235,8 @@ public class AIController : MonoBehaviour
     private void Awake()
     {
         ship = GetComponent<ShipController>();
+        shipRigidbody = GetComponent<Rigidbody>();
+        nextBarrelDecisionTime = Time.time + barrelDecisionInterval;
         rammingEvaluator = GetComponent<AIRammingEvaluator>();
         evadeEvaluator = GetComponent<AIEvadeEvaluator>();
         weapons = GetComponent<WeaponSystem>();
@@ -392,6 +416,9 @@ public class AIController : MonoBehaviour
             breakSteerState.Tick(toTarget, distance);
         }
 
+        if (combatMode == CombatMode.Evade || combatMode == CombatMode.Reposition)
+            TryDeployBarrels();
+
         bool avoidanceActive =
             obstacleAvoidance.ApplyAvoidance(
                 ref desiredSteering,
@@ -458,6 +485,7 @@ public class AIController : MonoBehaviour
 
         if (combatMode == CombatMode.Search)
         {
+            searchState.Begin();
             searchTimer = 0f;
             reachedSearchArea = false;
         }
@@ -501,11 +529,62 @@ public class AIController : MonoBehaviour
         breakSteerReturnState = previousState;
         combatMode = CombatMode.BreakSteer;
 
+        // Begin only chooses the turn. Release before the first Tick applies steering.
+        TryDeployBarrels();
+
         Debug.Log(
             $"AI State -> BreakSteer (return: {breakSteerReturnState})"
         );
 
         return true;
+    }
+
+    private void TryDeployBarrels()
+    {
+        if (Time.time < nextBarrelDecisionTime || !weapons.CanDeployBarrels ||
+            !HasBarrelOpportunity())
+            return;
+
+        // Both successful and failed rolls consume the shared decision interval.
+        nextBarrelDecisionTime = Time.time + Mathf.Max(0.1f, barrelDecisionInterval);
+        if (Random.value < barrelChancePercent / 100f)
+            weapons.DeployBarrels();
+    }
+
+    private bool HasBarrelOpportunity()
+    {
+        if (target == null || !perception.CanSeeTarget(target, barrelPursuitRange))
+            return false;
+
+        ShipHealth targetHealth = target.GetComponentInParent<ShipHealth>();
+        if (targetHealth != null && (targetHealth.IsDead || targetHealth.CurrentHealth <= 0f))
+            return false;
+
+        Vector3 toTarget = Vector3.ProjectOnPlane(target.position - transform.position, Vector3.up);
+        Vector3 rear = Vector3.ProjectOnPlane(-transform.forward, Vector3.up);
+        if (toTarget.sqrMagnitude > barrelPursuitRange * barrelPursuitRange ||
+            Vector3.Angle(rear, toTarget) > barrelRearHalfAngle)
+            return false;
+
+        Rigidbody targetBody = target.GetComponentInParent<Rigidbody>();
+        if (targetBody == null)
+            return false;
+
+        Vector3 velocity = Vector3.ProjectOnPlane(targetBody.linearVelocity, Vector3.up);
+        if (velocity.sqrMagnitude < 0.01f)
+            return false;
+
+        // Approximate the floating center; barrels retain ship velocity while airborne.
+        Vector3 center = weapons.BarrelsReleasePoint.position;
+        if (shipRigidbody != null)
+            center += shipRigidbody.linearVelocity * barrelDriftTime;
+        Vector3 toCenter = Vector3.ProjectOnPlane(center - target.position, Vector3.up);
+        float arrivalTime = Vector3.Dot(toCenter, velocity) / velocity.sqrMagnitude;
+        if (arrivalTime < barrelMinimumArrivalTime || arrivalTime > barrelMaximumArrivalTime)
+            return false;
+
+        Vector3 miss = toCenter - velocity * arrivalTime;
+        return miss.sqrMagnitude <= barrelPathTolerance * barrelPathTolerance;
     }
 
     internal void ReturnFromBreakSteer()
@@ -763,6 +842,33 @@ public class AIController : MonoBehaviour
         if (wasPatrolling)
         {
             ChangeState(CombatMode.Chase);
+        }
+    }
+
+    internal void ChooseSearchReturnPatrolPoint()
+    {
+        if (allPatrolPoints == null)
+            return;
+
+        PatrolPoint nearest = null;
+        float nearestDistance = float.PositiveInfinity;
+        foreach (PatrolPoint point in allPatrolPoints)
+        {
+            if (point == null)
+                continue;
+            Vector3 direction = point.transform.position - transform.position;
+            direction.y = 0f;
+            if (direction.sqrMagnitude >= nearestDistance ||
+                obstacleAvoidance.IsDirectionBlocked(direction))
+                continue;
+            nearest = point;
+            nearestDistance = direction.sqrMagnitude;
+        }
+
+        if (nearest != null)
+        {
+            previousPatrolPoint = null;
+            patrolTarget = nearest;
         }
     }
 

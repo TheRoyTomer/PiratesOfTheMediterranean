@@ -46,7 +46,7 @@ stateDiagram-v2
     REPOSITION --> BREAKSTEER : Pursuit break
 
     SEARCH --> CHASE : Reacquired
-    SEARCH --> PATROL : Search timeout
+    SEARCH --> PATROL : Search complete or approach abandoned
     SEARCH --> EVADE : Evade trigger
     SEARCH --> BREAKSTEER : Pursuit break
 
@@ -60,7 +60,14 @@ stateDiagram-v2
     BREAKSTEER --> REPOSITION : Resume
     BREAKSTEER --> SEARCH : Resume
     BREAKSTEER --> EVADE : Resume or Evade trigger
+
+    note right of BREAKSTEER
+        Optional barrel release before steering
+        One entry attempt; shared timer applies
+    end note
 ```
+
+Explosive barrel deployment is an action within `EVADE`, `REPOSITION`, or on entry to `BREAKSTEER`; it does not add a state or change transitions. See [Explosive Barrel Deployment](#explosive-barrel-deployment) for its shared decision rules.
 
 ---
 
@@ -143,6 +150,8 @@ In `REPOSITION`, the AI requests full forward throttle and no steering to create
 
 The Reposition timer starts when the AI enters this state and is reset on each new entry.
 
+While Reposition remains active, the AI may release one barrel set to intercept a pursuing player, subject to the shared 5-second decision interval, 15% success chance, and [deployment conditions](#explosive-barrel-deployment). Deployment does not restart the Reposition timer or change the state.
+
 ### Transitions from REPOSITION
 
 - **REPOSITION → RAMMING:** A valid Ramming opportunity is accepted. This is checked before the normal Reposition exit.
@@ -167,10 +176,11 @@ When the AI comes within 100 units of that position, it begins a 6-second search
 
 - **SEARCH → CHASE:** The player is detected again within 1100 units using combat perception.
 - **SEARCH → PATROL:** The AI reaches the search area and completes 6 seconds of searching without detecting the player.
+- **SEARCH → PATROL:** No last known position exists, approach time reaches 45 seconds, or 12 seconds pass without reducing the best approach distance by at least 10 units. Before returning, the AI selects the nearest PatrolPoint whose direction passes the existing obstacle check, when one is available; otherwise it keeps its current PatrolPoint.
 - **SEARCH → EVADE:** Damage triggers the Evade conditions.
 - **SEARCH → BREAKSTEER:** The sustained close-pursuit conditions are met and an escape turn is available.
 
-The search timer starts **on arrival**, not when entering `SEARCH`. If BreakSteer interrupts Search, the state's timer pauses and resumes afterward.
+The 6-second local search timer starts **on arrival**, not when entering `SEARCH`. Separate approach and no-progress timers prevent indefinite pursuit of an unreachable position. All Search timers pause while BreakSteer interrupts Search and resume afterward; a new Search entry resets them. Reacquiring the player takes priority over these timeouts.
 
 ---
 
@@ -186,6 +196,8 @@ Evade is evaluated when the AI receives damage. It may enter `EVADE` after eithe
 Entry also requires the 6-second Evade cooldown to have expired. Damage received during `BROADSIDE` or `RAMMING` does not interrupt those states to enter Evade. Low HP by itself does not trigger Evade on every update; a damage event must occur.
 
 In `EVADE`, the ship first turns away from the player. It then sails toward a selected PatrolPoint intended to take it farther from the fight. Evade does not restore HP.
+
+While Evade remains active, the AI may release one barrel set to cover its escape, using the shared 5-second decision interval, 15% success chance, and [deployment conditions](#explosive-barrel-deployment). Entering Evade or taking damage does not automatically release a set.
 
 ### Transitions from EVADE
 
@@ -235,6 +247,8 @@ The pursuit conditions must remain true for 6 consecutive seconds:
 
 The check is based on position and heading, not relative speed. On entry, the AI saves its previous state and chooses a usable left or right turn, checking for shoreline obstacles. It turns approximately 90°, then sails at full throttle for 3 seconds.
 
+After a usable turn is chosen, the AI makes at most one barrel decision **before applying the first steering command**. The shared timer must be ready and the [deployment conditions](#explosive-barrel-deployment) must pass; the roll then has a 15% success chance. Success releases one set before turning, without waiting for it to float or spread. Failure or ineligibility proceeds directly to the turn. There are no further attempts during the turn or escape run. The barrel rear arc and velocity checks are separate from the broader BreakSteer entry conditions above.
+
 ### Exit from BREAKSTEER
 
 - **BREAKSTEER → saved state:** Once the turn is within 10° of its target heading and the subsequent 3-second escape run is complete, the AI resumes the state it interrupted.
@@ -246,6 +260,21 @@ Damage can cause a different transition while BreakSteer is active: an Evade tri
 ---
 
 # Actions That Are Not States
+
+## Explosive Barrel Deployment
+
+Implemented as an action, not a state. The EnemyShip in GameScene starts with 3 sets, configured through `BarrelAmmo.startingAmmo`; it does not collect pickups.
+
+- `EVADE` and `REPOSITION` evaluate deployment while active, after normal state transitions.
+- `BREAKSTEER` evaluates once on successful entry, after choosing an unblocked turn but **before the first steering tick**. It does not deploy during the turn or escape run. It does not wait for the barrels to finish spreading.
+- No deployment in `PATROL`, `CHASE`, `BROADSIDE`, `SEARCH`, or `RAMMING`.
+- Each eligible roll has a **15%** success chance. Only a successful roll releases exactly **one set** and consumes one unit of ammo; a failed roll preserves ammo. A shared **5-second** decision interval starts after every roll, including failures, and is never reset by state changes. The first roll is unavailable for 5 seconds after initialization. Invalid opportunities do not consume a roll. BreakSteer skips its one attempt if the shared timer is not ready.
+- Requires available ammo, a ready and configured weapon, and a visible living target within 500 units and 60 degrees of the enemy's rear direction.
+- The player's horizontal velocity must predict passage within 60 units of the estimated barrel center in 5–12 seconds. The center estimate uses the release point plus 2 seconds of inherited ship velocity. These are Inspector tuning values, not an exact water/ballistics simulation; the minimum arrival time allows for floating and spreading.
+
+Decision interval, chance, rear arc, range, drift estimate, arrival window, and path tolerance are configurable under `AIController > Explosive Barrels`. Existing player deployment controls and pickup behavior are unchanged.
+
+---
 
 ## Front Fire
 
@@ -279,7 +308,7 @@ The table summarizes implemented transitions. Damage-triggered Evade transitions
 | `REPOSITION` | `RAMMING` | Ramming opportunity accepted |
 | `REPOSITION` | `CHASE` | Distance ≥400 or 8-second timeout |
 | `SEARCH` | `CHASE` | Player detected again |
-| `SEARCH` | `PATROL` | Search area reached, then 6 seconds pass without reacquisition |
+| `SEARCH` | `PATROL` | 6-second search completed, missing last known position, 45-second approach limit, or 12 seconds without 10 units of progress |
 | `CHASE` / `REPOSITION` / `SEARCH` | `EVADE` | Damage triggers Evade |
 | `EVADE` | `CHASE` | Evade fails, no waypoint is available, or timed exit finds the player visible under combat perception within 1300 units and in Patrol's rear blind region |
 | `EVADE` | `PATROL` | Other timed Evade exit |
@@ -290,6 +319,8 @@ The table summarizes implemented transitions. Damage-triggered Evade transitions
 | `RAMMING` | `REPOSITION` | Stored intercept is invalid, or the ship passes the interception plane |
 
 Ramming entry is checked before Broadside entry in `CHASE` and before the normal exit from `REPOSITION`. BreakSteer entry is checked before the target-loss and state-specific transitions. A damage-triggered Evade decision can also interrupt eligible states.
+
+Barrel deployment creates no transition. BreakSteer's entry attempt precedes its first steering tick; the ongoing deployment check runs only when the resulting state is Evade or Reposition after state ticks, before shoreline avoidance is applied. All three opportunities use the same decision timer.
 
 ---
 
@@ -309,6 +340,8 @@ Ramming entry is checked before Broadside entry in `CHASE` and before the normal
 | Reposition timeout | 8 seconds |
 | Search arrival distance | 100 |
 | Search duration after arrival | 6 seconds |
+| Search maximum approach duration | 45 seconds |
+| Search no-progress timeout / required distance improvement | 12 seconds / 10 units |
 | Evade minimum / maximum active duration | 12 / 25 seconds |
 | Evade damage-free exit period | 4 seconds |
 | Evade cooldown after exit | 6 seconds |
@@ -316,6 +349,15 @@ Ramming entry is checked before Broadside entry in `CHASE` and before the normal
 | Ramming acceptance chance for a valid opportunity | 25% |
 | BreakSteer pursuit duration | 6 seconds |
 | BreakSteer escape run after turning | 3 seconds |
+| EnemyShip starting barrel inventory (GameScene) | 3 sets |
+| Barrel success chance per eligible roll | 15% |
+| Shared barrel decision interval / initial delay | 5 seconds |
+| Barrel sets consumed per successful roll | 1 |
+| Barrel pursuit range | 500 |
+| Barrel rear half-angle | 60° (120° total arc) |
+| Barrel inherited-velocity drift estimate | 2 seconds |
+| Predicted player arrival window at barrel area | 5–12 seconds |
+| Barrel path miss tolerance from estimated center | 60 |
 
 The 325/400 distance gap helps prevent rapid switching at the Broadside boundary. There is **no post-Broadside Chase lock**.
 

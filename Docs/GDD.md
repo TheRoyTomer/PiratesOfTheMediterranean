@@ -90,7 +90,7 @@ Additional values and open design decisions:
 | Ship Parts drop amount | Parts awarded per defeated enemy | 1 |
 | Repair cost and amount | Parts spent and HP restored per repair | 1 Part; up to 25% of maximum HP |
 | Explosive Barrels Set spawning | When pickups appear and maximum active pickups | Initial pickup, then 17% every 30 seconds; maximum 2 active |
-| Radar range | Which enemies appear on the minimap / radar | TBD |
+| Radar range (optional) | Whether a future radar mode limits which enemies appear | TBD |
 
 **Where these live:** shared ship tuning is stored in `ShipConfig` and referenced by `ShipConfiguration`. Projectile, death-effect, and AI settings are configured separately. Ship Parts, repair, and barrel values are configured in their respective components. Wave values will be assigned when that system is designed.
 
@@ -160,7 +160,7 @@ Collision-based ramming damage is implemented for ships. The AI can also choose 
 - Pressing `F` spends one set and deploys a group of four barrels, subject to a 1-second cooldown.
 - Once the barrels are floating, they spread out and detonate when a ship comes close. Each affected ship takes damage once per group.
 - The deploying ship is temporarily protected from its own barrels.
-- Planned: a destroyed ship cannot deploy an Explosive Barrels Set.
+- A destroyed ship cannot deploy an Explosive Barrels Set.
 
 ### Damage and Destruction
 
@@ -170,7 +170,7 @@ Collision-based ramming damage is implemented for ships. The AI can also choose 
   - Bow hit: Bow → Middle → Stern
   - Middle hit: Middle → Bow → Stern
   - Stern hit: Stern → Middle → Bow
-- Explosions occur 1 second apart. Smoke begins approximately 0.7 seconds after each explosion.
+- Explosions occur 1 second apart. Fire begins approximately 0.7 seconds after each explosion.
 - The final explosion starts a slow roll, followed by a faster capsize and then sinking. The ship rolls toward the side determined by the lethal hit; centerline hits may choose either side.
 - The slow roll reaches approximately 15° over 5 seconds. The faster capsize continues toward 80°. The ship drops during the roll, then sinks to a depth of approximately 30 units below its death position.
 - The 8-second sinking delay is a fallback when the death effects do not start the sinking sequence.
@@ -194,10 +194,12 @@ The current AI can:
 
 - Patrol the arena and detect the player using range, field of view, and line of sight.
 - Chase, fire, position for broadsides, and reposition during combat.
-- Search for the player after losing sight of them.
+- Search for the player after losing sight of them; return to Patrol if approaching the last known position takes too long or stops making progress.
 - Evade under pressure, attempt ramming maneuvers, and break away when pursued closely.
+- Deploy Explosive Barrels Sets during Evade or Reposition, or once before the BreakSteer turn, when a pursuing player is on a suitable path. Eligible rolls have a 15% success chance with a shared 5-second interval; each success spends one set. The current enemy starts with 3 sets and cannot collect more. Deployment has been tested in-game; detailed rules are in `AI_StateMachine.md`.
 - Navigate between Patrol Points and avoid shoreline obstacles.
 - React to damage and recover from suitable frontal contact with ships or the shoreline.
+- Passively recover 25 HP in Patrol when at least 1300 units from the player: first after 20 seconds, then every 10 seconds, up to maximum HP. Damage, leaving Patrol, or moving within that distance resets the recovery wait.
 
 The planned wave system will bring several enemy ships into the arena to fight the player. Spawn placement, wave progression, and enemy scaling still require design decisions.
 
@@ -230,12 +232,12 @@ Currently implemented:
 - **Enemy HP and distance**, shown when the enemy is visible
 - **Current amount of Ship Parts**
 - **Current number of Explosive Barrels Sets**
+- **Minimap** showing the player, enemies, Ship Parts pickups, and Explosive Barrels Set pickups
 
 Planned for the survival wave system:
 
 - **Current wave**
 - **Enemies remaining in the current wave**, if waves end when all their enemies are defeated
-- **Minimap / Radar**
 - **Survival time or score**, depending on the match progression rules still to be decided
 
 ### Screens
@@ -295,7 +297,7 @@ The current AI controls one enemy with a reference to the player as its target. 
 
 `ShipConfig` is a ScriptableObject for shared ship tuning, referenced by the root `ShipConfiguration` component. Runtime values such as current HP, weapon cooldowns, and AI state belong to each ship instance. The current ships share the default config.
 
-`WeaponSystem` uses the shared scene-level `CannonballPool` to reuse projectiles. Cannonballs handle movement, collision, damage, impact effects, and return to the pool. VFX are currently instantiated rather than pooled. Planned: prevent barrel deployment after the deploying ship is destroyed.
+`WeaponSystem` uses the shared scene-level `CannonballPool` to reuse projectiles. Cannonballs handle movement, collision, damage, impact effects, and return to the pool. VFX are currently instantiated rather than pooled. Barrel deployment is blocked after the deploying ship is destroyed.
 
 Ship destruction is split between `ShipHealth`, `ShipDeathEffects`, and `ShipSinking`. Collision behavior is handled separately by `ShipRammingDamage`, `ShipCollisionResponse`, `ShipShorelineResponse`, and `ShipContactRecovery`. Contact recovery pushes a ship away after a suitable frontal collision; it does not restore HP.
 
@@ -309,7 +311,7 @@ Ship destruction is split between `ShipHealth`, `ShipDeathEffects`, and `ShipSin
 | `WeaponSystem` | Fires Front, Right, and Left cannon banks, manages their cooldowns, and deploys Explosive Barrels Sets. |
 | `CannonballPool` / `Cannonball` | Reuses projectiles and handles their movement, collision, and damage. |
 | `ShipHealth` | Tracks HP, applies damage, records the lethal hit, and raises death events. |
-| `ShipDeathEffects` / `ShipSinking` | Play the explosion, smoke, capsize, and sinking sequence. |
+| `ShipDeathEffects` / `ShipSinking` | Play the explosion, fire, capsize, and sinking sequence. |
 | `ShipRammingDamage` | Applies collision-based ramming damage to ships. |
 | `ShipCollisionResponse` / `ShipShorelineResponse` | Stabilize ship contacts and shoreline contacts. |
 | `ShipContactRecovery` | Applies a short backward kick after a suitable frontal collision. |
@@ -317,12 +319,12 @@ Ship destruction is split between `ShipHealth`, `ShipDeathEffects`, and `ShipSin
 | `AIPerception` / `AIObstacleAvoidance` | Handle target visibility and shoreline obstacle detection. |
 | `AIRammingEvaluator` / `AIEvadeEvaluator` | Evaluate opportunities to ram and conditions for evasive behavior. |
 | `CameraFollow` / `CameraModeController` | Handle the third-person camera, firing views, rear view, and camera switching. |
-| Current HUD components | Display player HP, enemy HP and distance, firing direction, cooldowns, Ship Parts, and Explosive Barrels Sets. |
+| Current HUD components | Display player HP, enemy HP and distance, firing direction, cooldowns, Ship Parts, Explosive Barrels Sets, and the minimap. |
 | Wave and match management (planned) | Spawn enemies in waves, track survival progress, and end the match when the player is destroyed. |
 | `ShipSinking` / `ShipPartsController` / `PlayerShipParts` | Spawn and collect Ship Parts after an enemy sinks, track the player's Parts, and spend them to repair HP. |
-| `ExplosiveBarrelSetSpawner` / `BarrelAmmoPickupController` / `BarrelAmmo` | Spawn and collect Explosive Barrels Sets and track the player's available sets. |
+| `ExplosiveBarrelSetSpawner` / `BarrelAmmoPickupController` / `BarrelAmmo` | Spawn player-only Explosive Barrels Set pickups and track player and enemy barrel inventories. |
 | `BarrelController` / `BarrelStrikeController` | Move the deployed barrels, detect ships, and apply explosion damage. |
-| Radar (planned) | Supply nearby-enemy information to the minimap or radar. |
+| `MinimapController` | Displays the arena map and tracks markers for the player, enemies, Ship Parts pickups, and Explosive Barrels Set pickups. |
 
 The scene object named `GameManager` currently hosts `CannonballPool`. It does not yet manage waves, survival results, or match state.
 
@@ -349,33 +351,40 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - [x] HP, damage, and local ship destruction
 - [x] One AI-controlled enemy capable of fighting the player
 - [ ] Multiple enemies spawning in survival waves
-- [ ] AI Passive Recovery outside combat
+- [ ] Spawn points for the player at match start and for enemies entering the arena
+- [x] AI Passive Recovery outside combat
+- [x] Enemy AI behavior for deploying Explosive Barrels Sets; state and decision rules documented in `AI_StateMachine.md`
 - [x] Ship Parts drops, collection, and player Repair
 - [x] Explosive Barrels Sets: spawning, collection, deployment, and detonation
-- [ ] Prevent destroyed ships from deploying Explosive Barrels Sets
+- [x] Prevent destroyed ships from deploying Explosive Barrels Sets
 - [x] Player HP, selected firing direction, and cooldown HUD
 - [x] Enemy HP and distance display
 - [x] Ship Parts and Explosive Barrels Sets HUD
 - [ ] Wave progress and survival result display
-- [ ] Minimap / Radar
+- [ ] Arrange and polish the in-game HUD layout
+- [x] Minimap with player, enemy, Ship Parts, and Explosive Barrels Set markers
 - [x] One enclosed naval arena
 - [ ] Game Over and survival result flow
 - [x] Hit VFX
 - [x] Short smoke effect at impact points
-- [x] Ship destruction effects: explosions, smoke, capsize, and sinking
+- [x] Ship destruction effects: explosions, fire, capsize, and sinking
 - [ ] Main Menu
-- [ ] Singleton for match management, as required for the course
+- [ ] Pause Menu
+- [ ] Tutorial on separate screens, accessible from the Main Menu, using text and gameplay images
+- [ ] Game Manager Singleton to control the game loop, wave progression, match state, and Game Over
+- [ ] Sound effects and music
+- [ ] Distinct hull colors for the player and enemy ships
+- [ ] Black player-ship sail with a pirate emblem
+- [ ] Pirate character at the helm
+- [ ] Visual appearance effect for Explosive Barrels Set pickups
+- [ ] Configure Build Settings for the final game build
+- [ ] Add an overhead debug camera to the game
 
 ### 9.2 Nice to Have / Polish
 
-- [ ] Mortar
-- [ ] Other special weapons
-- [ ] Captain animation
-- [ ] Advanced radar behavior
-- [ ] Further water interaction and ship rocking polish
 - [ ] Ship breaking into separate pieces
-- [ ] Multiple visual damage stages
-- [ ] More advanced fire and destruction effects
+- [ ] Add aiming reticles to the fixed firing cameras?
+- [ ] Should Explosive Barrels Sets and Ship Parts for repairs persist between matches?
 
 ### 9.3 Explicitly Out of Scope
 
@@ -400,7 +409,7 @@ The player and enemy ships use a shared ship prefab and configuration. The ship 
 
 ### Explosion Effects Asset
 
-A new Explosion Effects asset pack has been added to replace the previous explosion asset. Updating the game's existing explosion effects to use the new pack is planned for a later pass.
+The new Explosion Effects assets are integrated into the ship destruction sequence. Fire accompanies the death explosions; regular cannonball impacts retain their short smoke effect. The previous WarFX assets have been removed.
 
 ### Water Asset
 
