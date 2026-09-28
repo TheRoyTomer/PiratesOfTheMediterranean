@@ -94,6 +94,7 @@ public class ShipDeathEffects : MonoBehaviour
             positions[i] = points[i].position;
             rotations[i] = points[i].rotation;
             explosions[i] = Instantiate(deathExplosionPrefab, positions[i], rotations[i]);
+            GameAudio.Play(GameSound.HeavyExplosion, positions[i], 0.8f);
             if (i == points.Length - 1)
                 SignalFinalExplosionStarted();
             if (deathFirePrefab != null)

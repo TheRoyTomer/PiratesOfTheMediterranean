@@ -6,6 +6,14 @@ using UnityEngine;
 [RequireComponent(typeof(AIEvadeEvaluator))]
 public class AIController : MonoBehaviour
 {
+    // Called by the spawner while the instance is inactive, before Awake caches patrol points.
+    public void ConfigureSceneReferences(Transform playerTarget, Transform pointsRoot)
+    {
+        target = playerTarget;
+        patrolPointsRoot = pointsRoot;
+        patrolTarget = null;
+    }
+
     [SerializeField] private Transform target;
 
     [Header("Steering")]

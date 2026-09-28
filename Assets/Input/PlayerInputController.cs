@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputController : MonoBehaviour
 {
+    public void SetCameraController(CameraModeController controller) => cameraModeController = controller;
+
     [SerializeField] private ShipController shipController;
     [SerializeField] private FiringDirectionController firingDirectionController;
     [SerializeField] private WeaponSystem weaponSystem;
@@ -61,6 +63,7 @@ public class PlayerInputController : MonoBehaviour
         if (inputActions.Player.CycleFiringDirection.WasPressedThisFrame())
         {
             firingDirectionController.CycleDirection();
+            GameAudio.Play(GameSound.SwitchFireDirection);
         }
 
         if (cameraModeController != null)
@@ -72,26 +75,34 @@ public class PlayerInputController : MonoBehaviour
         
         if (inputActions.Player.Fire.WasPressedThisFrame())
         {
+            if ((shipHealth != null && shipHealth.IsDead) || weaponSystem.IsOnCooldown(firingDirectionController.SelectedDirection))
+                GameAudio.Play(GameSound.ActionDenied);
             weaponSystem.Fire(firingDirectionController.SelectedDirection);
         }
         
         if (inputActions.Player.DeployBarrels.WasPressedThisFrame())
         {
+            if (!weaponSystem.CanDeployBarrels) GameAudio.Play(GameSound.ActionDenied);
             weaponSystem.DeployBarrels();
         }
         
-        if (inputActions.Player.Repair.WasPressedThisFrame() &&
-            shipHealth != null &&
-            playerInventory != null &&
-            playerInventory.ShipParts > 0 &&
-            !shipHealth.IsDead &&
-            shipHealth.CurrentHealth < shipHealth.MaxHealth)
+        if (inputActions.Player.Repair.WasPressedThisFrame())
         {
-            float healthBeforeRepair = shipHealth.CurrentHealth;
-            shipHealth.Heal(shipHealth.MaxHealth * repairFraction);
+            if (shipHealth != null &&
+                playerInventory != null &&
+                playerInventory.ShipParts > 0 &&
+                !shipHealth.IsDead &&
+                shipHealth.CurrentHealth < shipHealth.MaxHealth)
+            {
+                float healthBeforeRepair = shipHealth.CurrentHealth;
+                shipHealth.Heal(shipHealth.MaxHealth * repairFraction);
 
-            if (shipHealth.CurrentHealth > healthBeforeRepair)
-                playerInventory.TryUseShipPart();
+                if (shipHealth.CurrentHealth > healthBeforeRepair && playerInventory.TryUseShipPart())
+                    GameAudio.Play(GameSound.Repair);
+                else
+                    GameAudio.Play(GameSound.ActionDenied);
+            }
+            else GameAudio.Play(GameSound.ActionDenied);
         }
     }
 }

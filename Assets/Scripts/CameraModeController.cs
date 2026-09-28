@@ -20,6 +20,16 @@ public sealed class CameraModeController : MonoBehaviour
     private bool reverseHeld;
     private Camera debugCamera;
 
+    public void BindPlayer(FiringDirectionController direction, Camera front, Camera right, Camera left, Camera back)
+    {
+        firingDirectionController = direction;
+        frontFiringCamera = front;
+        rightFiringCamera = right;
+        leftFiringCamera = left;
+        backFiringCamera = back;
+        ResetToMain();
+    }
+
     private void Awake()
     {
         ApplyCamera();

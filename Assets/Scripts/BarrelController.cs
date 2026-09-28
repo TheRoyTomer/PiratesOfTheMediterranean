@@ -144,6 +144,7 @@ public class BarrelController : MonoBehaviour
         isFalling = false;
         isFloating = true;
         floatingWaterOffset = transform.position.y - lastSurfaceHeight;
+        GameAudio.Play(GameSound.BarrelWaterSplash, ExplosionPoint, 0.5f);
 
         if (waterSplashPrefab != null)
         {

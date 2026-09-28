@@ -119,6 +119,7 @@ public class ShipPartsController : MonoBehaviour
             collected = true;
             ring.Hide();
             playerInventory.AddShipPart();
+            GameAudio.Play(GameSound.Pickup);
             Destroy(gameObject);
             return;
         }

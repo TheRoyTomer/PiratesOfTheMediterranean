@@ -5,6 +5,12 @@ using TMPro;
 [DisallowMultipleComponent]
 public sealed class PlayerHealthHUDController : MonoBehaviour
 {
+    public void SetPlayer(ShipHealth health)
+    {
+        playerHealth = health;
+        lastHealth = lastMaxHealth = float.NaN;
+    }
+
     [SerializeField] private ShipHealth playerHealth;
     [SerializeField] private Image healthFill;
     [SerializeField] private TMP_Text percentageText;

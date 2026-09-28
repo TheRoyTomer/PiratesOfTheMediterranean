@@ -3,6 +3,8 @@ using TMPro;
 
 public class CooldownHUDController : MonoBehaviour
 {
+    public void SetWeaponSystem(WeaponSystem weapons) => weaponSystem = weapons;
+
     [SerializeField] private WeaponSystem weaponSystem;
 
     [SerializeField] private TMP_Text frontCooldownText;

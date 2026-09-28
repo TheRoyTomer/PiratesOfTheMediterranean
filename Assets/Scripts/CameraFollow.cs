@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class CameraFollow : MonoBehaviour
 {
+    public void SetTarget(Transform ship) => target = ship;
+
     [SerializeField] private Transform target;
 
     [Header("Camera Settings")]

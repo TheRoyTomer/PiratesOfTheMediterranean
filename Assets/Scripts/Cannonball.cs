@@ -8,7 +8,6 @@ public class Cannonball : MonoBehaviour
     private ShipHealth owner;
     private bool hasHit;
     private bool hasSplashed;
-
     [Header("Damage")]
     [SerializeField] private float damage = 5f;
 
@@ -87,7 +86,9 @@ public class Cannonball : MonoBehaviour
         if (lifeTimer >= maxLifetime)
         {
             ReturnToPool();
+            return;
         }
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -146,6 +147,7 @@ public class Cannonball : MonoBehaviour
     private void SpawnWaterSplash(float waterY)
     {
         hasSplashed = true;
+        GameAudio.Play(GameSound.CannonWaterSplash, new Vector3(transform.position.x, waterY, transform.position.z));
 
         if (waterSplashEffect == null)
             return;
@@ -164,6 +166,7 @@ public class Cannonball : MonoBehaviour
 
     private void SpawnImpactEffects(Vector3 hitPoint, Transform hitParent = null)
     {
+        GameAudio.Play(GameSound.CannonImpact, hitPoint);
         if (impactExplosionEffect != null)
         {
             GameObject explosion = Instantiate(

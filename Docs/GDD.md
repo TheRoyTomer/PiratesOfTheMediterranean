@@ -23,9 +23,9 @@
 
 ## 2. Core Game Loop
 
-The planned match loop is survival against successive waves of enemy ships. The player fights, collects Ship Parts from defeated enemies to repair the ship, and collects Explosive Barrels Sets that appear in the arena to deploy in combat while trying to survive for as long as possible.
+The match loop is survival against successive waves of enemy ships. The player fights, collects Ship Parts from defeated enemies to repair the ship, and collects Explosive Barrels Sets that appear in the arena to deploy in combat while trying to survive for as long as possible.
 
-Ship movement, cannon combat, HP/damage, ship death, combat against one AI-controlled enemy, Ship Parts loot and repair, and Explosive Barrels Set pickups and deployment are implemented. Wave spawning, match-level defeat, and scoring are planned.
+Ship movement, cannon combat, HP/damage, ship death, AI combat, Ship Parts loot and repair, and Explosive Barrels Set pickups and deployment are implemented. Wave spawning, match-level defeat, survival results, and restart are implemented; combat balance and HUD polish still require gameplay review.
 
 ```mermaid
 flowchart TD
@@ -47,7 +47,26 @@ flowchart TD
     K -- Yes --> D
 ```
 
-The rules for completing a wave, starting the next wave, and measuring the player's survival performance are still to be defined.
+### Approved Survival Rules (2026-09-28)
+
+These rules are implemented in `GameManager`, including the starting barrel-set rolls for wave enemies.
+
+- Survive successive enemy waves until the player is destroyed.
+- Start the player at a random point from the shared set of 13 spawn points, with full health, 0 Ship Parts, and 0 Explosive Barrels Sets. The first wave starts after 5 seconds.
+- Wave 1 has 1 enemy; waves 2–3 have 2 enemies; waves 4–6 have 3 enemies; wave 7 onward has 4 enemies.
+- All enemies in a wave spawn together at distinct, unoccupied points. Select points without replacement within each wave: never assign the same point to two enemies.
+- Enemy spawn points must be at least 300 world units from the player's current position, measured horizontally. `GameManager.minimumEnemySpawnDistance` is a serialized Inspector setting with a default of 300. Existing ships must also have enough clearance to avoid overlapping newly spawned ships.
+- If there are too few eligible points, retry once per second without bypassing distance, occupancy, or uniqueness constraints. Spawn the entire wave together only when a complete group of points is available.
+- A wave ends when all its enemies reach 0 HP; sinking completion is not required.
+- Allow 10 seconds between waves for collection and repair, with a visible countdown.
+- Player health and inventory carry over between waves; the player receives no automatic healing.
+- Starting at wave 1, each enemy independently rolls in order: 20% for 4 sets; on failure, 40% for 3; on failure, 60% for 2; on failure, 80% for 1; otherwise 0. Stop on the first success. Final probabilities are 20%, 32%, 28.8%, 15.36%, and 3.84% for 4/3/2/1/0 sets. Each set deploys four barrels. The start wave and conditional percentages are serialized GameManager settings; these chances stay the same in subsequent waves.
+- Results show completed waves, enemies destroyed, and survival time.
+- Restart returns to wave 1 with full player health and inventory restored from the PlayerShip Variant component settings. `ResetInventory()` reads `PlayerShipParts.shipParts` and `BarrelAmmo.startingAmmo`; the intended defaults are 0, but Inspector values can be changed for testing and balancing. Runtime collection and spending do not modify these starting settings.
+
+`GameManager` instantiates `Assets/Prefabs/EnemyShip Variant.prefab`, which inherits from `Ship.prefab`. Each instance is created below an inactive staging parent and receives the player target, patrol points root, shared cannonball pool, and HUD player reference before activation and Awake. Its Start then chooses the nearest patrol point. Both fixed ship instances have been removed from GameScene. GameManager creates the player from `PlayerShip Variant.prefab` at match initialization. `PlayerSceneBindings` assigns camera follow, all four firing/rear cameras, input camera control, audio, health/cooldown/direction HUD, inventory text, and the KWS wake simulation target before player activation. The cannonball pool is also assigned before activation. Player spawn height defaults to -5. This player-prefab migration passed compilation and Edit Mode reference checks; gameplay verification is pending with the user, and no Play Mode check was performed for it. Before each enemy is activated, GameManager overrides that instance's starting barrel inventory with the wave roll; the prefab asset and player starting inventory are unchanged. Enemy spawn height is Inspector-configurable (default -5), while spawn points supply X/Z position and yaw. `shipSpawnClearance` defaults to 150 world units between ship centers, including active sinking ships and other selected points. Finished, deactivated enemy clones are destroyed after sinking and loot creation.
+
+Earlier runtime smoke checks passed for waves 1–4 under the previous enemy-count schedule, distinct and separated spawn positions, 300-unit player clearance, 10-second intermissions, the four-enemy cap, atomic failure when no points qualify, Game Over timer freeze, and scene-reload restart with empty player inventory. The revised enemy-count schedule has not been tested in Play Mode. Full combat balancing and visual HUD acceptance remain manual checks.
 
 ### Moment-to-Moment Rules
 
@@ -86,13 +105,14 @@ Additional values and open design decisions:
 | Parameter | What it controls | Value |
 |---|---|---|
 | Player cannon range | Whether and when the player's cannon fire is range-limited | TBD |
-| Enemy wave size and progression | How enemies appear and when the next wave begins | TBD |
+| Enemy wave size and progression | Enemies per wave; delay after clearing a wave | Wave 1: 1; waves 2–3: 2; waves 4–6: 3; wave 7+: 4; 10 seconds |
+| Minimum enemy spawn distance | Horizontal distance from the player; Inspector configurable | 300 |
 | Ship Parts drop amount | Parts awarded per defeated enemy | 1 |
 | Repair cost and amount | Parts spent and HP restored per repair | 1 Part; up to 25% of maximum HP |
 | Explosive Barrels Set spawning | When pickups appear and maximum active pickups | Initial pickup, then 17% every 30 seconds; maximum 2 active |
 | Radar range (optional) | Whether a future radar mode limits which enemies appear | TBD |
 
-**Where these live:** shared ship tuning is stored in `ShipConfig` and referenced by `ShipConfiguration`. Projectile, death-effect, and AI settings are configured separately. Ship Parts, repair, and barrel values are configured in their respective components. Wave values will be assigned when that system is designed.
+**Where these live:** shared ship tuning is stored in `ShipConfig` and referenced by `ShipConfiguration`. Projectile, death-effect, and AI settings are configured separately. Ship Parts, repair, and barrel values are configured in their respective components. Wave delays, spawn clearance, and scene references are configured in `GameManager`.
 
 ## 3. Controls & Input
 
@@ -176,20 +196,20 @@ Collision-based ramming damage is implemented for ships. The AI can also choose 
 - The slow roll reaches approximately 15° over 5 seconds. The faster capsize continues toward 80°. The ship drops during the roll, then sinks to a depth of approximately 30 units below its death position.
 - The 8-second sinking delay is a fallback when the death effects do not start the sinking sequence.
 
-Local ship death and sinking are implemented. Tracking the end of a survival match when the player is destroyed is planned.
+Local ship death and sinking are implemented. Player destruction ends the match, freezes survival statistics, and displays results with a restart button while death effects continue.
 
 ### Repair
 
 Ship Parts collection and player repair are implemented.
 
-- Each defeated enemy ship drops one Ship Parts pickup after sinking. Collecting it adds one Part to the player's inventory.
+- Each defeated enemy ship starts its Ship Parts pickup emergence when all active, enabled ship-model MeshRenderer bounds fall below KWS water level plus sink speed multiplied by `shipPartsEmergenceLeadTime` (default 5 seconds). This advances emergence by 5 seconds relative to the previous full-submersion threshold during constant-speed sinking; timing is approximate while capsize rotation is still in progress. The lead time is adjustable in the ShipSinking Inspector. The ship continues sinking afterward. The renderer list is cached before death effects are spawned, excluding particle fire and smoke from this check. This uses the water system's base level rather than individual wave crests. Final sinking completion remains a fallback; the pickup can only spawn once. Collecting it adds one Part to the player's inventory. The existing pickup rise animation is retained. The 5-second lead setting is saved on EnemyShip Variant and was manually tested and approved by the user on 2026-09-28.
 - Pressing `R` spends one Part to restore up to 25% of maximum HP, without exceeding maximum health.
 - A destroyed ship or a ship at full health cannot repair.
 
 
 ## 5. AI Behavior
 
-Combat against one AI-controlled enemy ship is implemented and has been tested in complete battles against the player. The current enemy targets the player. Multiple simultaneous enemies and wave spawning are planned.
+Combat against one AI-controlled enemy ship has been tested in complete battles against the player. Wave spawning now supports up to four simultaneous enemies, all targeting the player. Multi-enemy combat balancing remains to be tested manually.
 
 The current AI can:
 
@@ -197,12 +217,12 @@ The current AI can:
 - Chase, fire, position for broadsides, and reposition during combat.
 - Search for the player after losing sight of them; return to Patrol if approaching the last known position takes too long or stops making progress.
 - Evade under pressure, attempt ramming maneuvers, and break away when pursued closely.
-- Deploy Explosive Barrels Sets during Evade or Reposition, or once before the BreakSteer turn, when a pursuing player is on a suitable path. Eligible rolls have a 15% success chance with a shared 5-second interval; each success spends one set. The current enemy starts with 3 sets and cannot collect more. Deployment has been tested in-game; detailed rules are in `AI_StateMachine.md`.
+- Deploy Explosive Barrels Sets during Evade or Reposition, or once before the BreakSteer turn, when a pursuing player is on a suitable path. Eligible rolls have a 15% success chance with a shared 5-second interval; each success spends one set. Wave enemies independently roll 0–4 sets from wave 1 onward (section 2); they cannot collect more. Deployment has been tested in-game; detailed rules are in `AI_StateMachine.md`.
 - Start patrol toward the nearest Patrol Point by horizontal distance, then navigate along the points' configured connections and avoid shoreline obstacles.
 - React to damage and recover from suitable frontal contact with ships or the shoreline.
 - Passively recover 25 HP in Patrol when at least 1300 units from the player: first after 20 seconds, then every 10 seconds, up to maximum HP. Damage, leaving Patrol, or moving within that distance resets the recovery wait.
 
-The planned wave system will bring several enemy ships into the arena to fight the player. Spawn placement, wave progression, and enemy scaling still require design decisions.
+The wave system follows the approved survival rules in section 2. Starting barrel inventories follow the conditional rolls in section 2.
 
 The AI's states, transitions, and decision rules are documented separately in `AI_StateMachine.md`.
 
@@ -235,11 +255,11 @@ Currently implemented:
 - **Current number of Explosive Barrels Sets**
 - **Minimap** showing the player, enemies, Ship Parts pickups, and Explosive Barrels Set pickups
 
-Planned for the survival wave system:
+Implemented for the survival wave system:
 
 - **Current wave**
-- **Enemies remaining in the current wave**, if waves end when all their enemies are defeated
-- **Survival time or score**, depending on the match progression rules still to be decided
+- **Enemies remaining in the current wave**
+- **Survival time** and countdown to the next wave
 
 ### Screens
 
@@ -248,7 +268,7 @@ The current Gameplay Screen contains the combat view and the implemented HUD ele
 Planned screens:
 
 - **Main Menu** — starts a new match.
-- **Game Over** — shows the player's survival result after the ship is destroyed, with options to restart or return to the menu.
+- **Return to Main Menu from Game Over** — pending the Main Menu implementation. The Game Over results panel and restart button are already implemented in GameScene.
 
 ## 8. Technical Design
 
@@ -256,10 +276,10 @@ The game separates player and AI decisions from the shared systems that move shi
 
 ### Scenes
 
-- `GameScene` (current) — contains the arena, PlayerShip, one EnemyShip, combat and pickup systems, cameras, and the current HUD.
+- `GameScene` (current) — contains the arena, shared spawn points, wave manager, player scene bindings, combat and pickup systems, main camera, and HUD. Player and enemy ships are instantiated from their respective Variant assets at runtime; neither ship is pre-placed in the scene.
 - `MainMenu` (planned) — starts a survival match.
 
-Game Over is planned as a UI state inside `GameScene`. Wave spawning, survival results, and match-level defeat handling are not implemented yet.
+Game Over is a UI state inside `GameScene`. `MatchHUD` displays wave status, countdowns, survival results, and a restart button. GameScene is enabled in Build Settings for scene-reload restart; final release build configuration remains pending.
 
 ### Packages / Systems Used
 
@@ -294,7 +314,7 @@ flowchart TD
 
 PlayerShip and EnemyShip use the shared `Ship.prefab` and its ship movement, weapons, health, collision, and death systems. `PlayerInputController` translates player input into calls to those systems. `AIController` manages the enemy's states and decisions and calls the same movement and weapon systems.
 
-The current AI controls one enemy with a reference to the player as its target. It uses `AIPerception`, `AIObstacleAvoidance`, `AIRammingEvaluator`, and `AIEvadeEvaluator`. Target selection between multiple ships is not implemented. The planned survival mode will spawn multiple enemies in waves that fight the player.
+Each enemy AI has a reference to the player as its target. It uses `AIPerception`, `AIObstacleAvoidance`, `AIRammingEvaluator`, and `AIEvadeEvaluator`. Target selection between multiple ships is not implemented; all wave enemies fight the player.
 
 `ShipConfig` is a ScriptableObject for shared ship tuning, referenced by the root `ShipConfiguration` component. Runtime values such as current HP, weapon cooldowns, and AI state belong to each ship instance. The current ships share the default config.
 
@@ -321,13 +341,13 @@ Ship destruction is split between `ShipHealth`, `ShipDeathEffects`, and `ShipSin
 | `AIRammingEvaluator` / `AIEvadeEvaluator` | Evaluate opportunities to ram and conditions for evasive behavior. |
 | `CameraFollow` / `CameraModeController` | Handle the third-person camera, firing views, rear view, and camera switching. |
 | Current HUD components | Display player HP, enemy HP and distance, firing direction, cooldowns, Ship Parts, Explosive Barrels Sets, and the minimap. |
-| Wave and match management (planned) | Spawn enemies in waves, track survival progress, and end the match when the player is destroyed. |
+| `GameManager` / `MatchHUD` | Spawn enemies in waves, track survival progress, show countdowns and results, end the match on player death, and restart by reloading GameScene. |
 | `ShipSinking` / `ShipPartsController` / `PlayerShipParts` | Spawn and collect Ship Parts after an enemy sinks, track the player's Parts, and spend them to repair HP. |
 | `ExplosiveBarrelSetSpawner` / `BarrelAmmoPickupController` / `BarrelAmmo` | Spawn player-only Explosive Barrels Set pickups and track player and enemy barrel inventories. |
 | `BarrelController` / `BarrelStrikeController` | Move the deployed barrels, detect ships, and apply explosion damage. |
 | `MinimapController` | Displays the arena map and tracks markers for the player, enemies, Ship Parts pickups, and Explosive Barrels Set pickups. |
 
-The scene object named `GameManager` currently hosts `CannonballPool`. It does not yet manage waves, survival results, or match state.
+The scene object named `GameManager` hosts `CannonballPool` and the scene-local `GameManager` singleton, accessible through `GameManager.Instance`. The singleton rejects duplicate manager components and clears its reference on destruction. It manages wave progression, survival results, and match state, and is recreated when the gameplay scene reloads.
 
 ### Course Features / Design Patterns
 
@@ -335,7 +355,7 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 2. **Coroutines — implemented for timed death effects.** Weapon cooldowns use timers, while sinking advances through its own update-driven sequence.
 3. **State Pattern — implemented for enemy AI.** `AIController` coordinates separate state objects for Patrol, Chase, Broadside, Reposition, Search, Evade, Ramming, and BreakSteer.
 4. **Command Pattern — not implemented.** Player input and AI currently call the same shared execution systems directly. Whether separate command objects are useful will be decided only if a concrete need arises.
-5. Singleton — required, planned. A match manager will provide one authoritative instance for wave progression, survival state, and Game Over handling. The exact class and lifecycle will be decided when the wave system is designed. The current scene object named GameManager only hosts CannonballPool and is not yet this singleton.
+5. Singleton — implemented in `GameManager`. One scene-local instance is exposed through `GameManager.Instance`, with duplicate protection and static-reference cleanup, managing wave progression, survival state, and Game Over handling.
 
 ---
 
@@ -351,36 +371,48 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - [x] Collision-based ramming damage and AI Ramming behavior
 - [x] HP, damage, and local ship destruction
 - [x] One AI-controlled enemy capable of fighting the player
-- [ ] Multiple enemies spawning in survival waves
-- [ ] Spawn points for the player at match start and for enemies entering the arena
+- [x] Multiple enemies spawning in survival waves
+- [x] Enemy-count schedule: wave 1 has 1; waves 2–3 have 2; waves 4–6 have 3; wave 7 onward has 4
+- [x] Independent conditional starting barrel-set rolls for every enemy from wave 1 (20% for 4, then 40% for 3, 60% for 2, 80% for 1; otherwise 0)
+- [x] Spawn points for the player at match start and for enemies entering the arena
+- [x] Spawn player and enemies from their Ship prefab variants; bind scene dependencies at runtime; remove fixed scene ship instances
+- [x] Restore starting inventories from component settings, with player defaults of 0; retain health and inventory between waves
 - [x] AI Passive Recovery outside combat
 - [x] Enemy AI behavior for deploying Explosive Barrels Sets; state and decision rules documented in `AI_StateMachine.md`
 - [x] Ship Parts drops, collection, and player Repair
+- [x] Advance Ship Parts emergence by a configurable 5-second lead relative to full submersion, estimated from sink speed (implemented; manually tested and approved by the user on 2026-09-28)
 - [x] Explosive Barrels Sets: spawning, collection, deployment, and detonation
 - [x] Prevent destroyed ships from deploying Explosive Barrels Sets
 - [x] Player HP, selected firing direction, and cooldown HUD
 - [x] Enemy HP and distance display
 - [x] Ship Parts and Explosive Barrels Sets HUD
-- [ ] Wave progress and survival result display
+- [x] Wave progress and survival result display (basic layout; visual review pending)
 - [ ] Arrange and polish the in-game HUD layout
+- [ ] Design and polish the Wave HUD, including wave number, X/Y Alive counter, survival timer, and between-wave countdown
 - [x] Minimap with player, enemy, Ship Parts, and Explosive Barrels Set markers
 - [x] One enclosed naval arena
-- [ ] Game Over and survival result flow
+- [x] Game Over, survival results, and restart flow
+- [ ] Return to Main Menu from Game Over
 - [x] Hit VFX
 - [x] Short smoke effect at impact points
 - [x] Ship destruction effects: explosions, fire, capsize, and sinking
 - [ ] Main Menu
 - [ ] Pause Menu
 - [ ] Tutorial on separate screens, accessible from the Main Menu, using text and gameplay images
-- [ ] Game Manager Singleton to control the game loop, wave progression, match state, and Game Over
-- [ ] Sound effects and music
+- [x] Game Manager Singleton foundation in GameScene, with duplicate protection and scene-local lifecycle
+- [x] Game Manager control of the game loop, wave progression, match state, and Game Over
+- [x] Gameplay sound effects connected (17 implemented items in Audio_Checklist.md)
+- [ ] Finish menu audio and main-screen music (restart button click is connected; Main Menu and Pause Menu audio remain pending)
+- [ ] Complete audio listening checks and tune levels, distances, timing, and loop seams
 - [x] Distinct hull colors for the player and enemy ships: PlayerShipHull tint on the player hull and armor; original model material on the enemy hull and armor
 - [x] Player ship detail colors: Rudder and both Captain Room Door frames use PlayerShipHull; Back_Mast, Front_Mast, Directional_Mast, Mast, ShipWheel, and door wood use PlayerShipDarkWood. Mast metal accents and door glass retain their original materials; the wheel center uses PlayerShipHelmMetal. Player-only mesh copies separate material regions without changing geometry; existing textures are reused.
 - [x] Black player-ship sails with two upright pirate emblems: one on the third Front_Sails panel from the top and one on the middle Back_Sails panel; original one-sided visibility preserved
 - [x] Visual appearance effect for Explosive Barrels Set pickups — 1.5-second rise, 90-second availability, 1.5-second sinking; manually verified in gameplay
 - [ ] Configure Build Settings for the final game build
+- [x] Enable GameScene in Build Settings for scene-reload restart
 - [ ] Verify and optimize gameplay performance on the development laptop (Intel Graphics), including support for 1280×720 resolution and checking HUD readability at that resolution
-- [ ] Add an overhead debug camera to the game
+- [x] Overhead debug camera available in Editor/development builds (C key)
+- [ ] Promote the overhead debug camera to a supported gameplay camera in release builds
 
 ### 9.2 Nice to Have / Polish
 
@@ -388,7 +420,7 @@ The scene object named `GameManager` currently hosts `CannonballPool`. It does n
 - [ ] Audit and remove unused third-party assets to reduce project size and import overhead; check asset dependencies and runtime loading before removal, preserve a Git recovery point, and verify scenes and the game build afterward
 - [ ] Ship breaking into separate pieces
 - [ ] Add aiming reticles to the fixed firing cameras?
-- [ ] Should Explosive Barrels Sets and Ship Parts for repairs persist between matches?
+- [x] Decide inventory persistence: carry inventory between waves; a new match/restart restores prefab starting values, without carrying over collected inventory
 
 ### 9.3 Explicitly Out of Scope
 

@@ -163,6 +163,9 @@ public class BarrelStrikeController : MonoBehaviour
             return;
 
         hasDetonated = true;
+        Vector3 soundCenter = (leftBarrel.ExplosionPoint + midLeftBarrel.ExplosionPoint +
+            midRightBarrel.ExplosionPoint + rightBarrel.ExplosionPoint) / 4f;
+        GameAudio.Play(GameSound.HeavyExplosion, soundCenter);
 
         leftBarrel.PlayExplosion();
         midLeftBarrel.PlayExplosion();

@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 public class FiringDirectionUI : MonoBehaviour
 {
+    public void SetController(FiringDirectionController controller) => firingDirectionController = controller;
+
     [SerializeField] private FiringDirectionController firingDirectionController;
     [SerializeField] private Image directionArrow;
 

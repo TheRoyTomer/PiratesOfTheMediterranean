@@ -123,6 +123,7 @@ public class BarrelAmmoPickupController : MonoBehaviour
             collected = true;
             ring.Hide();
             barrelAmmo.Add(1);
+            GameAudio.Play(GameSound.Pickup);
             Destroy(gameObject);
             return;
         }

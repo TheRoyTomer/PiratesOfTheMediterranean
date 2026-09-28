@@ -5,6 +5,11 @@ using UnityEngine;
 [DefaultExecutionOrder(1000)]
 public sealed class EnemyHudController : MonoBehaviour
 {
+    public void SetPlayer(Transform player)
+    {
+        playerShip = player;
+    }
+
     [SerializeField] private EnemyHudView distanceHudPrefab;
     [SerializeField] private EnemyHudView healthHudPrefab;
     [SerializeField] private Transform playerShip;

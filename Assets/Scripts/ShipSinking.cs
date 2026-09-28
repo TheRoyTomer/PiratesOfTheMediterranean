@@ -22,13 +22,17 @@ public class ShipSinking : MonoBehaviour
     [SerializeField] private GameObject shipPartsPickupPrefab;
     [SerializeField] private float shipPartsRiseDepth = 3f;
     [SerializeField] private float shipPartsRiseDuration = 1.5f;
+    [Tooltip("Advance pickup emergence relative to full submersion, using sink speed. Approximate while the ship is still rolling.")]
+    [SerializeField, Min(0f)] private float shipPartsEmergenceLeadTime = 5f;
 
     private bool shipPartsPickupSpawned;
+    private MeshRenderer[] shipRenderers;
 
     private ShipHealth shipHealth;
     private Rigidbody body;
     private ShipDeathEffects deathEffects;
     private SinkingPhase phase;
+    public bool IsCapsizing => phase == SinkingPhase.SlowRoll || phase == SinkingPhase.FastCapsize;
 
     private Vector3 deathPosition;
     private Quaternion deathRotation;
@@ -67,6 +71,9 @@ public class ShipSinking : MonoBehaviour
         shipHealth = GetComponent<ShipHealth>();
         body = GetComponent<Rigidbody>();
         deathEffects = GetComponent<ShipDeathEffects>();
+        // Cache the ship model before death effects are created. Particle smoke/fire
+        // must not delay loot when the actual ship has disappeared underwater.
+        shipRenderers = GetComponentsInChildren<MeshRenderer>(true);
 
         FindWaterImpactMarkers();
     }
@@ -301,6 +308,32 @@ public class ShipSinking : MonoBehaviour
         );
     }
 
+    private void LateUpdate()
+    {
+        if (shipPartsPickupSpawned || shipPartsPickupPrefab == null ||
+            (phase != SinkingPhase.FastCapsize && phase != SinkingPhase.Sinking))
+            return;
+
+        float waterY = WaterSystem.Instance != null ? WaterSystem.Instance.WaterLevel : 0f;
+        // During constant-speed sinking, this height is reached leadTime seconds
+        // before the previous full-submersion threshold. Capsize rotation can affect timing.
+        float emergenceThreshold = waterY + config.Sinking.SinkSpeed * shipPartsEmergenceLeadTime;
+        bool hasVisibleMesh = false;
+        foreach (MeshRenderer mesh in shipRenderers)
+        {
+            if (mesh == null || !mesh.enabled || !mesh.gameObject.activeInHierarchy)
+                continue;
+
+            hasVisibleMesh = true;
+            if (mesh.bounds.max.y > emergenceThreshold)
+                return;
+        }
+
+        // Use the same once-only drop path as the final-depth fallback.
+        if (hasVisibleMesh)
+            SpawnShipPartsPickup();
+    }
+
     private void CheckWaterImpactMarkers()
     {
         if (WaterSystem.Instance == null)
@@ -384,6 +417,7 @@ public class ShipSinking : MonoBehaviour
 
         // Spawn directly on the water surface.
         spawnPosition.y = waterY;
+        GameAudio.Play(GameSound.CapsizeSplash, spawnPosition, 0.65f);
 
         GameObject splash =
             Instantiate(

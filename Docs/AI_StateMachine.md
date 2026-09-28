@@ -263,7 +263,7 @@ Damage can cause a different transition while BreakSteer is active: an Evade tri
 
 ## Explosive Barrel Deployment
 
-Implemented as an action, not a state. The EnemyShip in GameScene starts with 3 sets, configured through `BarrelAmmo.startingAmmo`; it does not collect pickups.
+Implemented as an action, not a state. GameManager configures each spawned enemy before activation: from wave 1, independent sequential rolls of 20% for 4 sets, then on failure 40% for 3, 60% for 2, and 80% for 1, otherwise 0. The first success stops the sequence. The start wave and chances are Inspector settings. Enemies do not collect pickups. These inventory rolls are separate from the deployment decision below.
 
 - `EVADE` and `REPOSITION` evaluate deployment while active, after normal state transitions.
 - `BREAKSTEER` evaluates once on successful entry, after choosing an unblocked turn but **before the first steering tick**. It does not deploy during the turn or escape run. It does not wait for the barrels to finish spreading.
@@ -349,7 +349,7 @@ Barrel deployment creates no transition. BreakSteer's entry attempt precedes its
 | Ramming acceptance chance for a valid opportunity | 25% |
 | BreakSteer pursuit duration | 6 seconds |
 | BreakSteer escape run after turning | 3 seconds |
-| EnemyShip starting barrel inventory (GameScene) | 3 sets |
+| Enemy starting barrel inventory | Wave 1 onward: conditional roll for 0–4 sets (see above) |
 | Barrel success chance per eligible roll | 15% |
 | Shared barrel decision interval / initial delay | 5 seconds |
 | Barrel sets consumed per successful roll | 1 |

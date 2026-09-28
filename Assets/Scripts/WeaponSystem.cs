@@ -3,6 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(ShipConfiguration))]
 public class WeaponSystem : MonoBehaviour
 {
+    public void SetCannonballPool(CannonballPool pool)
+    {
+        cannonballPool = pool;
+    }
+
     private ShipConfig config;
 
     [Header("Effects")]
@@ -66,10 +71,20 @@ public class WeaponSystem : MonoBehaviour
         if (IsOnCooldown(direction))
             return;
 
-        foreach (Transform firePoint in GetFirePoints(direction))
+        Transform[] firePoints = GetFirePoints(direction);
+        Vector3 volleyCenter = Vector3.zero;
+        int fired = 0;
+        foreach (Transform firePoint in firePoints)
         {
+            if (firePoint == null) continue;
             FireCannonball(firePoint);
+            volleyCenter += firePoint.position;
+            fired++;
         }
+
+        // One sound per volley avoids stacking identical full-volume cannon reports.
+        if (fired > 0)
+            GameAudio.Play(GameSound.CannonFire, volleyCenter / fired);
 
         StartCooldown(direction);
     }
