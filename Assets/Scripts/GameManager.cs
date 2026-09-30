@@ -58,7 +58,7 @@ public sealed class GameManager : MonoBehaviour
     private readonly List<Transform> candidates = new();
     private readonly List<Transform> selectedPoints = new();
     private float nextSpawnAttempt;
-    [SerializeField] private float enemySpawnHeight = -5f;
+    [SerializeField] private float enemySpawnHeight = 0f;
     private Transform spawnStagingRoot;
 
     public static int EnemyCountForWave(int wave)

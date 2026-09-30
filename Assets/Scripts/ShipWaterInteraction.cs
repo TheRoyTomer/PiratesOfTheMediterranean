@@ -13,8 +13,8 @@ public sealed class ShipWaterInteraction : MonoBehaviour
     [SerializeField] private ParticleSystem[] sideBubbles;
     [SerializeField] private ParticleSystem[] waterParticles;
     [SerializeField] private Behaviour[] emissionControllers;
-    [SerializeField, Min(0f)] private float sideFoamPerMeter = 0.18f;
-    [SerializeField, Min(0f)] private float sideBubblesPerMeter = 0.06f;
+    [SerializeField, Min(0f)] private float sideFoamPerMeter = 0.75f;
+    [SerializeField, Min(0f)] private float sideBubblesPerMeter = 0.3f;
     [SerializeField, Min(0f)] private float minimumFoamSpeed = 0.5f;
     [SerializeField, Min(0.01f)] private float fullFoamSpeed = 4f;
 

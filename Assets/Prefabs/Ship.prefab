@@ -2263,7 +2263,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfc518e9dd5349c489a8aa1d2e2500c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BarrelAmmo
-  startingAmmo: 3
+  startingAmmo: 0
   barrelAmmoText: {fileID: 0}
 --- !u!114 &7417990142427667351
 MonoBehaviour:

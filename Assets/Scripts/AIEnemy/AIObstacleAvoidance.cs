@@ -9,7 +9,7 @@ public class AIObstacleAvoidance : MonoBehaviour
     [SerializeField] private float brakeAcceleration = 3f;
     [SerializeField] private float reactionTime = 3f;
     [SerializeField] private float obstacleCapsuleRadius = 10f;
-    [SerializeField] private LayerMask obstacleMask;
+    [SerializeField] private LayerMask obstacleMask = 1 << 9;
     [SerializeField] private float avoidanceThrottle = 0.3f;
 
     private Rigidbody rb;

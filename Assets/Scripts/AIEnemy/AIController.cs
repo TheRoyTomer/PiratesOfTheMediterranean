@@ -34,7 +34,7 @@ public class AIController : MonoBehaviour
 
     [Header("Broadside Selection")]
     [SerializeField] private float broadsideSwitchThreshold = 15f;
-    [SerializeField, Range(-1f, 0f)] private float broadsideBrakeThrottle = -0.35f;
+    [SerializeField, Range(-1f, 0f)] private float broadsideBrakeThrottle = 0f;
     [SerializeField] private float broadsideAlignmentTolerance = 1f;
     [SerializeField] private float broadsideFullSteeringAngle = 7f;
     [SerializeField] private float broadsideBlockedTimeout = 1.5f;

@@ -7,6 +7,7 @@ public sealed class PlayerSceneBindings : MonoBehaviour
 {
     [SerializeField] private CameraFollow cameraFollow;
     [SerializeField] private CameraModeController cameraModes;
+    [SerializeField] private CannonReticleHUD cannonReticles;
     [SerializeField] private GameAudio gameAudio;
     [SerializeField] private PlayerHealthHUDController healthHUD;
     [SerializeField] private CooldownHUDController cooldownHUD;
@@ -15,15 +16,16 @@ public sealed class PlayerSceneBindings : MonoBehaviour
     [SerializeField] private TMP_Text shipPartsText;
     [SerializeField] private KWS_DynamicWavesSimulationZone wakeSimulation;
     [Header("Camera paths relative to the PlayerShip prefab root")]
-    [SerializeField] private string frontCameraPath;
-    [SerializeField] private string rightCameraPath;
-    [SerializeField] private string leftCameraPath;
-    [SerializeField] private string backCameraPath;
+    [SerializeField] private string frontCameraPath = "CameraViews/FrontFiringCamera";
+    [SerializeField] private string rightCameraPath = "CameraViews/RightFiringCamera";
+    [SerializeField] private string leftCameraPath = "CameraViews/LeftFiringCamera";
+    [SerializeField] private string backCameraPath = "CameraViews/BackFiringCamera";
 
     public void Bind(ShipHealth player)
     {
         var input = player.GetComponent<PlayerInputController>();
         var direction = player.GetComponent<FiringDirectionController>();
+        if (cannonReticles != null) cannonReticles.BindPlayer(player);
         input.SetCameraController(cameraModes);
         cameraFollow.SetTarget(player.transform);
         cameraModes.BindPlayer(direction,

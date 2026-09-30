@@ -18,9 +18,9 @@ public sealed class GameAudio : MonoBehaviour
         public AudioClip clip;
         [Range(0f, 1f)] public float volume = 0.5f;
         public bool spatial = true;
-        [Min(1f)] public float minDistance = 25f;
-        [Min(2f)] public float maxDistance = 450f;
-        [Min(0f)] public float minimumInterval = 0.04f;
+        [Min(1f)] public float minDistance = 30f;
+        [Min(2f)] public float maxDistance = 400f;
+        [Min(0f)] public float minimumInterval = 0.035f;
         [Min(1)] public int maxVoices = 6;
     }
 
@@ -35,7 +35,22 @@ public sealed class GameAudio : MonoBehaviour
     }
 
     [SerializeField] private PlayerInputController player;
-    [SerializeField] private Sound[] sounds;
+    [SerializeField] private Sound[] sounds = new Sound[]
+    {
+        new Sound { id = GameSound.CannonFire, volume = 0.45f, spatial = true, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.CannonImpact, volume = 0.4f, spatial = true, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.CannonWaterSplash, volume = 0.35f, spatial = true, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.CannonWhistle, volume = 0.18f, spatial = true, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.4f, maxVoices = 2 },
+        new Sound { id = GameSound.ShipCollision, volume = 0.5f, spatial = true, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.BarrelWaterSplash, volume = 0.4f, spatial = true, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.HeavyExplosion, volume = 0.65f, spatial = true, minDistance = 30f, maxDistance = 600f, minimumInterval = 0f, maxVoices = 6 },
+        new Sound { id = GameSound.CapsizeSplash, volume = 0.45f, spatial = true, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.Pickup, volume = 0.5f, spatial = false, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.Repair, volume = 0.45f, spatial = false, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.SwitchFireDirection, volume = 0.35f, spatial = false, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+        new Sound { id = GameSound.ActionDenied, volume = 0.3f, spatial = false, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.4f, maxVoices = 6 },
+        new Sound { id = GameSound.MenuClick, volume = 0.35f, spatial = false, minDistance = 30f, maxDistance = 400f, minimumInterval = 0.035f, maxVoices = 6 },
+    };
     [Header("Environment")]
     [SerializeField] private AudioClip ocean;
     [SerializeField, Range(0f, 1f)] private float oceanVolume = 0.18f;

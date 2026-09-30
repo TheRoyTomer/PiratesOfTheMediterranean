@@ -8,17 +8,17 @@ public sealed class ShipConfig : ScriptableObject
     public sealed class MovementSettings
     {
         [Tooltip("Forward acceleration in world units per second squared.")]
-        [SerializeField] private float acceleration = 15f;
+        [SerializeField] private float acceleration = 20f;
         [Tooltip("Longitudinal braking acceleration in world units per second squared.")]
-        [Min(0f)] [SerializeField] private float brakeAcceleration = 10f;
+        [Min(0f)] [SerializeField] private float brakeAcceleration = 3f;
         [Tooltip("Horizontal sideways velocity damping rate per second.")]
-        [Min(0f)] [SerializeField] private float lateralDrag = 1f;
+        [Min(0f)] [SerializeField] private float lateralDrag = 8f;
         [Tooltip("Steering torque acceleration.")]
-        [SerializeField] private float turnAcceleration = 2f;
+        [SerializeField] private float turnAcceleration = 1.25f;
         [Tooltip("Acceleration multiplier while boosting.")]
         [SerializeField] private float boostMultiplier = 1.5f;
         [Tooltip("Angular speed threshold for applying steering torque.")]
-        [SerializeField] private float maxTurnSpeed = 0.6f;
+        [SerializeField] private float maxTurnSpeed = 0.4f;
         [Tooltip("Forward speed at which steering reaches full effectiveness.")]
         [Min(0.01f)]
         [SerializeField] private float fullSteeringSpeed = 20f;
@@ -38,11 +38,11 @@ public sealed class ShipConfig : ScriptableObject
         [Tooltip("Health assigned when a ship initializes.")]
         [SerializeField] private float maxHealth = 100f;
         [Tooltip("Seconds of cooldown after firing.")]
-        [SerializeField] private float cooldownDuration = 2f;
+        [SerializeField] private float cooldownDuration = 4f;
         [Tooltip("Additional cooldown when another firing direction is cooling down.")]
         [SerializeField] private float extraCooldownPenalty = 2f;
         [Tooltip("Cannonball launch speed in world units per second.")]
-        [SerializeField] private float cannonballSpeed = 150f;
+        [SerializeField] private float cannonballSpeed = 200f;
 
         public float MaxHealth => maxHealth;
         public float CooldownDuration => cooldownDuration;

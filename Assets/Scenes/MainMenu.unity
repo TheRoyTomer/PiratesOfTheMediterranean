@@ -2226,9 +2226,9 @@ MonoBehaviour:
     changes its direction.
 
 
-    Reticles appear only in
+    Laser aiming lines appear
 
-    these fixed firing
+    only in these firing
     views.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cab71904b85c1324b9826803cbc8bb33, type: 2}

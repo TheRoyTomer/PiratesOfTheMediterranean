@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 
-// Runtime-only diagnostic view; no scene or gameplay-camera settings are saved.
+// Supported overhead gameplay view. The class name is retained for existing HUD references.
 public sealed class DebugTopCamera : MonoBehaviour
 {
     private Camera gameplayCamera;
@@ -10,7 +10,6 @@ public sealed class DebugTopCamera : MonoBehaviour
     private Transform ship;
     private CameraModeController cameraModeController;
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void CreateDebugCamera()
     {
@@ -19,7 +18,7 @@ public sealed class DebugTopCamera : MonoBehaviour
         if (main == null || player == null || main.GetComponent<CameraModeController>() == null)
             return;
 
-        GameObject root = new GameObject("DebugTopCamera");
+        GameObject root = new GameObject("Overhead Camera");
         root.SetActive(false);
         Camera view = root.AddComponent<Camera>();
         view.CopyFrom(main);
@@ -40,13 +39,12 @@ public sealed class DebugTopCamera : MonoBehaviour
         toggle.FrameCurrentArea();
         root.SetActive(true);
     }
-#endif
 
     private void Update()
     {
         if (PauseMenuController.BlocksGameplayInput) return;
 
-        if (Keyboard.current == null || !Keyboard.current.cKey.wasPressedThisFrame
+        if (Keyboard.current == null || !Keyboard.current.capsLockKey.wasPressedThisFrame
             || gameplayCamera == null || debugCamera == null || ship == null)
             return;
 

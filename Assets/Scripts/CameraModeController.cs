@@ -21,6 +21,7 @@ public sealed class CameraModeController : MonoBehaviour
 
     public CameraMode Mode { get; private set; } = CameraMode.Main;
     public Camera ActiveGameplayCamera { get; private set; }
+    public bool IsFiringViewActive => !deathViewActive && debugCamera == null && Mode == CameraMode.Firing;
 
     private bool toggleRequested;
     private bool reverseHeld;

@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 public class PickupRingVisual : MonoBehaviour
 {
     [SerializeField] private float radius = 32f;
-    [SerializeField] private float baseWidth = 4f;
+    [SerializeField] private float baseWidth = 5f;
     [SerializeField] private Color ringColor = new Color(0.72f, 0.3f, 1f, 1f);
     [SerializeField] private float pulseSpeed = 4f;
 

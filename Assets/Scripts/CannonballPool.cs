@@ -7,6 +7,7 @@ public class CannonballPool : MonoBehaviour
     [SerializeField] private int initialPoolSize = 20;
 
     private readonly Queue<GameObject> pool = new Queue<GameObject>();
+    public Cannonball Projectile => cannonballPrefab != null ? cannonballPrefab.GetComponent<Cannonball>() : null;
 
     private void Awake()
     {

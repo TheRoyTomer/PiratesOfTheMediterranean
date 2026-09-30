@@ -177,7 +177,7 @@ public class WeaponSystem : MonoBehaviour
             rightCooldown += config.Combat.ExtraCooldownPenalty;
     }
 
-    private Transform[] GetFirePoints(FiringDirection direction)
+    public Transform[] GetFirePoints(FiringDirection direction)
     {
         return direction switch
         {
@@ -202,8 +202,7 @@ public class WeaponSystem : MonoBehaviour
             firePoint.rotation
         );
 
-        Vector3 firingDirection =
-            Vector3.ProjectOnPlane(firePoint.forward, Vector3.up).normalized;
+        Vector3 firingDirection = GetFiringDirection(firePoint);
 
         cannonball.Launch(
             cannonballPool,
@@ -211,5 +210,17 @@ public class WeaponSystem : MonoBehaviour
             config.Combat.CannonballSpeed,
             shipHealth
         );
+    }
+
+    public static Vector3 GetFiringDirection(Transform firePoint) =>
+        Vector3.ProjectOnPlane(firePoint.forward, Vector3.up).normalized;
+
+    public bool TryPredictWaterImpact(Transform firePoint, float waterLevel, out Vector3 impact)
+    {
+        impact = default;
+        return config != null && cannonballPool != null && firePoint != null &&
+            cannonballPool.Projectile != null && cannonballPool.Projectile.TryPredictWaterImpact(
+                firePoint.position, GetFiringDirection(firePoint), config.Combat.CannonballSpeed,
+                waterLevel, Time.fixedDeltaTime, out impact);
     }
 }

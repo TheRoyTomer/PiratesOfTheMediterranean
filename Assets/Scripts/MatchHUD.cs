@@ -8,10 +8,18 @@ public sealed class MatchHUD : MonoBehaviour
 {
     [SerializeField] private GameManager manager;
     [SerializeField] private TMP_Text statusText;
+    [SerializeField] private GameObject statusBackdrop;
     [SerializeField] private GameObject resultsPanel;
     [SerializeField] private TMP_Text wavesValue;
     [SerializeField] private TMP_Text enemiesValue;
     [SerializeField] private TMP_Text survivalValue;
+    [SerializeField] private TMP_Text wavesRecordLabel;
+    [SerializeField] private TMP_Text enemiesRecordLabel;
+    [SerializeField] private TMP_Text survivalRecordLabel;
+    [SerializeField] private Color recordColor = new Color(0.8f, 0.04f, 0.025f, 1f);
+    private Color normalWavesColor, normalEnemiesColor, normalSurvivalColor;
+    private bool recordedResults;
+    private LocalHighScores.Records records;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private string mainMenuScene = "MainMenu";
@@ -21,9 +29,14 @@ public sealed class MatchHUD : MonoBehaviour
 
     private void Awake()
     {
+        normalWavesColor = wavesValue.color;
+        normalEnemiesColor = enemiesValue.color;
+        normalSurvivalColor = survivalValue.color;
+        ResetRecordHighlights();
         restartButton.onClick.AddListener(Restart);
         mainMenuButton.onClick.AddListener(ReturnToMainMenu);
         resultsPanel.SetActive(false);
+        if (statusBackdrop != null) statusBackdrop.SetActive(true);
     }
 
     private void Update()
@@ -32,6 +45,14 @@ public sealed class MatchHUD : MonoBehaviour
         if (playerSinking == null && manager.Player != null)
             playerSinking = manager.Player.GetComponent<ShipSinking>();
         bool finished = manager.State == MatchState.GameOver;
+        if (finished && !recordedResults)
+        {
+            records = LocalHighScores.SaveResult(manager.CompletedWaves, manager.EnemiesDestroyed, manager.SurvivalTime);
+            recordedResults = true;
+            ApplyRecordHighlights();
+        }
+        else if (!finished && recordedResults) ResetRecordHighlights();
+        if (statusBackdrop != null) statusBackdrop.SetActive(!finished);
         bool revealResults = finished && (playerSinking == null || playerSinking.HasStartedFinalDescent);
         resultsPanel.SetActive(revealResults);
         if (revealResults && !showingResults && EventSystem.current != null)
@@ -67,6 +88,31 @@ public sealed class MatchHUD : MonoBehaviour
         leaving = true;
         GameAudio.Play(GameSound.MenuClick);
         manager.RestartMatch();
+    }
+
+    private void ApplyRecordHighlights()
+    {
+        wavesValue.color = records.Waves ? recordColor : normalWavesColor;
+        enemiesValue.color = records.Enemies ? recordColor : normalEnemiesColor;
+        survivalValue.color = records.Survival ? recordColor : normalSurvivalColor;
+        SetRecordLabel(wavesRecordLabel, records.Waves);
+        SetRecordLabel(enemiesRecordLabel, records.Enemies);
+        SetRecordLabel(survivalRecordLabel, records.Survival);
+    }
+
+    private void SetRecordLabel(TMP_Text label, bool visible)
+    {
+        if (label == null) return;
+        label.text = "HIGH SCORE!";
+        label.color = recordColor;
+        label.gameObject.SetActive(visible);
+    }
+
+    private void ResetRecordHighlights()
+    {
+        recordedResults = false;
+        records = default;
+        ApplyRecordHighlights();
     }
 
     private void ReturnToMainMenu()

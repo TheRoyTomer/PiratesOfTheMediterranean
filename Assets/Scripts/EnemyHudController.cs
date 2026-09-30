@@ -23,14 +23,14 @@ public sealed class EnemyHudController : MonoBehaviour
     [Header("Distance HUD Screen Scaling")]
     [SerializeField] private float distanceHudCloseDistance = 100f;
     [SerializeField] private float distanceHudFarDistance = 1700f;
-    [SerializeField] private float distanceHudCloseScale = 1.1f;
-    [SerializeField] private float distanceHudFarScale = 0.7f;
+    [SerializeField] private float distanceHudCloseScale = 0.9f;
+    [SerializeField] private float distanceHudFarScale = 0.65f;
 
     [Header("Health HUD Screen Scaling")]
     [SerializeField] private float healthHudCloseDistance = 100f;
     [SerializeField] private float healthHudFarDistance = 1700f;
-    [SerializeField] private float healthHudMinScreenScale = 0.35f;
-    [SerializeField] private float healthHudMaxScreenScale = 0.45f;
+    [SerializeField] private float healthHudMinScreenScale = 0.45f;
+    [SerializeField] private float healthHudMaxScreenScale = 0.65f;
 
     private ShipHealth health;
     private EnemyHudView distanceView;

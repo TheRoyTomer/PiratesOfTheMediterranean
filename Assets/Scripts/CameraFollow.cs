@@ -12,8 +12,8 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float height = 35f;
     [SerializeField] private float mouseSensitivity = 0.5f;
     [SerializeField] private float verticalMouseSensitivity = 0.5f;
-    [SerializeField] private float minPitch = 5f;
-    [SerializeField] private float maxPitch = 28f;
+    [SerializeField] private float minPitch = -20f;
+    [SerializeField] private float maxPitch = 0f;
 
     [Header("Camera Smoothing")]
     [SerializeField] private float rotationSmoothSpeed = 5f;

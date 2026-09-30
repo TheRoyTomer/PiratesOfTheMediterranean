@@ -11,7 +11,7 @@ public class AIPerception : MonoBehaviour
     [SerializeField, Range(0f, 180f)]
     private float patrolFieldOfViewHalfAngle = 120f;
 
-    [SerializeField] private LayerMask visibilityOccluderMask;
+    [SerializeField] private LayerMask visibilityOccluderMask = 1 << 11;
     [SerializeField] private float visionOriginHeight = 10f;
     [SerializeField] private float visionTargetHeight = 10f;
     [SerializeField] private float loseTargetRange = 1300f;

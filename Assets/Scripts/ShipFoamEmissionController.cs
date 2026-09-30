@@ -6,8 +6,8 @@ public sealed class ShipFoamEmissionController : MonoBehaviour
 {
     [SerializeField] private ParticleSystem mainFoam;
     [SerializeField] private ParticleSystem bubbles;
-    [SerializeField, Min(0f)] private float mainFoamPerMeter = 0.4f;
-    [SerializeField, Min(0f)] private float bubblesPerMeter = 0.15f;
+    [SerializeField, Min(0f)] private float mainFoamPerMeter = 0.75f;
+    [SerializeField, Min(0f)] private float bubblesPerMeter = 0.3f;
 
     private Rigidbody body;
 

@@ -6,7 +6,7 @@ public sealed class ShipBowSprayController : MonoBehaviour
 {
     [SerializeField] private ParticleSystem leftSpray;
     [SerializeField] private ParticleSystem rightSpray;
-    [SerializeField, Min(0f)] private float maximumEmissionRate = 10f;
+    [SerializeField, Min(0f)] private float maximumEmissionRate = 60f;
 
     private Rigidbody body;
 
