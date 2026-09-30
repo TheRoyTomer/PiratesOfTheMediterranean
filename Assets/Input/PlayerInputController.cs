@@ -48,6 +48,8 @@ public class PlayerInputController : MonoBehaviour
 
     private void Update()
     {
+        if (PauseMenuController.BlocksGameplayInput || (shipHealth != null && shipHealth.IsDead)) return;
+
         Vector2 moveInput = inputActions.Player.Move.ReadValue<Vector2>();
 
         shipController.SetThrottle(moveInput.y);

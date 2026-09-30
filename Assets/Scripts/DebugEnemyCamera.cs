@@ -53,6 +53,8 @@ public sealed class DebugEnemyCamera : MonoBehaviour
 
     private void Update()
     {
+        if (PauseMenuController.BlocksGameplayInput) return;
+
         if (enemy == null)
         {
             RestorePlayerCamera();

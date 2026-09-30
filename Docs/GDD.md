@@ -265,10 +265,12 @@ Implemented for the survival wave system:
 
 The current Gameplay Screen contains the combat view and the implemented HUD elements.
 
-Planned screens:
+Menu screens:
 
-- **Main Menu** — starts a new match.
-- **Return to Main Menu from Game Over** — pending the Main Menu implementation. The Game Over results panel and restart button are already implemented in GameScene.
+- **Main Menu** — implemented in a separate `MainMenu` scene, first in Build Settings. Uses the approved parchment map, separate ornamental divider, IM Fell English SC headings/buttons, and IM Fell English body text. Play loads GameScene; Quit exits the application (stops Play Mode in the Editor). Menu music and click audio are connected.
+- **Illustrated How to Play** — five scene-authored pages: ship controls and cooldowns; cameras; supplies; annotated HUD with repair/barrel controls; survival waves. Shared ESC/Main Menu control, page counter, previous/next buttons and left/right keyboard navigation. The ends do not wrap. Opening help starts on page one. All text, screenshots and HUD arrows are editable scene objects; `MainMenuController` changes page visibility without generating UI. SC, Regular and Italic IM Fell English TMP assets are used. The tutorial includes the requested Caps Lock overhead control and firing-view reticles as the intended controls; those gameplay features still need implementation (the current overhead camera is a development-only C-key view, and the firing screenshot has no reticle).
+- **Pause Menu** — scene-authored overlay in GameScene with a dimmed game background, separate parchment asset, IM Fell English SC heading/buttons, RESUME [ESC] and QUIT. ESC toggles pause/resume; QUIT returns to MainMenu. Match time, physics and gameplay audio pause; player actions and camera input are blocked. Resume restores the previous cursor/time/audio state and suppresses gameplay input for the resume frame. The first How to Play page explains ESC and Pause Menu Quit. No UI builder script is used.
+- **Game Over** — editable parchment results panel built in the Unity Editor, matching the Pause Menu's artwork and IM Fell English fonts. Separate fields display completed waves, enemies destroyed and survival time; RESTART starts a new match and MAIN MENU loads MainMenu. On player death only, a dedicated scene camera switches to an elevated side view at a fixed world position above the water. Explosions and capsize play unobstructed; the results panel appears when the player's ShipSinking enters its final downward Sinking phase. The camera remains fixed after the ship disappears, and gameplay camera switching is blocked during the death view. Enemy deaths never activate this camera or reveal results. Both buttons, player/enemy isolation, reveal timing and restart camera reset were verified in Play Mode; final visual acceptance is pending.
 
 ## 8. Technical Design
 
@@ -277,7 +279,7 @@ The game separates player and AI decisions from the shared systems that move shi
 ### Scenes
 
 - `GameScene` (current) — contains the arena, shared spawn points, wave manager, player scene bindings, combat and pickup systems, main camera, and HUD. Player and enemy ships are instantiated from their respective Variant assets at runtime; neither ship is pre-placed in the scene.
-- `MainMenu` (planned) — starts a survival match.
+- `MainMenu` — starts a survival match, with parchment UI, a basic controls reference panel, and menu audio.
 
 Game Over is a UI state inside `GameScene`. `MatchHUD` displays wave status, countdowns, survival results, and a restart button. GameScene is enabled in Build Settings for scene-reload restart; final release build configuration remains pending.
 
@@ -351,7 +353,7 @@ The scene object named `GameManager` hosts `CannonballPool` and the scene-local 
 
 ### Course Features / Design Patterns
 
-1. **Object Pool — implemented for cannonballs.** `CannonballPool` reuses projectile instances. VFX pooling is optional and not implemented.
+1. **Object Pool — implemented for cannonballs.** `CannonballPool` reuses projectile instances. Extending pooling to frequently spawned VFX is a planned Scope task and is not yet implemented. If scene loading or pool prewarming takes several seconds, provide a responsive loading screen while preparation completes.
 2. **Coroutines — implemented for timed death effects.** Weapon cooldowns use timers, while sinking advances through its own update-driven sequence.
 3. **State Pattern — implemented for enemy AI.** `AIController` coordinates separate state objects for Patrol, Chase, Broadside, Reposition, Search, Evade, Ramming, and BreakSteer.
 4. **Command Pattern — not implemented.** Player input and AI currently call the same shared execution systems directly. Whether separate command objects are useful will be decided only if a concrete need arises.
@@ -392,17 +394,21 @@ The scene object named `GameManager` hosts `CannonballPool` and the scene-local 
 - [x] Minimap with player, enemy, Ship Parts, and Explosive Barrels Set markers
 - [x] One enclosed naval arena
 - [x] Game Over, survival results, and restart flow
-- [ ] Return to Main Menu from Game Over
+- [ ] Save three independent local high scores using PlayerPrefs: most waves completed, most enemies destroyed, and longest survival time. Preserve each record across matches and application restarts. At match end, compare each result against its previously saved record before updating it; strictly higher results count as new records, ties do not. In Game Over, display each record-breaking result in red with **HIGH SCORE!** beside it; other results retain their normal styling. Multiple categories can break records in the same match. Keep the per-match record flags until leaving the results screen so saving the new values does not remove the highlights, and reset those flags for a new match.
+- [x] Return to Main Menu from Game Over — connected and verified in Play Mode; Game Over redesigned as a parchment panel with separate result fields and RESTART / MAIN MENU buttons.
+- [x] Player-only death camera and delayed Game Over reveal — dedicated scene camera disabled during gameplay; elevated side view activates on player death and stays fixed above water. Results appear at the start of final sinking, after explosions/capsize. Enemy deaths leave gameplay cameras and results visibility unchanged. Verified player/enemy cases, fixed height through full sinking, and normal camera restoration after Restart; final user visual acceptance pending.
 - [x] Hit VFX
 - [x] Short smoke effect at impact points
 - [x] Ship destruction effects: explosions, fire, capsize, and sinking
-- [ ] Main Menu
-- [ ] Pause Menu
-- [ ] Tutorial on separate screens, accessible from the Main Menu, using text and gameplay images
+- [x] Main Menu — separate editable scene, Play/How to Play/Quit, pointer and keyboard selection, music and click audio. Verified at 1280×720; Play Mode checks passed for help/back navigation and Play loading GameScene with the player and wave 1. Final visual and listening acceptance remains with the user.
+- [x] Pause Menu — COMPLETE and finally approved by the user on 2026-09-30. Editable GameScene UI built in the Unity Editor: RESUME [ESC], QUIT to MainMenu, ESC toggle, paused time/audio and blocked gameplay/camera input. Play Mode checks passed for frozen countdown/survival time, Resume button, Quit returning to MainMenu and a fresh match with normal time. Visual check passed at 1280×720. The user confirmed the design, ESC, buttons and sound work as expected.
+- [x] Illustrated How to Play — COMPLETE and finally approved by the user on 2026-09-30. Five editable pages built in the Unity Editor, with gameplay images, annotated HUD, IM Fell English SC/Regular/Italic fonts, shared return control and page navigation. Play Mode checks passed for forward/back buttons, disabled end buttons, return to menu and reopening on page one; visual checks completed at 1280×720.
+- [x] Final How to Play visual acceptance — enlarged page navigation; moved text away from background illustrations; removed the Enemy Status callout; shortened HUD arrows to avoid covering indicators. The user made the final arrow adjustment outside Play Mode and confirmed completion on 2026-09-30.
+- [ ] Refresh the tutorial camera images after the overhead gameplay camera and firing reticles are implemented; keep the instructions aligned with gameplay
 - [x] Game Manager Singleton foundation in GameScene, with duplicate protection and scene-local lifecycle
 - [x] Game Manager control of the game loop, wave progression, match state, and Game Over
 - [x] Gameplay sound effects connected (17 implemented items in Audio_Checklist.md)
-- [ ] Finish menu audio and main-screen music (restart button click is connected; Main Menu and Pause Menu audio remain pending)
+- [ ] Finish menu audio and main-screen music (restart, Main Menu and Pause Menu clicks and main-screen music are connected; Pause Menu sound approved by the user; remaining menu/music listening acceptance is pending)
 - [ ] Complete audio listening checks and tune levels, distances, timing, and loop seams
 - [x] Distinct hull colors for the player and enemy ships: PlayerShipHull tint on the player hull and armor; original model material on the enemy hull and armor
 - [x] Player ship detail colors: Rudder and both Captain Room Door frames use PlayerShipHull; Back_Mast, Front_Mast, Directional_Mast, Mast, ShipWheel, and door wood use PlayerShipDarkWood. Mast metal accents and door glass retain their original materials; the wheel center uses PlayerShipHelmMetal. Player-only mesh copies separate material regions without changing geometry; existing textures are reused.
@@ -411,15 +417,17 @@ The scene object named `GameManager` hosts `CannonballPool` and the scene-local 
 - [ ] Configure Build Settings for the final game build
 - [x] Enable GameScene in Build Settings for scene-reload restart
 - [ ] Verify and optimize gameplay performance on the development laptop (Intel Graphics), including support for 1280×720 resolution and checking HUD readability at that resolution
+- [ ] Evaluate and extend Object Pooling for frequently spawned effects, such as cannon fire, impacts and water splashes. Reset all effect state on reuse, return finished effects to their pools, and compare performance before and after the change.
+- [ ] Measure scene-loading and pool-prewarming time; if preparation takes several seconds or causes a noticeable wait, add a responsive loading screen when entering gameplay. Approved design direction: reuse the menus' parchment background and IM Fell English fonts, with the text **PREPARING TO SET SAIL…** and a small animated nautical symbol. Spread pool prewarming across frames so the loading UI can update, start gameplay only when preparation is complete, and avoid artificial delays or misleading progress percentages.
 - [x] Overhead debug camera available in Editor/development builds (C key)
-- [ ] Promote the overhead debug camera to a supported gameplay camera in release builds
+- [ ] Promote the overhead debug camera to a supported gameplay camera in release builds, toggled with Caps Lock
+- [ ] Audit and remove unused third-party assets to reduce project size and import overhead; check asset dependencies and runtime loading before removal, preserve a Git recovery point, and verify scenes and the game build afterward
+- [ ] Add aiming reticles only to the fixed firing cameras accessed with E; the view follows the current firing direction selected with Q
 
 ### 9.2 Nice to Have / Polish
 
 - [ ] Pirate character at the helm
-- [ ] Audit and remove unused third-party assets to reduce project size and import overhead; check asset dependencies and runtime loading before removal, preserve a Git recovery point, and verify scenes and the game build afterward
 - [ ] Ship breaking into separate pieces
-- [ ] Add aiming reticles to the fixed firing cameras?
 - [x] Decide inventory persistence: carry inventory between waves; a new match/restart restores prefab starting values, without carrying over collected inventory
 
 ### 9.3 Explicitly Out of Scope

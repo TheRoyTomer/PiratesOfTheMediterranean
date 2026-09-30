@@ -44,6 +44,8 @@ public sealed class DebugTopCamera : MonoBehaviour
 
     private void Update()
     {
+        if (PauseMenuController.BlocksGameplayInput) return;
+
         if (Keyboard.current == null || !Keyboard.current.cKey.wasPressedThisFrame
             || gameplayCamera == null || debugCamera == null || ship == null)
             return;

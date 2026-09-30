@@ -147,7 +147,7 @@ public sealed class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (State == MatchState.GameOver) return;
+        if (PauseMenuController.IsPaused || State == MatchState.GameOver) return;
         SurvivalTime += Time.deltaTime;
 
         // Deaths are observed at 0 HP, independently of the sinking sequence.

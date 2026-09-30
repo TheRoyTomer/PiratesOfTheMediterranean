@@ -33,6 +33,7 @@ public class ShipSinking : MonoBehaviour
     private ShipDeathEffects deathEffects;
     private SinkingPhase phase;
     public bool IsCapsizing => phase == SinkingPhase.SlowRoll || phase == SinkingPhase.FastCapsize;
+    public bool HasStartedFinalDescent => phase == SinkingPhase.Sinking || phase == SinkingPhase.Finished;
 
     private Vector3 deathPosition;
     private Quaternion deathRotation;

@@ -59,6 +59,8 @@ public class CameraFollow : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (PauseMenuController.BlocksGameplayInput) return;
+
         if (target == null)
             return;
 
