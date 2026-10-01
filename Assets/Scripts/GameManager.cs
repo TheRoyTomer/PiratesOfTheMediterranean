@@ -25,6 +25,7 @@ public sealed class GameManager : MonoBehaviour
     [SerializeField] private float playerSpawnHeight = -5f;
     private ShipHealth player;
     public ShipHealth Player => player;
+    public bool IsInitialized { get; private set; }
     [Tooltip("EnemyShip prefab variant used for wave spawning.")]
     [SerializeField] private ShipHealth enemyPrefab;
     [SerializeField] private Transform patrolPointsRoot;
@@ -140,14 +141,16 @@ public sealed class GameManager : MonoBehaviour
 
     private void Start()
     {
+        if (player == null) return;
         player.Heal(player.MaxHealth);
         player.GetComponent<BarrelAmmo>().ResetInventory();
         player.GetComponent<PlayerShipParts>().ResetInventory();
+        IsInitialized = true;
     }
 
     private void Update()
     {
-        if (PauseMenuController.IsPaused || State == MatchState.GameOver) return;
+        if (GameplayLoadingScreen.BlocksGameplayInput || PauseMenuController.IsPaused || State == MatchState.GameOver) return;
         SurvivalTime += Time.deltaTime;
 
         // Deaths are observed at 0 HP, independently of the sinking sequence.

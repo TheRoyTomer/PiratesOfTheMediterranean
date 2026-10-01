@@ -20,8 +20,8 @@ public sealed class PauseMenuController : MonoBehaviour
     private static PauseMenuController instance;
     public static bool IsPaused => instance != null && instance.paused;
     // Do not let the click/Space that resumes the game also fire a cannon.
-    public static bool BlocksGameplayInput => instance != null &&
-        (instance.paused || instance.leaving || Time.frameCount == instance.resumeFrame);
+    public static bool BlocksGameplayInput => GameplayLoadingScreen.BlocksGameplayInput || (instance != null &&
+        (instance.paused || instance.leaving || Time.frameCount == instance.resumeFrame));
 
     private bool paused, leaving;
     private int resumeFrame = -1;
@@ -43,14 +43,14 @@ public sealed class PauseMenuController : MonoBehaviour
 
     private void Update()
     {
-        if (leaving || Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
+        if (GameplayLoadingScreen.BlocksGameplayInput || leaving || Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
         if (paused) Resume();
         else Pause();
     }
 
     public void Pause()
     {
-        if (paused || leaving || GameManager.Instance == null ||
+        if (GameplayLoadingScreen.BlocksGameplayInput || paused || leaving || GameManager.Instance == null ||
             GameManager.Instance.State == MatchState.GameOver) return;
         previousTimeScale = Time.timeScale;
         previousAudioPause = AudioListener.pause;

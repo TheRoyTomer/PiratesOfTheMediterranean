@@ -13,6 +13,10 @@
 #pragma kernel ComputeNormal NORMAL_PASS = 1
 //#pragma kernel InterpolationPacking BAKE_PASS = 1
 
+// Keep shared includes visible to the player-build dependency scanner, which
+// does not define the per-kernel NORMAL_PASS macro when gathering includes.
+#include "../KWS_WaterHelpers.cginc"
+
 #ifdef CLEAR_PASS 
 
 RWTexture2DArray<float4> KWS_ClearTarget;
@@ -46,7 +50,6 @@ groupshared float2 scratchX[SIZE];
 groupshared float2 intermediatesZ[SIZE];
 groupshared float2 scratchZ[SIZE];
 
-float4 KWS_WavesDomainHeightScales;
 
 
 uint crossReversebits(uint x)
@@ -197,7 +200,6 @@ void ComputeFFT(uint3 id : SV_DispatchThreadID)
 
 	#pragma multi_compile _ FFT_BAKE_MODE
 
-	#include "../KWS_WaterHelpers.cginc"
 
 	#define MAX_FFT_WAVES_MAX_CASCADES 4
 	//#define FOAM_MIN_WIND 3

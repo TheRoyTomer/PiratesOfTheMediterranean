@@ -10,6 +10,7 @@ public sealed class VfxPool : MonoBehaviour
         public GameObject Prefab;
         public readonly Stack<Effect> Available = new();
         public int Count;
+        public int Target;
     }
 
     private sealed class Effect
@@ -35,13 +36,41 @@ public sealed class VfxPool : MonoBehaviour
     public int CreatedCount { get; private set; }
     public int ReusedCount { get; private set; }
     public int ActiveCount => active.Count;
+    public double PrewarmMilliseconds { get; private set; }
+    public int PrewarmTargetCount
+    {
+        get { int total = 0; foreach (var bucket in buckets.Values) total += bucket.Target; return total; }
+    }
+    public int PrewarmedCount
+    {
+        get { int total = 0; foreach (var bucket in buckets.Values) total += Mathf.Min(bucket.Count, bucket.Target); return total; }
+    }
+
+    public bool PrepareOne()
+    {
+        foreach (var bucket in buckets.Values)
+        {
+            if (bucket.Count >= bucket.Target) continue;
+            long started = System.Diagnostics.Stopwatch.GetTimestamp();
+            bucket.Available.Push(Create(bucket));
+            PrewarmMilliseconds += (System.Diagnostics.Stopwatch.GetTimestamp() - started) *
+                1000.0 / System.Diagnostics.Stopwatch.Frequency;
+            return true;
+        }
+        return false;
+    }
 
     public void Prewarm(GameObject prefab, int count)
     {
         if (prefab == null) return;
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
         Bucket bucket = GetBucket(prefab);
-        while (bucket.Count < count)
+        bucket.Target = Mathf.Max(bucket.Target, count);
+        if (GameplayLoadingScreen.IsLoading) return;
+        while (bucket.Count < bucket.Target)
             bucket.Available.Push(Create(bucket));
+        PrewarmMilliseconds += (System.Diagnostics.Stopwatch.GetTimestamp() - started) *
+            1000.0 / System.Diagnostics.Stopwatch.Frequency;
     }
 
     /// <param name="lifetime">Existing timed effects keep their lifetime; zero returns when particles finish.</param>
@@ -162,13 +191,16 @@ public sealed class VfxPool : MonoBehaviour
         return false;
     }
 
-    private void Return(int index)
+    private void Return(int index, bool reparent = true)
     {
         Effect effect = active[index];
         foreach (ParticleSystem system in effect.Particles)
             if (system != null) system.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         effect.Object.SetActive(false);
-        effect.Transform.SetParent(storage, false);
+        // Unity locks the hierarchy during parent activation/deactivation. OnDisable
+        // leaves returned effects inactive under their current parent; StartEffect
+        // restores their parent normally when they are reused.
+        if (reparent) effect.Transform.SetParent(storage, false);
         effect.Follow = null;
         effect.HasFollow = false;
         effect.Started = false;
@@ -186,7 +218,7 @@ public sealed class VfxPool : MonoBehaviour
     {
         for (int i = active.Count - 1; i >= 0; i--)
         {
-            if (active[i].Object != null) Return(i);
+            if (active[i].Object != null) Return(i, reparent: false);
             else RemoveActive(i);
         }
     }

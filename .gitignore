@@ -74,3 +74,8 @@ UserSettings/*
 
 # Local design previews and Unity tool capture output
 /output/
+/Screenshots/
+
+# Temporary KWS shader materials generated during builds
+/Assets/3rd party/KriptoFX/WaterSystem2/WaterQualitySettings/Resources/GeneratedShaderFeatureMaterials/
+/Assets/3rd party/KriptoFX/WaterSystem2/WaterQualitySettings/Resources/GeneratedShaderFeatureMaterials.meta

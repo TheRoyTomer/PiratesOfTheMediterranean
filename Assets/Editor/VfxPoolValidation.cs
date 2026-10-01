@@ -31,6 +31,8 @@ public static class VfxPoolValidation
         try
         {
             Time.timeScale = 1f;
+            ValidateHierarchyDisable();
+            report.Add("PASS: hierarchy/component disable, pending cancellation, and reuse without reparent errors.");
             string[] names = { "CannonMuzzleFlash", "CannonballImpactExplosion", "CannonballImpactSmoke", "WaterBallSplash" };
             var prefabs = new GameObject[names.Length];
             Vector3 position = new Vector3(5000f, 50f, 5000f);
@@ -165,6 +167,48 @@ public static class VfxPoolValidation
             if (ship != null) Object.Destroy(ship);
             if (root != null) Object.Destroy(root);
             running = false;
+        }
+    }
+
+    public static void ValidateHierarchyDisable()
+    {
+        Check(EditorApplication.isPlaying, "Hierarchy validation requires Play Mode");
+        var parent = new GameObject("VFX hierarchy regression");
+        var root = new GameObject("Test pool owner");
+        root.transform.SetParent(parent.transform);
+        var pool = root.AddComponent<VfxPool>();
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Used/CannonballImpactSmoke.prefab");
+        var errors = new List<string>();
+        Application.LogCallback capture = (message, stack, type) =>
+        {
+            if (type == LogType.Error || type == LogType.Exception || type == LogType.Assert)
+                errors.Add(message);
+        };
+        Application.logMessageReceived += capture;
+        try
+        {
+            pool.Prewarm(prefab, 2);
+            for (int mode = 0; mode < 3; mode++)
+            {
+                pool.Play(prefab, Vector3.zero, Quaternion.identity, 10f);
+                pool.Play(prefab, Vector3.zero, Quaternion.identity, delay: 10f);
+                Check(pool.ActiveCount == 2, "Active and delayed effects registered");
+                if (mode == 0) pool.enabled = false;
+                else if (mode == 1) root.SetActive(false);
+                else parent.SetActive(false);
+                Check(pool.ActiveCount == 0, "Disable returns active and pending effects");
+                pool.enabled = true;
+                parent.SetActive(true);
+                root.SetActive(true);
+                Check(ActiveRoots(root).Count == 0, "Re-enable does not revive returned effects");
+                Check(pool.CreatedCount == 2, "Re-enable reuses existing instances");
+            }
+            Check(errors.Count == 0, "Hierarchy lifecycle errors: " + string.Join("; ", errors));
+        }
+        finally
+        {
+            Application.logMessageReceived -= capture;
+            Object.Destroy(parent);
         }
     }
 

@@ -778,6 +778,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuController
   gameplayScene: GameScene
+  loadingScreenPrefab: {fileID: 4951068111838831418, guid: 21a8bc2a119e8564c9a56bc1c0f2a15c, type: 3}
   homePanel: {fileID: 553006270}
   helpPanel: {fileID: 292039916}
   playButton: {fileID: 987456517}

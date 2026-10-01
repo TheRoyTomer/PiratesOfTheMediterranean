@@ -1,15 +1,14 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>Scene-owned navigation and audio for the main menu.</summary>
 public sealed class MainMenuController : MonoBehaviour
 {
     [SerializeField] private string gameplayScene = "GameScene";
+    [SerializeField] private GameplayLoadingScreen loadingScreenPrefab;
     [SerializeField] private GameObject homePanel;
     [SerializeField] private GameObject helpPanel;
     [SerializeField] private Button playButton;
@@ -75,18 +74,14 @@ public sealed class MainMenuController : MonoBehaviour
             Debug.LogError("Main menu cannot load scene: " + gameplayScene, this);
             return;
         }
-        loading = true;
         Click();
-        StartCoroutine(LoadGame());
-    }
-
-    private IEnumerator LoadGame()
-    {
+        if (!GameplayLoadingScreen.Begin(loadingScreenPrefab, gameplayScene))
+        {
+            feedback.text = "Unable to open the loading screen.";
+            return;
+        }
+        loading = true;
         foreach (var button in homePanel.GetComponentsInChildren<Button>()) button.interactable = false;
-        feedback.text = "Preparing to sail...";
-        // Let the click play and the loading label render before loading the arena.
-        yield return new WaitForSecondsRealtime(0.15f);
-        yield return SceneManager.LoadSceneAsync(gameplayScene);
     }
 
     public void OpenHelp()

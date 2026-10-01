@@ -17,7 +17,14 @@ public sealed class CannonReticleHUD : MonoBehaviour
         direction = player.GetComponent<FiringDirectionController>();
     }
 
-    private void Awake() => HideAll();
+    private void Awake()
+    {
+        // Tiled UVs measure distance along each line, so dash spacing stays consistent.
+        if (lines != null)
+            foreach (LineRenderer line in lines)
+                if (line != null) line.textureMode = LineTextureMode.Tile;
+        HideAll();
+    }
 
     private void LateUpdate()
     {

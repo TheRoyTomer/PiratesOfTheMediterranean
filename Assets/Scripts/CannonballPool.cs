@@ -9,18 +9,33 @@ public class CannonballPool : MonoBehaviour
     private readonly Queue<GameObject> pool = new Queue<GameObject>();
     public Cannonball Projectile => cannonballPrefab != null ? cannonballPrefab.GetComponent<Cannonball>() : null;
     private VfxPool effects;
+    public double ProjectilePrewarmMilliseconds { get; private set; }
+    public int InitialPoolSize => Mathf.Max(0, initialPoolSize);
+    public int PreparedCount { get; private set; }
     public VfxPool Effects => effects != null ? effects :
         (effects = GetComponent<VfxPool>() ?? gameObject.AddComponent<VfxPool>());
 
     private void Awake()
     {
         if (Projectile != null) Projectile.PrewarmEffects(Effects);
-        for (int i = 0; i < initialPoolSize; i++)
+        if (GameplayLoadingScreen.IsLoading) return;
+        while (PrepareOne()) { }
+    }
+
+    public bool PrepareOne()
+    {
+        if (PreparedCount < InitialPoolSize)
         {
+            long started = System.Diagnostics.Stopwatch.GetTimestamp();
             GameObject cannonball = CreateCannonball();
             cannonball.SetActive(false);
             pool.Enqueue(cannonball);
+            PreparedCount++;
+            ProjectilePrewarmMilliseconds += (System.Diagnostics.Stopwatch.GetTimestamp() - started) *
+                1000.0 / System.Diagnostics.Stopwatch.Frequency;
+            return true;
         }
+        return Effects.PrepareOne();
     }
 
     public GameObject GetCannonball()

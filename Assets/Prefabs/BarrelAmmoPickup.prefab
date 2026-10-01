@@ -433,6 +433,9 @@ MonoBehaviour:
   immersionDepth: 1
   barrelExplosionSplashPrefab: {fileID: 7151254913210794864, guid: bcc04412133b0fe419dae2d510b24ba9, type: 3}
   explosionSplashLifetime: 8
+  initialWaterSplashPoolSize: 160
+  initialExplosionPoolSize: 80
+  initialExplosionSplashPoolSize: 80
 --- !u!4 &7688398642358094278 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7668020639922478129, guid: d1efeabcef9013c4c8e17797c15322ec, type: 3}
@@ -552,6 +555,9 @@ MonoBehaviour:
   immersionDepth: 1
   barrelExplosionSplashPrefab: {fileID: 7151254913210794864, guid: bcc04412133b0fe419dae2d510b24ba9, type: 3}
   explosionSplashLifetime: 8
+  initialWaterSplashPoolSize: 160
+  initialExplosionPoolSize: 80
+  initialExplosionSplashPoolSize: 80
 --- !u!1001 &4033200133748944490
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -666,6 +672,9 @@ MonoBehaviour:
   immersionDepth: 1
   barrelExplosionSplashPrefab: {fileID: 7151254913210794864, guid: bcc04412133b0fe419dae2d510b24ba9, type: 3}
   explosionSplashLifetime: 8
+  initialWaterSplashPoolSize: 160
+  initialExplosionPoolSize: 80
+  initialExplosionSplashPoolSize: 80
 --- !u!1001 &8388975706925327170
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -780,3 +789,6 @@ MonoBehaviour:
   immersionDepth: 1
   barrelExplosionSplashPrefab: {fileID: 7151254913210794864, guid: bcc04412133b0fe419dae2d510b24ba9, type: 3}
   explosionSplashLifetime: 8
+  initialWaterSplashPoolSize: 160
+  initialExplosionPoolSize: 80
+  initialExplosionSplashPoolSize: 80
