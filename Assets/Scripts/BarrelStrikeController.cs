@@ -29,7 +29,15 @@ public class BarrelStrikeController : MonoBehaviour
     private Vector3 midRightStart;
     private Vector3 rightStart;
 
-    public void BeginRelease(Vector3 shipVelocity, ShipHealth releasingShip)
+    public void PrewarmEffects(VfxPool pool)
+    {
+        leftBarrel.PrewarmEffects(pool);
+        midLeftBarrel.PrewarmEffects(pool);
+        midRightBarrel.PrewarmEffects(pool);
+        rightBarrel.PrewarmEffects(pool);
+    }
+
+    public void BeginRelease(Vector3 shipVelocity, ShipHealth releasingShip, VfxPool effects)
     {
         ownerShip = releasingShip;
         ownerHull = releasingShip != null
@@ -40,10 +48,10 @@ public class BarrelStrikeController : MonoBehaviour
 
         Vector3 outwardDirection = transform.right;
 
-        leftBarrel.BeginRoll(outwardDirection, shipVelocity);
-        midLeftBarrel.BeginRoll(outwardDirection, shipVelocity);
-        midRightBarrel.BeginRoll(outwardDirection, shipVelocity);
-        rightBarrel.BeginRoll(outwardDirection, shipVelocity);
+        leftBarrel.BeginRoll(outwardDirection, shipVelocity, effects);
+        midLeftBarrel.BeginRoll(outwardDirection, shipVelocity, effects);
+        midRightBarrel.BeginRoll(outwardDirection, shipVelocity, effects);
+        rightBarrel.BeginRoll(outwardDirection, shipVelocity, effects);
     }
 
     private void LateUpdate()

@@ -6,12 +6,19 @@ public class WeaponSystem : MonoBehaviour
     public void SetCannonballPool(CannonballPool pool)
     {
         cannonballPool = pool;
+        if (pool != null)
+        {
+            pool.Effects.Prewarm(cannonFireEffect, initialMuzzleFlashPoolSize);
+            if (barrelsGroupPrefab != null) barrelsGroupPrefab.PrewarmEffects(pool.Effects);
+        }
     }
 
     private ShipConfig config;
 
     [Header("Effects")]
     [SerializeField] private GameObject cannonFireEffect;
+    [Tooltip("Shared pool target, not per ship: five ships x 14 cannons, plus headroom.")]
+    [SerializeField, Min(0)] private int initialMuzzleFlashPoolSize = 80;
 
 
     private ShipHealth shipHealth;
@@ -104,7 +111,7 @@ public class WeaponSystem : MonoBehaviour
             ? shipRigidbody.linearVelocity
             : Vector3.zero;
 
-        strike.BeginRelease(shipVelocity, shipHealth);
+        strike.BeginRelease(shipVelocity, shipHealth, cannonballPool.Effects);
         barrelAmmo.TryUseOne();
         nextBarrelReleaseTime = Time.time + 1f;
     }
@@ -196,7 +203,7 @@ public class WeaponSystem : MonoBehaviour
         cannonballObject.transform.position = firePoint.position;
         cannonballObject.transform.rotation = firePoint.rotation;
 
-        Instantiate(
+        cannonballPool.Effects.Play(
             cannonFireEffect,
             firePoint.position,
             firePoint.rotation

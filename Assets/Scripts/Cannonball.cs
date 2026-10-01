@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using KWS;
 
@@ -31,10 +30,22 @@ public class Cannonball : MonoBehaviour
 
     [Header("Pool")]
     [SerializeField] private float maxLifetime = 8f;
+    [Tooltip("Shared scene VFX targets for five ships firing up to 70 shots per combined volley.")]
+    [SerializeField, Min(0)] private int initialExplosionPoolSize = 80;
+    [SerializeField, Min(0)] private int initialSplashPoolSize = 80;
+    [Tooltip("Smoke can last about 12 seconds: reserve roughly three volleys plus headroom.")]
+    [SerializeField, Min(0)] private int initialSmokePoolSize = 240;
 
     private Rigidbody rb;
     private CannonballPool pool;
     private float lifeTimer;
+
+    public void PrewarmEffects(VfxPool effects)
+    {
+        effects.Prewarm(impactExplosionEffect, initialExplosionPoolSize);
+        effects.Prewarm(impactAftermathEffect, initialSmokePoolSize);
+        effects.Prewarm(waterSplashEffect, initialSplashPoolSize);
+    }
 
     public Vector3 GetLaunchVelocity(Vector3 direction, float speed) =>
         direction.normalized * speed + Vector3.up * upwardSpeed;
@@ -181,13 +192,12 @@ public class Cannonball : MonoBehaviour
         Vector3 splashPosition = transform.position;
         splashPosition.y = waterY;
 
-        GameObject splash = Instantiate(
+        pool.Effects.Play(
             waterSplashEffect,
             splashPosition,
-            Quaternion.LookRotation(Vector3.up)
+            Quaternion.LookRotation(Vector3.up),
+            waterSplashLifetime
         );
-
-        Destroy(splash, waterSplashLifetime);
     }
 
     private void SpawnImpactEffects(Vector3 hitPoint, Transform hitParent = null)
@@ -195,79 +205,24 @@ public class Cannonball : MonoBehaviour
         GameAudio.Play(GameSound.CannonImpact, hitPoint);
         if (impactExplosionEffect != null)
         {
-            GameObject explosion = Instantiate(
+            pool.Effects.Play(
                 impactExplosionEffect,
                 hitPoint,
-                Quaternion.identity
+                Quaternion.identity,
+                explosionLifetime
             );
-
-            Destroy(explosion, explosionLifetime);
         }
 
         if (impactAftermathEffect != null)
         {
-            pool.StartCoroutine(SpawnImpactSmokeAfterDelay(
+            pool.Effects.Play(
                 impactAftermathEffect,
                 hitPoint,
                 Quaternion.identity,
-                impactSmokeDelay,
-                hitParent
-            ));
+                follow: hitParent,
+                delay: impactSmokeDelay
+            );
         }
-    }
-
-    private static IEnumerator SpawnImpactSmokeAfterDelay(
-        GameObject smokePrefab,
-        Vector3 hitPosition,
-        Quaternion hitRotation,
-        float delay,
-        Transform hitParent)
-    {
-        bool attachToShip = hitParent != null;
-        Vector3 localPosition = Vector3.zero;
-        Quaternion localRotation = Quaternion.identity;
-
-        if (attachToShip)
-        {
-            localPosition = hitParent.InverseTransformPoint(hitPosition);
-            localRotation = Quaternion.Inverse(hitParent.rotation) * hitRotation;
-        }
-
-        if (delay > 0f)
-            yield return new WaitForSeconds(delay);
-
-        if (smokePrefab == null)
-            yield break;
-
-        if (attachToShip)
-        {
-            if (hitParent == null || !hitParent.gameObject.activeInHierarchy)
-                yield break;
-
-            hitPosition = hitParent.TransformPoint(localPosition);
-            hitRotation = hitParent.rotation * localRotation;
-        }
-
-        GameObject smoke = Instantiate(
-            smokePrefab,
-            hitPosition,
-            hitRotation
-        );
-
-        if (!attachToShip)
-            yield break;
-
-        smoke.transform.SetParent(hitParent, true);
-
-        while (smoke != null &&
-            hitParent != null &&
-            hitParent.gameObject.activeInHierarchy)
-        {
-            yield return null;
-        }
-
-        if (smoke != null)
-            Destroy(smoke);
     }
 
     private void ReturnToPool()

@@ -8,9 +8,13 @@ public class CannonballPool : MonoBehaviour
 
     private readonly Queue<GameObject> pool = new Queue<GameObject>();
     public Cannonball Projectile => cannonballPrefab != null ? cannonballPrefab.GetComponent<Cannonball>() : null;
+    private VfxPool effects;
+    public VfxPool Effects => effects != null ? effects :
+        (effects = GetComponent<VfxPool>() ?? gameObject.AddComponent<VfxPool>());
 
     private void Awake()
     {
+        if (Projectile != null) Projectile.PrewarmEffects(Effects);
         for (int i = 0; i < initialPoolSize; i++)
         {
             GameObject cannonball = CreateCannonball();

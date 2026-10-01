@@ -16,9 +16,24 @@ public class BarrelController : MonoBehaviour
     [SerializeField, Min(0f)] private float explosionHeightOffset = 2f;
     [SerializeField, Min(0f)] private float floatBobHeight = 0.05f;
     [SerializeField, Min(0f)] private float floatBobSpeed = 1.2f;
-    [SerializeField, Min(0f)] private float immersionDepth = 1f;[SerializeField] private GameObject barrelExplosionSplashPrefab;
+    [SerializeField, Min(0f)] private float immersionDepth = 1f;
+    [SerializeField] private GameObject barrelExplosionSplashPrefab;
     [SerializeField, Min(0f)] private float explosionSplashLifetime = 8f;
-    
+
+    [Header("Shared VFX Pool")]
+    [Tooltip("Shared with cannonball water impacts: 70 cannon splashes plus 20 barrel entries and 10 spare.")]
+    [SerializeField, Min(0)] private int initialWaterSplashPoolSize = 100;
+    [Tooltip("Eight sets x four barrels. Shared scene target; grows automatically when exhausted.")]
+    [SerializeField, Min(0)] private int initialExplosionPoolSize = 32;
+    [SerializeField, Min(0)] private int initialExplosionSplashPoolSize = 32;
+    private VfxPool effects;
+
+    public void PrewarmEffects(VfxPool pool)
+    {
+        pool.Prewarm(waterSplashPrefab, initialWaterSplashPoolSize);
+        pool.Prewarm(barrelExplosionPrefab, initialExplosionPoolSize);
+        pool.Prewarm(barrelExplosionSplashPrefab, initialExplosionSplashPoolSize);
+    }
 
     private Vector3 rollDirection;
     private Vector3 inheritedVelocity;
@@ -53,8 +68,9 @@ public class BarrelController : MonoBehaviour
         barrelRenderer = GetComponent<MeshRenderer>();
     }
 
-    public void BeginRoll(Vector3 outwardDirection, Vector3 shipVelocity)
+    public void BeginRoll(Vector3 outwardDirection, Vector3 shipVelocity, VfxPool effectPool)
     {
+        effects = effectPool;
         rollDirection = outwardDirection.normalized;
         inheritedVelocity = shipVelocity;
         currentRollSpeed = Mathf.Lerp(
@@ -150,12 +166,12 @@ public class BarrelController : MonoBehaviour
         {
             Vector3 splashPosition = barrelRenderer.bounds.center;
             splashPosition.y = lastSurfaceHeight;
-            GameObject splash = Instantiate(
+            effects.Play(
                 waterSplashPrefab,
                 splashPosition,
-                Quaternion.identity
+                Quaternion.identity,
+                waterSplashLifetime
             );
-            Destroy(splash, waterSplashLifetime);
         }
     }
 
@@ -163,24 +179,22 @@ public class BarrelController : MonoBehaviour
     {
         if (barrelExplosionPrefab != null)
         {
-            GameObject effect = Instantiate(
+            effects.Play(
                 barrelExplosionPrefab,
                 ExplosionPoint + Vector3.up * explosionHeightOffset,
-                Quaternion.identity
+                Quaternion.identity,
+                explosionEffectLifetime
             );
-
-            Destroy(effect, explosionEffectLifetime);
         }
 
         if (barrelExplosionSplashPrefab != null)
         {
-            GameObject splash = Instantiate(
+            effects.Play(
                 barrelExplosionSplashPrefab,
                 ExplosionPoint,
-                Quaternion.identity
+                Quaternion.identity,
+                explosionSplashLifetime
             );
-
-            Destroy(splash, explosionSplashLifetime);
         }
     }
 }
