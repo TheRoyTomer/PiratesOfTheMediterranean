@@ -10,13 +10,18 @@ public sealed class DebugTopCamera : MonoBehaviour
     private Transform ship;
     private CameraModeController cameraModeController;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void CreateDebugCamera()
+    // Called for each spawned player, including menu entry and scene-reload restart.
+    public static void CreateForPlayer(Camera main, Transform player, CameraModeController modes)
     {
-        Camera main = Camera.main;
-        GameObject player = GameObject.Find("PlayerShip");
-        if (main == null || player == null || main.GetComponent<CameraModeController>() == null)
+        if (main == null || player == null || modes == null)
             return;
+
+        foreach (var existing in FindObjectsByType<DebugTopCamera>(FindObjectsSortMode.None))
+        {
+            if (existing.cameraModeController != modes) continue;
+            existing.ship = player;
+            return;
+        }
 
         GameObject root = new GameObject("Overhead Camera");
         root.SetActive(false);
@@ -33,9 +38,9 @@ public sealed class DebugTopCamera : MonoBehaviour
 
         DebugTopCamera toggle = root.AddComponent<DebugTopCamera>();
         toggle.gameplayCamera = main;
-        toggle.cameraModeController = main.GetComponent<CameraModeController>();
+        toggle.cameraModeController = modes;
         toggle.debugCamera = view;
-        toggle.ship = player.transform;
+        toggle.ship = player;
         toggle.FrameCurrentArea();
         root.SetActive(true);
     }

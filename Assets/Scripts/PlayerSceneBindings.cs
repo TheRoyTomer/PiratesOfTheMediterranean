@@ -40,5 +40,6 @@ public sealed class PlayerSceneBindings : MonoBehaviour
         player.GetComponent<BarrelAmmo>().SetHUD(barrelAmmoText);
         player.GetComponent<PlayerShipParts>().SetHUD(shipPartsText);
         wakeSimulation.FollowTarget = player.gameObject;
+        DebugTopCamera.CreateForPlayer(cameraFollow.GetComponent<Camera>(), player.transform, cameraModes);
     }
 }

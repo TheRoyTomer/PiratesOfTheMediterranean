@@ -13,7 +13,6 @@ public class ShipController : MonoBehaviour
     private float throttleInput;
     private float steeringInput;
     private bool boostActive;
-    private bool developmentBoostActive;
 
     private float contactRecoveryTimer;
 
@@ -53,7 +52,6 @@ public class ShipController : MonoBehaviour
         throttleInput = 0f;
         steeringInput = 0f;
         boostActive = false;
-       developmentBoostActive = false;
 
         contactRecoveryTimer = 0f;
     }
@@ -121,11 +119,6 @@ public class ShipController : MonoBehaviour
         );
     }
 
-    public void SetDevelopmentBoost(bool active)
-    {
-        developmentBoostActive = active;
-    }
-
     private void ApplyMovement()
     {
         if (throttleInput < 0f)
@@ -141,9 +134,7 @@ public class ShipController : MonoBehaviour
             return;
         }
 
-        float multiplier = developmentBoostActive
-            ? 3f
-            : boostActive ? config.Movement.BoostMultiplier :     1f;
+        float multiplier = boostActive ? config.Movement.BoostMultiplier : 1f;
             
         Vector3 force =
             transform.forward *

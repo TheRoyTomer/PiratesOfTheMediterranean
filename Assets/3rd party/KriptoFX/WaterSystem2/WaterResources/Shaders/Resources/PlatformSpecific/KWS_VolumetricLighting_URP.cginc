@@ -23,7 +23,7 @@ inline void RayMarchDirLight(RaymarchData raymarchData, inout RaymarchResult res
         #if defined(KWS_USE_DYNAMIC_WAVES)
 
         float3 dynamicWavesMapUV = GetDynamicWavesMapUV(currentPos, GetWorldToCameraDistance(currentPos));
-        if (!IsOutsideUvBorders(dynamicWavesMapUV))
+        if (!IsOutsideUvBorders(dynamicWavesMapUV.xy))
         {
             float4 dynamicWaves = GetDynamicWavesMap(dynamicWavesMapUV);
             DynamicWavesAdditionalData additionalData = GetDynamicWavesAdditionalMapBicubic(dynamicWavesMapUV);

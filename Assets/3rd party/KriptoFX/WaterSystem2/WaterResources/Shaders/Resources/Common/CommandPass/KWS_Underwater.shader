@@ -248,7 +248,7 @@ Shader "Hidden/KriptoFX/KWS/Underwater"
 						float3 dynamicWavesMapUV = GetDynamicWavesMapUV(worldPos, distanceToCamera);
             			
             	
-						isDynamicWavesZone = !IsOutsideUvBorders(dynamicWavesMapUV);
+						isDynamicWavesZone = !IsOutsideUvBorders(dynamicWavesMapUV.xy);
 						if (surfaceMask < 0.5 && isDynamicWavesZone && !isOutDistance)
 						{
 							float4 dynamicWaves = GetDynamicWavesMapBicubic(dynamicWavesMapUV);

@@ -167,7 +167,7 @@ static const uint2 offsets[4] =
 
 bool TryReserveSplashTileSlots(float3 worldPos, uint count, uint maxParticlesPerTile)
 {
-	float2 uv = WorldPosToScreenPos(worldPos);
+	float2 uv = WorldPosToScreenPos(worldPos).xy;
 
 	if (IsOutsideUV(uv)) return false;
 

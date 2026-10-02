@@ -520,9 +520,6 @@ public class AIController : MonoBehaviour
             repositionState.Begin();
         }
         
-        Debug.Log(
-            $"[{Time.time:F2}s] AI State: {previousState} -> {combatMode}"
-        );
     }
 
     private bool TryEnterBreakSteer(Vector3 toTarget)
@@ -545,9 +542,6 @@ public class AIController : MonoBehaviour
         // Begin only chooses the turn. Release before the first Tick applies steering.
         TryDeployBarrels();
 
-        Debug.Log(
-            $"AI State -> BreakSteer (return: {breakSteerReturnState})"
-        );
 
         return true;
     }
@@ -612,9 +606,6 @@ public class AIController : MonoBehaviour
 
         combatMode = returnState;
 
-        Debug.Log(
-            $"AI State -> {combatMode} (returned from BreakSteer)"
-        );
     }
 
     private bool TryChooseBroadside(Vector3 toTarget)

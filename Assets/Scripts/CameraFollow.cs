@@ -28,21 +28,6 @@ public class CameraFollow : MonoBehaviour
 
     private float timeSinceMouseInput;
 
-    // Reuse the player's orbit tuning for runtime diagnostic cameras.
-    public void CopySettingsFrom(CameraFollow source, Transform followTarget)
-    {
-        target = followTarget;
-        distance = source.distance;
-        height = source.height;
-        mouseSensitivity = source.mouseSensitivity;
-        verticalMouseSensitivity = source.verticalMouseSensitivity;
-        minPitch = source.minPitch;
-        maxPitch = source.maxPitch;
-        rotationSmoothSpeed = source.rotationSmoothSpeed;
-        returnDelay = source.returnDelay;
-        returnSpeed = source.returnSpeed;
-    }
-
     private void Start()
     {
         targetYaw = target.eulerAngles.y;

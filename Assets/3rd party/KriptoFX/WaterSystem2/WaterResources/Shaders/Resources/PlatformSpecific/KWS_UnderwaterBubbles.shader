@@ -62,7 +62,7 @@ Shader "KriptoFX/KWS2/Bubbles"
         float3 quadOffset = vertex.xyz - center.xyz;
         float quadOffsetLength = length(quadOffset) * 2;
 
-        WaterOffsetData waterData = ComputeWaterOffset(vertex);
+        WaterOffsetData waterData = ComputeWaterOffset(vertex.xyz);
         float surfaceLevel = KWS_WaterLevel + waterData.offset.y;
         
         if (center.y > surfaceLevel - quadOffsetLength)
@@ -176,12 +176,12 @@ Shader "KriptoFX/KWS2/Bubbles"
                 v.vertex = UpdateParticlePosition(v.centerSize.xyz, v.vertex, o.SizeAndDistanceToSurface);
                 o.vertex = ObjectToClipPos(v.vertex);
                 o.color = v.color;
-                o.worldPos.xyz = v.vertex; //particle system always in world pos
+                o.worldPos.xyz = v.vertex.xyz; //particle system always in world pos
                 o.uv = v.uv.xy;
 
                 o.screenPos = ComputeScreenPos(o.vertex);
                 float2 screenUV = o.screenPos.xy / o.screenPos.w;
-                o.color.rgb *= KWS_ComputeLighting(o.worldPos.xyz, 0.05, false, screenUV);
+                o.color.rgb *= KWS_ComputeLighting(o.worldPos.xyz, 0.05, false, screenUV).rgb;
                 return o;
             }
 

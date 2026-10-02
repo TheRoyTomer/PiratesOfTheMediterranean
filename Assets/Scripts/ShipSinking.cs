@@ -20,8 +20,6 @@ public class ShipSinking : MonoBehaviour
     
     [Header("Enemy Ship Parts")]
     [SerializeField] private GameObject shipPartsPickupPrefab;
-    [SerializeField] private float shipPartsRiseDepth = 3f;
-    [SerializeField] private float shipPartsRiseDuration = 1.5f;
     [Tooltip("Advance pickup emergence relative to full submersion, using sink speed. Approximate while the ship is still rolling.")]
     [SerializeField, Min(0f)] private float shipPartsEmergenceLeadTime = 5f;
 
