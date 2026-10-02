@@ -95,7 +95,7 @@ Current values from the ship configuration and connected assets:
 | Combat | `maxHealth` | 100 |
 | Combat | `cooldownDuration` | 4 |
 | Combat | `extraCooldownPenalty` | 2 |
-| Combat | `cannonballSpeed` | 200 |
+| Combat | `cannonballSpeed` | 300 |
 | Projectile | Cannonball `damage` | 5 |
 
 Death and sinking effects have their own settings. The current sequence uses explosions followed by a slow roll, a faster capsize, and sinking. The old `sinkingStartDelay` value of 8 seconds is a fallback when death effects do not start the sinking sequence; `rollDuration` is a legacy value and does not describe the current roll sequence.
@@ -164,6 +164,7 @@ Combat is based on maneuvering the ship into effective positions and choosing th
 - Side cannons are used for broadside attacks.
 - The AI checks range and angle before deciding to fire. The player's firing is currently limited by the selected direction's cooldown, not by target detection or target range. A player firing-range rule remains planned.
 - Cannons use cooldowns rather than limited ammunition.
+- On 2026-10-02, the user increased cannonball launch speed from 200 to 300 world units per second because shots felt too slow. With the same launch height, upward speed, gravity and damping, unobstructed horizontal range before water impact increases by approximately 50%; absolute range has not been measured at the new speed. Aiming guides automatically use the configured speed. AI firing-distance thresholds, damage and cooldowns are independent and unchanged. Combat balance and hit registration at the new speed still require gameplay validation.
 - Front, Left, and Right have separate cooldown timers. The current base cooldown is 4 seconds per direction.
 - Firing a ready direction while another direction is cooling down adds a 2-second penalty to the newly fired direction's cooldown and to each active cooldown. Other ready directions receive no penalty.
 

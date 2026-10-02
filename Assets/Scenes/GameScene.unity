@@ -34041,7 +34041,7 @@ Transform:
   m_GameObject: {fileID: 643493028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1900, y: 0, z: 900}
+  m_LocalPosition: {x: 2265, y: 0, z: 900}
   m_LocalScale: {x: 1900, y: 1900, z: 1900}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -34060,7 +34060,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: KriptoFX.KWS2.Core.Runtime::KWS.KWS_LocalWaterZone
   OverrideColorSettings: 1
-  Transparent: 40
+  Transparent: 100
   WaterColor: {r: 1, g: 1, b: 1, a: 1}
   TurbidityColor: {r: 0.0619, g: 0.434, b: 0.4528, a: 1}
   UseSphericalBlending: 1
@@ -65934,7 +65934,7 @@ Transform:
   m_GameObject: {fileID: 1174454812}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2000, y: 0, z: 0}
+  m_LocalPosition: {x: 2278, y: 0, z: 0}
   m_LocalScale: {x: 1900, y: 1900, z: 1900}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -65953,7 +65953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: KriptoFX.KWS2.Core.Runtime::KWS.KWS_LocalWaterZone
   OverrideColorSettings: 1
-  Transparent: 40
+  Transparent: 100
   WaterColor: {r: 1, g: 1, b: 1, a: 1}
   TurbidityColor: {r: 0.0619, g: 0.434, b: 0.4528, a: 1}
   UseSphericalBlending: 1
@@ -66041,8 +66041,8 @@ MonoBehaviour:
   OverrideSkyColor: 0
   CustomSkyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   ReflectSun: 1
-  ReflectedSunCloudinessStrength: 0.04
-  ReflectedSunStrength: 1
+  ReflectedSunCloudinessStrength: 0.03
+  ReflectedSunStrength: 0.35
   RefractionMode: 1
   RefractionSimpleStrength: 0.25
   RefractionDispersion: 0
@@ -110129,7 +110129,7 @@ Transform:
   m_GameObject: {fileID: 2013226718}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1900, y: 0, z: -900}
+  m_LocalPosition: {x: 2306, y: 0, z: -1202}
   m_LocalScale: {x: 1900, y: 1900, z: 1900}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -110148,13 +110148,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: KriptoFX.KWS2.Core.Runtime::KWS.KWS_LocalWaterZone
   OverrideColorSettings: 1
-  Transparent: 40
+  Transparent: 100
   WaterColor: {r: 1, g: 1, b: 1, a: 1}
   TurbidityColor: {r: 0.0619, g: 0.434, b: 0.4528, a: 1}
   UseSphericalBlending: 1
   OverrideWindSettings: 0
   WindStrengthMultiplier: 0.05
-  WindEdgeBlending: 0.75
+  WindEdgeBlending: 0.737
   OverrideHeight: 0
   HeightEdgeBlending: 1
   ClipWaterBelowZone: 0

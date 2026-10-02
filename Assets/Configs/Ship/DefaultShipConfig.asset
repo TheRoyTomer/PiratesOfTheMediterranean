@@ -24,7 +24,7 @@ MonoBehaviour:
     maxHealth: 100
     cooldownDuration: 4
     extraCooldownPenalty: 2
-    cannonballSpeed: 200
+    cannonballSpeed: 300
   deathEffects:
     explosionDelay: 1
     fireStartAfterExplosion: 0.7

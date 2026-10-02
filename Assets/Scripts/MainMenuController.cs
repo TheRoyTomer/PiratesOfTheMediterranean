@@ -14,6 +14,13 @@ public sealed class MainMenuController : MonoBehaviour
     [SerializeField] private Button playButton;
     [SerializeField] private Button helpButton;
     [SerializeField] private Button backButton;
+    [Header("Credits")]
+    [SerializeField] private GameObject creditsPanel;
+    [SerializeField] private Button creditsButton;
+    [SerializeField] private Button creditsBackButton;
+    [SerializeField] private ScrollRect creditsScroll;
+    [SerializeField, Min(1f)] private float creditsScrollSpeed = 45f;
+    private float creditsHold;
     [Header("Illustrated help — objects authored in the scene")]
     [SerializeField] private GameObject[] helpPages;
     [SerializeField] private TMP_Text helpHeading;
@@ -52,6 +59,7 @@ public sealed class MainMenuController : MonoBehaviour
         Cursor.visible = true;
         homePanel.SetActive(true);
         helpPanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
         feedback.text = "";
         if (music != null && music.clip != null) music.Play();
         Select(playButton);
@@ -59,7 +67,14 @@ public sealed class MainMenuController : MonoBehaviour
 
     private void Update()
     {
-        if (loading || !helpPanel.activeSelf || Keyboard.current == null) return;
+        if (loading) return;
+        if (creditsPanel != null && creditsPanel.activeSelf)
+        {
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) CloseCredits();
+            else ScrollCredits();
+            return;
+        }
+        if (!helpPanel.activeSelf || Keyboard.current == null) return;
         if (Keyboard.current.escapeKey.wasPressedThisFrame) CloseHelp();
         else if (Keyboard.current.leftArrowKey.wasPressedThisFrame) PreviousHelpPage();
         else if (Keyboard.current.rightArrowKey.wasPressedThisFrame) NextHelpPage();
@@ -89,6 +104,7 @@ public sealed class MainMenuController : MonoBehaviour
         if (loading) return;
         Click();
         homePanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
         helpPanel.SetActive(true);
         ShowHelpPage(0);
         Select(backButton);
@@ -134,6 +150,54 @@ public sealed class MainMenuController : MonoBehaviour
         helpPanel.SetActive(false);
         homePanel.SetActive(true);
         Select(helpButton);
+    }
+
+    public void OpenCredits()
+    {
+        if (loading || creditsPanel == null) return;
+        Click();
+        homePanel.SetActive(false);
+        helpPanel.SetActive(false);
+        creditsPanel.SetActive(true);
+        creditsHold = 3f;
+        Canvas.ForceUpdateCanvases();
+        if (creditsScroll != null)
+        {
+            creditsScroll.StopMovement();
+            creditsScroll.verticalNormalizedPosition = 1f;
+        }
+        Select(creditsBackButton);
+    }
+
+    public void CloseCredits()
+    {
+        if (loading || creditsPanel == null || !creditsPanel.activeSelf) return;
+        Click();
+        creditsPanel.SetActive(false);
+        homePanel.SetActive(true);
+        Select(creditsButton);
+    }
+
+    private void ScrollCredits()
+    {
+        if (creditsScroll == null || creditsScroll.content == null || creditsScroll.viewport == null) return;
+        float travel = creditsScroll.content.rect.height - creditsScroll.viewport.rect.height;
+        if (travel <= 0f) return;
+        if (creditsHold > 0f)
+        {
+            creditsHold -= Time.unscaledDeltaTime;
+            return;
+        }
+        creditsScroll.StopMovement();
+        if (creditsScroll.verticalNormalizedPosition <= 0f)
+        {
+            creditsScroll.verticalNormalizedPosition = 1f;
+            creditsHold = 3f;
+            return;
+        }
+        creditsScroll.verticalNormalizedPosition = Mathf.Max(0f,
+            creditsScroll.verticalNormalizedPosition - creditsScrollSpeed * Time.unscaledDeltaTime / travel);
+        if (creditsScroll.verticalNormalizedPosition <= 0f) creditsHold = 4f;
     }
 
     public void Quit()
