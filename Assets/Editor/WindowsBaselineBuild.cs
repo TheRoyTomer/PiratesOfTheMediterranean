@@ -10,7 +10,7 @@ public static class WindowsBaselineBuild
     // Batch entry point: -executeMethod WindowsBaselineBuild.Run
     public static void Run()
     {
-        const string output = "Builds/WindowsWaterVerified";
+        const string output = "Builds/Windows";
         const string shaderPath = "Assets/3rd party/KriptoFX/WaterSystem2/WaterResources/Shaders/Resources/Common/CommandPass/KWS_WavesFFT.compute";
         Directory.CreateDirectory(output);
         AssetDatabase.ImportAsset(shaderPath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
@@ -31,7 +31,8 @@ public static class WindowsBaselineBuild
         File.WriteAllText(output + "/build-report.txt",
             $"Result: {report.summary.result}\nErrors: {report.summary.totalErrors}\nWarnings: {report.summary.totalWarnings}\nSize: {report.summary.totalSize}\nDuration: {report.summary.totalTime}\n" + string.Join("\n", messages));
         // Unity can report Succeeded while shipping a broken compute shader.
-        if (report.summary.result != BuildResult.Succeeded || messages.Any(message => message.Contains("Shader error")))
+        if (report.summary.result != BuildResult.Succeeded || report.summary.totalErrors != 0 ||
+            messages.Any(message => message.IndexOf("Shader error", StringComparison.OrdinalIgnoreCase) >= 0))
             throw new InvalidOperationException("Build failed validation; inspect " + output + "/build-report.txt");
     }
 }

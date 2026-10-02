@@ -2,7 +2,32 @@
 
 Companion document to the [GDD](GDD.md), based on the agreed sound and music requirements.
 
-Status updated on 2026-09-28. `[x]` means implemented and connected to its gameplay event; `[ ]` means not implemented. Downloading or assigning a clip alone does not count as implementation. Checked items may still need listening checks and adjustments to volume, timing, distance, or loop seams. Omitted items are outside the current scope and have no checkbox.
+Status updated on 2026-10-02. `[x]` means implemented and connected to its gameplay event; `[ ]` means not implemented. Downloading or assigning a clip alone does not count as implementation. Checked items may still need listening checks and adjustments to volume, timing, distance, or loop seams. Omitted items are outside the current scope and have no checkbox.
+
+## Gameplay listening review — 2026-10-02
+
+Numbers match the 17-item gameplay checklist supplied to the user.
+
+**FINAL ACCEPTANCE — 2026-10-02:** The user approved the final faded impact and confirmed that all sound checks are complete. All 17 gameplay audio items, menu sounds, and main-screen music are approved. Earlier pending statuses in the review history below are superseded by this acceptance. Optional unimplemented sailing hull creaks are not part of these completed checks.
+
+### Current impact selection — 2026-10-02
+
+The user rejected both replacement candidates and requested removal of the comparison tool. `ImpactAudioComparison.cs` and its meta were deleted and its window closed. The user shortened the original impact themselves and supplied `Assets/Audio/Downloaded Audio/Cannon_Impact_New.wav` (approximately 2.006 seconds). This clip is now saved as the CannonImpact sound in GameScene, at the existing volume 0.4 and attenuation distances 60–800. The original is retained under `Assets/Audio/Downloaded Audio/Source/Cannon_Impact.ogg`. At the user's request, a linear fade-out was added over the final 0.300 seconds on 2026-10-02. The original user edit was backed up as `Source/Cannon_Impact_New_BeforeFade.wav`; all samples before the fade remain byte-identical, the duration is unchanged and both channels end at zero. The user approved the faded version on 2026-10-02. Original cannon firing remains restored. Import/decoding and scene assignment were checked; final gameplay listening approval is complete. Earlier feedback below is historical and superseded by this selection.
+
+### Standalone follow-up — 2026-10-02
+
+**Latest correction:** The user clarified that **4 (cannon firing) was already satisfactory** and the unresolved sound is **5 (cannonball impact on ships/land)**. Restored the original `Cannon_Fire.ogg` in GameScene. Do not shorten or otherwise change item 5: the user wants to choose a replacement together. `Cannon_Impact.ogg` and its current settings remain unchanged. Only item 5 is open; all other gameplay sounds are approved. The WindowsAudioReview build predates this restoration; its shortened firing clip does not reflect the current project. The earlier numbered feedback below is historical and superseded by this correction.
+
+The user tested `Builds/WindowsAudioReview/PiratesOfTheMediterranean.exe` and confirmed that everything was resolved except item **4**. Items **3, 6, 12, 13 and 14** are now approved, alongside the previously approved items below. Only item **4** remains open. The user explicitly requested no further sound changes yet and is considering selecting a different cannonball-impact sound. The original numbered list called item 4 cannon firing and item 5 ship/land impact; the feedback under item 4 covers both firing and impact audibility, so confirm the replacement event before integrating a new clip. Current firing and impact clips/settings remain unchanged. The entries below preserve the initial review and tuning history; this follow-up supersedes their pending-listening statuses except item 4.
+
+- Approved by the user: **1** ocean, **2** bow water, **5** ship/land impact sound, **7** collisions, **8** barrel water entry, **9** barrel explosions, **10** death explosions, **11** capsize creaks, **15** repair, **16** direction switching, **17** unavailable actions.
+- **3 — Sails:** not heard; low priority. Increased scene volume from 0.08 to 0.12. Awaiting another listening check.
+- **4 — Cannon fire and impact audibility:** user requested a shorter firing sound without its late tail, especially under overlapping combat. Created `Cannon_Fire_Short.wav` from the original: 0.70 seconds, with a fade from 0.50 to 0.70 seconds. Original retained. Ship/land impact attenuation distances increased from 30–400 to 60–800 world units; the approved impact clip and volume are unchanged. Awaiting listening checks for both changes.
+- **6 — Cannonball water splash:** not heard. Clip and gameplay call are connected; the previous 400-unit cutoff could exclude distant splashes. Increased attenuation distances from 30–400 to 60–800. Cause not conclusively reproduced; awaiting gameplay listening.
+- **12 — Capsize water impact:** not heard. Both ship variants have the splash prefab and all eight water-impact markers. Increased scene volume from 0.45 to 0.60 and attenuation distances from 30–400 to 60–650. Existing event intensity remains 0.65. Cause not conclusively reproduced; awaiting gameplay listening.
+- **13/14 — Both pickups:** user requested slightly louder feedback. Increased shared pickup volume from 0.50 to 0.65. Awaiting listening confirmation.
+
+Saved scene references, clip duration, PCM fade endpoint, and prefab marker bindings were checked in the Editor. No new Play Mode or audible gameplay validation was performed for these adjustments. Menu sounds and main-screen music were separately approved by the user on 2026-10-02.
 
 ## 1. Ambience and Sailing
 
@@ -22,10 +47,10 @@ Status updated on 2026-09-28. `[x]` means implemented and connected to its gamep
 ## 2. Cannons and Impacts
 
 - [x] **Cannon fire:** Sound when player or enemy cannons actually fire. Balance simultaneous shots so a broadside does not produce excessive volume.
-  - Implemented on 2026-09-28: `Assets/Audio/Downloaded Audio/Cannon_Fire.ogg`.
+  - Implemented on 2026-09-28: `Assets/Audio/Downloaded Audio/Cannon_Fire.ogg`. Original restored on 2026-10-02 after the user clarified that firing was already satisfactory. The unused `Cannon_Fire_Short.wav` is retained as an earlier edit, not assigned to gameplay.
   - Selected by the user on 2026-09-27: `cannon_fire.ogg` from [Battle at Sea by Thimras](https://opengameart.org/content/battle-at-sea). Source license: CC0.
 - [x] **Cannonball impact on ships or land:** Use the same sound type for both impact categories, played at the impact position.
-  - Implemented on 2026-09-28: `Assets/Audio/Downloaded Audio/Cannon_Impact.ogg`.
+  - Implemented on 2026-09-28; user-edited replacement selected on 2026-10-02: `Assets/Audio/Downloaded Audio/Cannon_Impact_New.wav`. Original retained in `Source/Cannon_Impact.ogg`.
   - Selected by the user on 2026-09-27: `cannon_hit.ogg` from [Battle at Sea by Thimras](https://opengameart.org/content/battle-at-sea). Source license: CC0.
 - [x] **Cannonball impact on water:** A splash at the point where the projectile enters the water, distinct from ship or land impacts.
   - Implemented on 2026-09-28: `Assets/Audio/Downloaded Audio/Cannon_WaterSplash.ogg`.
@@ -94,13 +119,13 @@ Pickups require sound only when collected. No emergence, floating, or sinking so
   - Implemented on 2026-09-28: `Assets/Audio/Downloaded Audio/UI_ActionDenied.mp3`.
   - Selected by the user on 2026-09-27: [Denied sound.mp3 by Mendenhall02](https://freesound.org/people/Mendenhall02/sounds/522720/). Source license: CC0.
   - Earlier audition feedback on 2026-09-27: the user could not hear [pong sound effect ui button by Troube](https://freesound.org/people/Troube/sounds/686543/). Not selected. The cause of the inaudible preview has not been established.
-- [ ] **Menu click / confirmation:** One shared feedback sound for menu buttons and confirming selections. The user confirmed on 2026-09-28 that click and confirmation are the same requirement; do not layer two sounds.
-  - Selected by the user on 2026-09-27: [Click by colorsCrimsonTears](https://freesound.org/people/colorsCrimsonTears/sounds/562294/). Source license: CC0. Imported as `Assets/Audio/Downloaded Audio/UI_MenuClick.wav`; connected to the Game Over restart button through MatchHUD. Main Menu and Pause Menu button integration remains pending.
+- [x] **Menu click / confirmation:** One shared feedback sound for menu buttons and confirming selections. Implemented and finally approved by the user on 2026-10-02. The user confirmed on 2026-09-28 that click and confirmation are the same requirement; do not layer two sounds.
+  - Selected by the user on 2026-09-27: [Click by colorsCrimsonTears](https://freesound.org/people/colorsCrimsonTears/sounds/562294/). Source license: CC0. Imported as `Assets/Audio/Downloaded Audio/UI_MenuClick.wav`; connected to Game Over restart, Main Menu and Pause Menu buttons.
 
 ## 8. Music
 
-- [ ] **Background music for the main screens:** Music accompanying the main screens, with seamless looping and smooth transitions on screen entry and exit. Decide which screens use it and whether one track serves all of them.
-  - Selected by the user on 2026-09-27: [The Buccaneer's Haul by Shane Ivers](https://www.silvermansound.com/free-music/the-buccaneers-haul). Source license: CC BY 4.0; credit Shane Ivers, link the source and license, and identify any modifications. The track is approximately 2:43 long; verify or prepare a seamless loop during integration. Imported as `Assets/Audio/Downloaded Audio/Music_MainMenu.mp3`; not yet connected to main screens. Music transitions and loop verification remain pending.
+- [x] **Background music for the main screens:** Implemented and finally approved by the user on 2026-10-02.
+  - Selected by the user on 2026-09-27: [The Buccaneer's Haul by Shane Ivers](https://www.silvermansound.com/free-music/the-buccaneers-haul). Source license: CC BY 4.0; credit Shane Ivers, link the source and license, and identify any modifications. The track is approximately 2:43 long. Imported as `Assets/Audio/Downloaded Audio/Music_MainMenu.mp3`; connected to the Main Menu and approved.
 
 Sailing and combat music are not part of the agreed list at this stage.
 

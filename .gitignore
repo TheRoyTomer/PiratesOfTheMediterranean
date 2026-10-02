@@ -6,7 +6,14 @@
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
-/[Bb]uilds/
+# Publish only the packaged Windows and Mac builds via Git LFS.
+/Builds/*
+!/Builds/Windows/
+!/Builds/MacUniversal/
+/Builds/Windows/*
+/Builds/MacUniversal/*
+!/Builds/Windows/*.zip
+!/Builds/MacUniversal/*.zip
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 

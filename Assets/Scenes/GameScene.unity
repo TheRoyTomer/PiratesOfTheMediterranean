@@ -18676,7 +18676,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -19319,7 +19319,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -21428,7 +21428,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -23694,7 +23694,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -24674,26 +24674,26 @@ MonoBehaviour:
   sounds:
   - id: 0
     clip: {fileID: 8300000, guid: 8faa1fe3a88dcb2499d3eb402e315b5b, type: 3}
-    volume: 0.45
+    volume: 0.6
     spatial: 1
     minDistance: 30
     maxDistance: 400
     minimumInterval: 0.035
     maxVoices: 6
   - id: 1
-    clip: {fileID: 8300000, guid: 8150c09aa9af72d419b91568bc0d6480, type: 3}
+    clip: {fileID: 8300000, guid: d6da765fccb709441974bfb92786105e, type: 3}
     volume: 0.4
     spatial: 1
-    minDistance: 30
-    maxDistance: 400
+    minDistance: 60
+    maxDistance: 800
     minimumInterval: 0.035
     maxVoices: 6
   - id: 2
     clip: {fileID: 8300000, guid: e56e80f739646204cb362663eb724cf7, type: 3}
     volume: 0.35
     spatial: 1
-    minDistance: 30
-    maxDistance: 400
+    minDistance: 60
+    maxDistance: 800
     minimumInterval: 0.035
     maxVoices: 6
   - id: 3
@@ -24730,15 +24730,15 @@ MonoBehaviour:
     maxVoices: 6
   - id: 7
     clip: {fileID: 8300000, guid: 07366d3d8a737d645bac6e9fc0cbffc3, type: 3}
-    volume: 0.45
+    volume: 0.6
     spatial: 1
-    minDistance: 30
-    maxDistance: 400
+    minDistance: 60
+    maxDistance: 650
     minimumInterval: 0.035
     maxVoices: 6
   - id: 8
     clip: {fileID: 8300000, guid: fbfa93c647bcc3e43a9d4c84a3808c0f, type: 3}
-    volume: 0.5
+    volume: 0.65
     spatial: 0
     minDistance: 30
     maxDistance: 400
@@ -24777,11 +24777,11 @@ MonoBehaviour:
     minimumInterval: 0.035
     maxVoices: 6
   ocean: {fileID: 8300000, guid: 40ff9aacd82f9cf4fbb73d15ad07c973, type: 3}
-  oceanVolume: 0.18
+  oceanVolume: 0.13
   bowWater: {fileID: 8300000, guid: 020a8c6ce54601341b73293241477691, type: 3}
-  bowWaterVolume: 0.2
+  bowWaterVolume: 0.13
   sailRustle: {fileID: 8300000, guid: cf4f80501e5d926438bd8002c97e4411, type: 3}
-  sailVolume: 0.08
+  sailVolume: 0.12
   capsizeCreak: {fileID: 8300000, guid: 376d57788593c53419e0ad343adfab2f, type: 3}
   creakVolume: 0.4
   menuMusic: {fileID: 8300000, guid: 790fcd69acdf12448b775eed50c14a82, type: 3}
@@ -58222,7 +58222,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -61504,7 +61504,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -69198,7 +69198,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -87926,7 +87926,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -88774,7 +88774,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -88904,7 +88904,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -89502,7 +89502,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -90307,7 +90307,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -98665,7 +98665,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}

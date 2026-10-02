@@ -17,6 +17,8 @@ short effects use PCM/decompress-on-load. These are Unity import settings only.
 
 ## Connected behavior
 
+Gameplay balance adjustment (2026-10-02, after Windows/Mac listening): GameScene ocean ambience volume reduced from 0.18 to 0.13; CannonFire volume increased from 0.45 to 0.60. Bow-water movement audio maximum reduced from 0.20 to 0.13 at the user's follow-up request; it still scales with ship speed. CannonImpact remains 0.40. Sails, clips, and attenuation settings are unchanged. Included in the refreshed Windows and Mac Universal builds on 2026-10-02; listening acceptance remains pending.
+
 - Ocean loops throughout gameplay. Bow water fades with player speed; sails form
   a quiet player-ship layer and fade on death.
 - Actual cannon volleys emit one report per volley. Ship/land hits and water hits
@@ -32,16 +34,11 @@ short effects use PCM/decompress-on-load. These are Unity import settings only.
   plays after health increases and a part is consumed. Direction switching and
   blocked player actions have UI feedback; blocked feedback is rate limited.
 
-## Pending
+## Listening acceptance and remaining optional work
 
-There are no main-menu scenes yet. `Music_MainMenu` and `UI_MenuClick` are assigned
-in the manager for future use but are not triggered during gameplay. Main-screen
-music transitions/loop preparation and menu click integration remain to be done.
-Menu click and confirmation are one shared requirement, using `UI_MenuClick.wav`, as confirmed by the user on 2026-09-28. Optional sailing hull creaks are undecided.
+Menu clicks and main-screen music are implemented and were finally approved by the user on 2026-10-02. Optional sailing hull creaks remain undecided.
 
-The heavy blast is 7.31 seconds; its fit against successive blasts still needs listening.
-Ocean/water/sail loop seams, creak repetition, relative levels and distances are
-initial settings pending an audible gameplay pass. Source loops were not edited.
+All 17 gameplay sounds, including the final faded impact, were finally approved by the user on 2026-10-02. Audio listening checks are complete. On 2026-10-02, after rejecting both replacement candidates, the user supplied their own shortened original as `Cannon_Impact_New.wav` (about 2.006 seconds, now with a user-requested 0.300-second fade-out; pre-fade backup in `Source/Cannon_Impact_New_BeforeFade.wav`). GameScene now uses it for ship/land impacts with unchanged volume and distance settings. The comparison editor tool was removed. Original cannon firing remains restored; the original impact is retained in `Source/Cannon_Impact.ogg`. The existing WindowsAudioReview build predates these selections. See `Audio_Checklist.md` for review history.
 
 ## Listening checklist
 

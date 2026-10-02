@@ -362,7 +362,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 1480, y: 4312.2}
+  m_SizeDelta: {x: 1480, y: 4550.69}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &35060853
 MonoBehaviour:
@@ -384,7 +384,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=44><b>WATER, SHIPS & VISUAL EFFECTS</b></size>\n\n<b>KWS2 Dynamic
+  m_text: "<size=44><b>Chief Morale Officer & Captain\u2019s Better Half</b></size>\n\nYuval
+    Bashan\n\n\n<size=44><b>WATER, SHIPS & VISUAL EFFECTS</b></size>\n\n<b>KWS2 Dynamic
     Water System</b>\nkripto289 / KriptoFX\n\n<b>Stylized Pirate Ship</b>\nYorakeys\n\n<b>3D
     Fire and Explosions</b>\nHovl Studio\n\n\n<size=44><b>MUSIC</b></size>\n\n<b>The
     Buccaneer's Haul</b>\nShane Ivers / Silverman Sound\n<size=28>Copyright 2016
@@ -4184,7 +4185,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 160, y: -285}
-  m_SizeDelta: {x: 1600, y: 680}
+  m_SizeDelta: {x: 1600, y: 918.48975}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &580070265
 MonoBehaviour:
