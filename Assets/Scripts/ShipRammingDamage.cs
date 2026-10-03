@@ -426,13 +426,13 @@ public sealed class ShipRammingDamage : MonoBehaviour
                 excess
             );
 
-        return baseDamage *
+        return Mathf.RoundToInt(baseDamage *
                Mathf.Lerp(
                    Mathf.Clamp01(
                        ship.rammerSelfDamageFraction
                    ),
                    1f,
                    Mathf.Clamp01(otherShare)
-               );
+               ));
     }
 }

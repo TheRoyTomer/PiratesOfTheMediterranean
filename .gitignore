@@ -8,12 +8,7 @@
 /[Bb]uild/
 # Publish only the packaged Windows and Mac builds via Git LFS.
 /Builds/*
-!/Builds/Windows/
-!/Builds/MacUniversal/
-/Builds/Windows/*
-/Builds/MacUniversal/*
-!/Builds/Windows/*.zip
-!/Builds/MacUniversal/*.zip
+!/Builds/*.zip
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
